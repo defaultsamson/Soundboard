@@ -26,10 +26,14 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    board.cpp \
+    sound.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    board.h \
+    sound.h
 
 FORMS += \
         mainwindow.ui

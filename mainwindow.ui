@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>634</width>
-    <height>442</height>
+    <width>615</width>
+    <height>305</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="leftMargin">
      <number>8</number>
     </property>
@@ -268,6 +268,13 @@
       </widget>
      </widget>
     </item>
+    <item>
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -275,7 +282,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>634</width>
+     <width>615</width>
      <height>22</height>
     </rect>
    </property>
