@@ -5,6 +5,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    selectedBoard(0),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -52,6 +53,5 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionSettings_triggered()
 {
-    // Sound Settings
+    // Settings (e.g. Sound set)
 }
-
