@@ -19,6 +19,5 @@ void KeybindWidget::focusInEvent(QFocusEvent *) {
 
 void KeybindWidget::updateKey(int key) {
     this->key = key;
-    std::cout << key << std::endl;
     this->setText(key == -1 ? "" : QKeySequence(key).toString());
 }
