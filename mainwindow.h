@@ -19,6 +19,7 @@ public:
     void load();
     void save();
     void clear();
+    void boardEdit();
 
 private slots:
 
@@ -51,6 +52,8 @@ private slots:
     void on_buttonRemoveSound_clicked();
 
     void on_actionOpen_triggered();
+
+    void on_buttonEditBoard_clicked();
 
 private:
     Ui::MainWindow *ui;

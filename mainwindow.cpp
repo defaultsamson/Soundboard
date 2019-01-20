@@ -7,6 +7,9 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include "boardedit.h"
+
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -84,6 +87,7 @@ void MainWindow::on_actionSettings_triggered()
 void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
 {
     setDebug("[BOARDS] Item Activated: " + std::to_string(ui->listBoards->currentRow()));
+    this->boardEdit();
 }
 
 // SOUNDS
@@ -110,6 +114,7 @@ void MainWindow::on_buttonAddBoard_clicked()
 {
     ui->listBoards->addItem(new Board());
     // TODO enter edit mode
+
 }
 
 // Remove board item
@@ -206,4 +211,15 @@ void MainWindow::save() {
 void MainWindow::on_actionOpen_triggered()
 {
     this->load();
+}
+
+void MainWindow::on_buttonEditBoard_clicked()
+{
+    this->boardEdit();
+}
+
+void MainWindow::boardEdit() {
+    Board *board = static_cast<Board*>(ui->listBoards->item(ui->listBoards->currentRow()));
+    BoardEdit w(this, board);
+    w.exec();
 }

@@ -6,7 +6,8 @@
 #include <QString>
 
 Board::Board(QString text) :
-    QListWidgetItem(text)
+    QListWidgetItem(text),
+    key(-1)
 {
 
 }
@@ -33,6 +34,8 @@ void Board::populateList(QListWidget *list) {
 
 void Board::load(const QJsonObject &json) {
     this->setText(json["name"].toString());
+    this->key = json["key"].toInt();
+
     QJsonArray arr = json["sounds"].toArray();
 
     // Loads all the sounds
@@ -45,6 +48,7 @@ void Board::load(const QJsonObject &json) {
 
 void Board::save(QJsonObject &json) {
     json["name"] = this->text();
+    json["key"] = this->key;
 
     QJsonArray sounds;
     for (size_t i = 0; i < this->sounds.size(); ++i) {

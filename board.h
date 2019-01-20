@@ -15,6 +15,7 @@ public:
     void populateList(QListWidget *list);
     void load(const QJsonObject &json);
     void save(QJsonObject &json);
+    int key;
 
 private:
     std::vector<Sound*> sounds;
