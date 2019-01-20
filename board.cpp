@@ -16,7 +16,7 @@ Board::Board(MainWindow *main, QString text) :
     hotkey(new QHotkey(this->main))
 {
     QObject::connect(this->hotkey, &QHotkey::activated, this->main, [&](){
-        this->trigger();
+        this->main->setCurrentBoard(this);
     });
 }
 
@@ -33,17 +33,14 @@ void Board::setKey(int k) {
     this->hotkey->setRegistered(true);
 }
 
-void Board::trigger() {
-    // TODO switch boards
-
-}
-
 void Board::reg() {
-    // TODO register all sounds keybinds
+    // Register all sounds' keybinds
+    for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->reg();
 }
 
 void Board::unreg() {
-    // TODO register all sounds keybinds
+    // Unregister all sounds' keybinds
+    for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->unreg();
 }
 
 int Board::key() {
@@ -74,7 +71,7 @@ void Board::load(const QJsonObject &json) {
 
     // Loads all the sounds
     for (int i = 0; i < arr.size(); ++i) {
-        Sound *sound = new Sound();
+        Sound *sound = new Sound(this->main);
         sound->load(arr[i].toObject());
         this->addSound(sound);
     }

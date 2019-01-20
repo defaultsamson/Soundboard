@@ -28,10 +28,10 @@ public:
 
 private:
     std::vector<Sound*> sounds;
+
     int _key;
     MainWindow *main;
     QHotkey *hotkey;
-    void trigger();
 };
 
 #endif // BOARD_H

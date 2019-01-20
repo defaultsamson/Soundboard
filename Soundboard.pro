@@ -31,7 +31,8 @@ SOURCES += \
     sound.cpp \
     boardedit.cpp \
     keybinddialog.cpp \
-    keybindwidget.cpp
+    keybindwidget.cpp \
+    settingsdialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,12 +40,14 @@ HEADERS += \
     sound.h \
     boardedit.h \
     keybinddialog.h \
-    keybindwidget.h
+    keybindwidget.h \
+    settingsdialog.h
 
 FORMS += \
         mainwindow.ui \
     boardedit.ui \
-    keybinddialog.ui
+    keybinddialog.ui \
+    settingsdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

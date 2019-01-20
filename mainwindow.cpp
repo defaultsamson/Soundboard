@@ -135,7 +135,7 @@ void MainWindow::on_buttonRemoveBoard_clicked()
 void MainWindow::on_buttonAddSound_clicked()
 {
     int row = ui->listBoards->currentRow();
-    Sound *sound = new Sound();
+    Sound *sound = new Sound(this);
     Board *board = static_cast<Board*>(ui->listBoards->item(row));
     board->addSound(sound);
     this->displayBoard(board);
@@ -245,6 +245,7 @@ void MainWindow::boardEdit() {
 }
 
 void MainWindow::boardEdit(Board *board) {
+    if (!board) return;
     BoardEdit w(this, board);
     w.exec();
 }
@@ -264,6 +265,6 @@ void MainWindow::setCurrentBoard(Board *board) {
     if (this->currentBoard) {
         this->currentBoard->reg();
         // TODO don't do visuals if the settin say not to
-        //this->ui->listBoards->setCurrentItem(this->currentBoard);
+        this->ui->listBoards->setCurrentItem(this->currentBoard);
     }
 }
