@@ -1,8 +1,12 @@
 #include "board.h"
+#include "sound.h"
 #include <QListWidgetItem>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QString>
 
-Board::Board(std::string text) :
-    QListWidgetItem(QString::fromStdString(text))
+Board::Board(QString text) :
+    QListWidgetItem(text)
 {
 
 }
@@ -25,4 +29,29 @@ void Board::populateList(QListWidget *list) {
     for (int i = list->count() - 1; i >= 0; --i) list->takeItem(i);
     // Adds items to list
     for (size_t i = 0; i < this->sounds.size(); ++i) list->addItem(this->sounds.at(i));
+}
+
+void Board::load(const QJsonObject &json) {
+    this->setText(json["name"].toString());
+    QJsonArray arr = json["sounds"].toArray();
+
+    // Loads all the sounds
+    for (int i = 0; i < arr.size(); ++i) {
+        Sound *sound = new Sound();
+        sound->load(arr[i].toObject());
+        this->addSound(sound);
+    }
+}
+
+void Board::save(QJsonObject &json) {
+    json["name"] = this->text();
+
+    QJsonArray sounds;
+    for (size_t i = 0; i < this->sounds.size(); ++i) {
+        QJsonObject s;
+        this->sounds.at(i)->save(s);
+        sounds.append(s);
+    }
+
+    json["sounds"] = sounds;
 }

@@ -16,6 +16,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void load();
+    void save();
+    void clear();
 
 private slots:
 
@@ -46,6 +49,8 @@ private slots:
     void on_buttonAddSound_clicked();
 
     void on_buttonRemoveSound_clicked();
+
+    void on_actionOpen_triggered();
 
 private:
     Ui::MainWindow *ui;

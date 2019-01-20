@@ -6,11 +6,13 @@
 class Sound : public QListWidgetItem
 {
 public:
-    Sound(std::string text);
-    void setFileName(std::string name);
+    Sound(QString text = "New Sound");
+    void setFileName(QString name);
+    void load(const QJsonObject &json);
+    void save(QJsonObject &json);
 
 private:
-    std::string filename;
+    QString filename;
 };
 
 #endif // SOUND_H
