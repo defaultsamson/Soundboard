@@ -9,6 +9,7 @@
 #include <QJsonObject>
 #include "boardedit.h"
 #include <QFileDialog>
+#include <QHotkey/QHotkey>
 
 #include <iostream>
 
@@ -18,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     hasFile(false)
 {
     ui->setupUi(this);
+
+    connect(this->hotkey, &QHotkey::activated, this, &MainWindow::succ);
 
     /*
     Board *board1 = new Board("First");
@@ -35,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent) :
     board1->addSound(new Sound("Nut 5"));
 
     board3->addSound(new Sound("Succ 1"));*/
+}
+
+void MainWindow::succ() {
+    std::cout << "succ" << std::endl;
 }
 
 MainWindow::~MainWindow()

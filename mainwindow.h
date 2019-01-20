@@ -5,6 +5,8 @@
 #include <QListWidgetItem>
 #include "board.h"
 
+#include <QHotkey/QHotkey>
+
 namespace Ui {
 class MainWindow;
 }
@@ -65,6 +67,10 @@ private:
     void boardEdit(Board *board);
     bool hasFile;
     QString fileName;
+
+    void succ();
+
+    QHotkey *hotkey;
 };
 
 #endif // MAINWINDOW_H
