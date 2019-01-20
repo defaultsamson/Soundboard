@@ -1,15 +1,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include "boardedit.h"
+#include "board.h"
+#include "sound.h"
+
 #include <QDesktopServices>
 #include <QUrl>
 #include <QJsonArray>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "boardedit.h"
 #include <QFileDialog>
 
 #include <iostream>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,9 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     /*
-    Board *board1 = new Board("First");
-    Board *board2 = new Board("Second");
-    Board *board3 = new Board("Third");
+    Board *board1 = new Board(this, "First");
+    Board *board2 = new Board(this, "Second");
+    Board *board3 = new Board(this, "Third");
 
     ui->listBoards->addItem(board1);
     ui->listBoards->addItem(board2);
@@ -51,7 +56,7 @@ void MainWindow::on_actionSave_triggered()
 // Save As
 void MainWindow::on_actionSaveAs_triggered()
 {
-
+    this->save(true);
 }
 
 // Github Page
@@ -190,7 +195,11 @@ void MainWindow::load() {
 }
 
 void MainWindow::save() {
-    if (!this->hasFile) {
+    this->save(false);
+}
+
+void MainWindow::save(bool saveAs) {
+    if (!this->hasFile || saveAs) {
         // Let the user choose a save file
         this->fileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
     }
@@ -245,4 +254,16 @@ void MainWindow::on_actionNew_triggered()
     this->clear();
     this->hasFile = false;
     this->fileName = "";
+}
+
+void MainWindow::setCurrentBoard(Board *board) {
+    if (this->currentBoard) {
+        this->currentBoard->unreg();
+    }
+    this->currentBoard = board;
+    if (this->currentBoard) {
+        this->currentBoard->reg();
+        // TODO don't do visuals if the settin say not to
+        //this->ui->listBoards->setCurrentItem(this->currentBoard);
+    }
 }

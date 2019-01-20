@@ -2,6 +2,7 @@
 #define KEYBINDWIDGET_H
 
 #include <QLineEdit>
+#include <QFocusEvent>
 
 class KeybindWidget : public QLineEdit
 {

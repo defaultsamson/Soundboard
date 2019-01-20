@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QString>
+#include <QWidget>
+
 #include "board.h"
 
 namespace Ui {
@@ -18,7 +21,9 @@ public:
     ~MainWindow();
     void load();
     void save();
+    void save(bool saveAs);
     void clear();
+    void setCurrentBoard(Board *board);
 
 private slots:
 
@@ -65,6 +70,7 @@ private:
     void boardEdit(Board *board);
     bool hasFile;
     QString fileName;
+    Board *currentBoard;
 };
 
 #endif // MAINWINDOW_H

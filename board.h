@@ -1,16 +1,20 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <QListWidgetItem>
-#include <vector>
 #include "sound.h"
-#include <QObject>
+
+#include <QListWidgetItem>
+#include <QJsonObject>
+#include <vector>
+#include <QString>
 #include <QHotkey>
+
+class MainWindow;
 
 class Board : public QListWidgetItem
 {
 public:
-    Board(QObject *main, QString text = "New Board");
+    Board(MainWindow *main, QString text = "New Board");
     ~Board();
     void addSound(Sound *sound);
     void removeSound(int n);
@@ -19,11 +23,13 @@ public:
     void save(QJsonObject &json);
     int key();
     void setKey(int key);
+    void reg();
+    void unreg();
 
 private:
     std::vector<Sound*> sounds;
     int _key;
-    QObject *main;
+    MainWindow *main;
     QHotkey *hotkey;
     void trigger();
 };

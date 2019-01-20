@@ -1,5 +1,7 @@
 #include "board.h"
+#include "mainwindow.h"
 #include "sound.h"
+
 #include <QListWidgetItem>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -7,7 +9,7 @@
 #include <QHotkey>
 #include <QObject>
 
-Board::Board(QObject *main, QString text) :
+Board::Board(MainWindow *main, QString text) :
     QListWidgetItem(text),
     _key(-1),
     main(main),
@@ -20,19 +22,28 @@ Board::Board(QObject *main, QString text) :
 
 Board::~Board() {
     for (size_t i = 0; i < this->sounds.size(); ++i) delete this->sounds.at(i);
+    delete hotkey;
 }
 
 void Board::setKey(int k) {
     this->_key = k;
-    if (k < 0) return;
-
     this->hotkey->setRegistered(false);
+    if (k < 0) return;
     this->hotkey->setShortcut(QKeySequence(k), false);
     this->hotkey->setRegistered(true);
 }
 
 void Board::trigger() {
-    // TODO switch boars
+    // TODO switch boards
+
+}
+
+void Board::reg() {
+    // TODO register all sounds keybinds
+}
+
+void Board::unreg() {
+    // TODO register all sounds keybinds
 }
 
 int Board::key() {

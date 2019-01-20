@@ -2,6 +2,8 @@
 #define SOUND_H
 
 #include <QListWidgetItem>
+#include <QString>
+#include <QJsonObject>
 
 class Sound : public QListWidgetItem
 {

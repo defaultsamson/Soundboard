@@ -1,5 +1,7 @@
 #include "boardedit.h"
 #include "ui_boardedit.h"
+#include "board.h"
+
 #include <QKeyEvent>
 
 #include <iostream>

@@ -2,6 +2,8 @@
 #define BOARDEDIT_H
 
 #include <QDialog>
+#include <QWidget>
+
 #include "board.h"
 
 namespace Ui {
