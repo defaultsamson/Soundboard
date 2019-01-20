@@ -31,7 +31,18 @@ SOURCES += \
     sound.cpp \
     boardedit.cpp \
     keybinddialog.cpp \
-    keybindwidget.cpp
+    keybindwidget.cpp \
+    QHotkey/qhotkey.cpp \
+    QHotkey/qhotkey_mac.cpp \
+    QHotkey/qhotkey_win.cpp \
+    QHotkey/qhotkey_x11.cpp \
+    board.cpp \
+    boardedit.cpp \
+    keybinddialog.cpp \
+    keybindwidget.cpp \
+    main.cpp \
+    mainwindow.cpp \
+    sound.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,7 +50,15 @@ HEADERS += \
     sound.h \
     boardedit.h \
     keybinddialog.h \
-    keybindwidget.h
+    keybindwidget.h \
+    QHotkey/qhotkey.h \
+    QHotkey/qhotkey_p.h \
+    board.h \
+    boardedit.h \
+    keybinddialog.h \
+    keybindwidget.h \
+    mainwindow.h \
+    sound.h
 
 FORMS += \
         mainwindow.ui \
