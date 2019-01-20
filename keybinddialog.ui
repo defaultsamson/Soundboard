@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Keybind</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -27,7 +27,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Press ESC to cancel.</string>
+      <string>Press ESC to unbind.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

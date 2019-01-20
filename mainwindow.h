@@ -19,7 +19,6 @@ public:
     void load();
     void save();
     void clear();
-    void boardEdit();
 
 private slots:
 
@@ -55,11 +54,17 @@ private slots:
 
     void on_buttonEditBoard_clicked();
 
+    void on_actionNew_triggered();
+
 private:
     Ui::MainWindow *ui;
     void setDebug(std::string st);
     void displayBoard(int row);
     void displayBoard(Board *board);
+    void boardEdit();
+    void boardEdit(Board *board);
+    bool hasFile;
+    QString fileName;
 };
 
 #endif // MAINWINDOW_H

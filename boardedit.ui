@@ -46,7 +46,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="lineEditName"/>
+    <widget class="QLineEdit" name="lineEditName">
+     <property name="placeholderText">
+      <string>New Board</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="labelKeybind">
@@ -59,6 +66,12 @@
     <widget class="KeybindWidget" name="lineEdiKeybind">
      <property name="readOnly">
       <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Click here to set key</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

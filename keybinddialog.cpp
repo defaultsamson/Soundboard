@@ -19,7 +19,7 @@ KeybindDialog::~KeybindDialog()
 
 void KeybindDialog::keyPressEvent(QKeyEvent *e) {
     if (e->key()==Qt::Key_Escape) {
-        // Do not bind!
+        this->text->updateKey(-1);
     } else {
         this->text->updateKey(e->key());
     }

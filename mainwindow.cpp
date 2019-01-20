@@ -8,15 +8,18 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include "boardedit.h"
+#include <QFileDialog>
 
 #include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    hasFile(false)
 {
     ui->setupUi(this);
 
+    /*
     Board *board1 = new Board("First");
     Board *board2 = new Board("Second");
     Board *board3 = new Board("Third");
@@ -31,11 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
     board1->addSound(new Sound("Nut 4"));
     board1->addSound(new Sound("Nut 5"));
 
-    board3->addSound(new Sound("Succ 1"));
+    board3->addSound(new Sound("Succ 1"));*/
 }
 
 MainWindow::~MainWindow()
 {
+    this->clear();
     delete ui;
 }
 
@@ -112,9 +116,9 @@ void MainWindow::on_listBoards_currentRowChanged(int currentRow)
 // Add board item
 void MainWindow::on_buttonAddBoard_clicked()
 {
-    ui->listBoards->addItem(new Board());
-    // TODO enter edit mode
-
+    Board *board = new Board();
+    ui->listBoards->addItem(board);
+    this->boardEdit(board);
 }
 
 // Remove board item
@@ -160,8 +164,9 @@ void MainWindow::clear() {
 }
 
 void MainWindow::load() {
-    // TODO let the user choose a load file
-    QFile file("soundboardsave.json");
+    QString fn = QFileDialog::getOpenFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
+
+    QFile file(fn);
 
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open save file.");
@@ -171,6 +176,9 @@ void MainWindow::load() {
     QJsonDocument loadDoc(QJsonDocument::fromJson(file.readAll()));
     QJsonObject obj = loadDoc.object();
     QJsonArray arr = obj["boards"].toArray();
+
+    this->hasFile = true;
+    this->fileName = fn;
 
     this->clear();
 
@@ -183,8 +191,12 @@ void MainWindow::load() {
 }
 
 void MainWindow::save() {
-    // TODO let the user choose a save file
-    QFile file("soundboardsave.json");
+    if (!this->hasFile) {
+        // Let the user choose a save file
+        this->fileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
+    }
+
+    QFile file(this->fileName);
 
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning("Couldn't open save file.");
@@ -206,6 +218,8 @@ void MainWindow::save() {
     // Turns the object into text and saves it
     QJsonDocument saveDoc(json);
     file.write(saveDoc.toJson());
+
+    this->hasFile = true;
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -219,7 +233,17 @@ void MainWindow::on_buttonEditBoard_clicked()
 }
 
 void MainWindow::boardEdit() {
-    Board *board = static_cast<Board*>(ui->listBoards->item(ui->listBoards->currentRow()));
+    this->boardEdit(static_cast<Board*>(ui->listBoards->item(ui->listBoards->currentRow())));
+}
+
+void MainWindow::boardEdit(Board *board) {
     BoardEdit w(this, board);
     w.exec();
+}
+
+void MainWindow::on_actionNew_triggered()
+{
+    this->clear();
+    this->hasFile = false;
+    this->fileName = "";
 }
