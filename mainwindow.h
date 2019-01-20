@@ -17,6 +17,20 @@ public:
 
 private slots:
 
+    void on_actionSave_triggered();
+
+    void on_actionSave_As_triggered();
+
+    void on_actionGitHub_Page_triggered();
+
+    void on_actionCheck_For_Updates_triggered();
+
+    void on_actionWiki_triggered();
+
+    void on_actionExit_triggered();
+
+    void on_actionSettings_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
