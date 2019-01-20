@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QDesktopServices>
 #include <QUrl>
-#include "board.h"
 #include <QJsonArray>
 #include <QFile>
 #include <QJsonDocument>
@@ -116,7 +115,7 @@ void MainWindow::on_listBoards_currentRowChanged(int currentRow)
 // Add board item
 void MainWindow::on_buttonAddBoard_clicked()
 {
-    Board *board = new Board();
+    Board *board = new Board(this);
     ui->listBoards->addItem(board);
     this->boardEdit(board);
 }
@@ -184,7 +183,7 @@ void MainWindow::load() {
 
     // Loads all the boards
     for (int i = 0; i < arr.size(); ++i) {
-        Board *board = new Board();
+        Board *board = new Board(this);
         board->load(arr[i].toObject());
         this->ui->listBoards->addItem(board);
     }

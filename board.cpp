@@ -4,16 +4,39 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QString>
+#include <QHotkey>
+#include <QObject>
 
-Board::Board(QString text) :
+Board::Board(QObject *main, QString text) :
     QListWidgetItem(text),
-    key(-1)
+    _key(-1),
+    main(main),
+    hotkey(new QHotkey(this->main))
 {
-
+    QObject::connect(this->hotkey, &QHotkey::activated, this->main, [&](){
+        this->trigger();
+    });
 }
 
 Board::~Board() {
     for (size_t i = 0; i < this->sounds.size(); ++i) delete this->sounds.at(i);
+}
+
+void Board::setKey(int k) {
+    this->_key = k;
+    if (k < 0) return;
+
+    this->hotkey->setRegistered(false);
+    this->hotkey->setShortcut(QKeySequence(k), false);
+    this->hotkey->setRegistered(true);
+}
+
+void Board::trigger() {
+    // TODO switch boars
+}
+
+int Board::key() {
+    return this->_key;
 }
 
 void Board::addSound(Sound *sound) {
@@ -34,7 +57,7 @@ void Board::populateList(QListWidget *list) {
 
 void Board::load(const QJsonObject &json) {
     this->setText(json["name"].toString());
-    this->key = json["key"].toInt();
+    this->setKey(json["key"].toInt());
 
     QJsonArray arr = json["sounds"].toArray();
 
@@ -48,7 +71,7 @@ void Board::load(const QJsonObject &json) {
 
 void Board::save(QJsonObject &json) {
     json["name"] = this->text();
-    json["key"] = this->key;
+    json["key"] = this->key();
 
     QJsonArray sounds;
     for (size_t i = 0; i < this->sounds.size(); ++i) {
