@@ -59,7 +59,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="labelBoards">
           <property name="text">
            <string>Boards</string>
           </property>
@@ -85,38 +85,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QListWidget" name="listWidget_2">
-          <item>
-           <property name="text">
-            <string>Sound1 1</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sound1 2</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sound1 3</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sound1 4</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sound1 5</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sound1 6</string>
-           </property>
-          </item>
-         </widget>
+         <widget class="QListWidget" name="listBoards"/>
         </item>
         <item>
          <spacer name="verticalSpacer_3">
@@ -137,21 +106,21 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="buttonAddBoard">
             <property name="text">
              <string>Add</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="buttonRemoveBoard">
             <property name="text">
              <string>Remove</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="buttonEditBoard">
             <property name="text">
              <string>Edit</string>
             </property>
@@ -179,7 +148,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="labelSounds">
           <property name="text">
            <string>Sounds</string>
           </property>
@@ -205,23 +174,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QListWidget" name="listWidget">
-          <item>
-           <property name="text">
-            <string>Layout 1</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Layout 2</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Layout 3</string>
-           </property>
-          </item>
-         </widget>
+         <widget class="QListWidget" name="listSounds"/>
         </item>
         <item>
          <spacer name="verticalSpacer_4">
@@ -242,21 +195,21 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QPushButton" name="pushButton_6">
+           <widget class="QPushButton" name="buttonAddSound">
             <property name="text">
              <string>Add</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_5">
+           <widget class="QPushButton" name="buttonRemoveSound">
             <property name="text">
              <string>Remove</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_4">
+           <widget class="QPushButton" name="buttonEditSound">
             <property name="text">
              <string>Edit</string>
             </property>
@@ -271,7 +224,7 @@
     <item>
      <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>TextLabel</string>
+       <string>Debug text</string>
       </property>
      </widget>
     </item>
@@ -286,18 +239,18 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuTitle">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
-    <addaction name="actionSave_As"/>
+    <addaction name="actionSaveAs"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuThing">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
@@ -309,12 +262,12 @@
      <string>Help</string>
     </property>
     <addaction name="actionWiki"/>
-    <addaction name="actionGitHub_Page"/>
+    <addaction name="actionGitHub"/>
     <addaction name="separator"/>
-    <addaction name="actionCheck_For_Updates"/>
+    <addaction name="actionUpdate"/>
    </widget>
-   <addaction name="menuTitle"/>
-   <addaction name="menuThing"/>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionSettings">
@@ -354,7 +307,7 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSave_As">
+  <action name="actionSaveAs">
    <property name="text">
     <string>Save As</string>
    </property>
@@ -362,12 +315,12 @@
     <string>Ctrl+Shift+S</string>
    </property>
   </action>
-  <action name="actionGitHub_Page">
+  <action name="actionGitHub">
    <property name="text">
     <string>GitHub Page</string>
    </property>
   </action>
-  <action name="actionCheck_For_Updates">
+  <action name="actionUpdate">
    <property name="text">
     <string>Check For Updates</string>
    </property>

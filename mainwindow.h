@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include "board.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,11 +21,11 @@ private slots:
 
     void on_actionSave_triggered();
 
-    void on_actionSave_As_triggered();
+    void on_actionSaveAs_triggered();
 
-    void on_actionGitHub_Page_triggered();
+    void on_actionGitHub_triggered();
 
-    void on_actionCheck_For_Updates_triggered();
+    void on_actionUpdate_triggered();
 
     void on_actionWiki_triggered();
 
@@ -32,19 +33,25 @@ private slots:
 
     void on_actionSettings_triggered();
 
-    void on_listWidget_2_itemActivated(QListWidgetItem *item);
+    void on_listBoards_itemActivated(QListWidgetItem *item);
 
-    void on_listWidget_itemActivated(QListWidgetItem *item);
+    void on_listSounds_itemActivated(QListWidgetItem *item);
 
-    void on_listWidget_2_currentRowChanged(int currentRow);
+    void on_listBoards_currentRowChanged(int currentRow);
 
-    void on_pushButton_3_clicked();
+    void on_buttonAddBoard_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_buttonRemoveBoard_clicked();
+
+    void on_buttonAddSound_clicked();
+
+    void on_buttonRemoveSound_clicked();
 
 private:
     Ui::MainWindow *ui;
     void setDebug(std::string st);
+    void displayBoard(int row);
+    void displayBoard(Board *board);
 };
 
 #endif // MAINWINDOW_H

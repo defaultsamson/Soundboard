@@ -6,3 +6,7 @@ Sound::Sound(std::string text) :
 {
 
 }
+
+void Sound::setFileName(std::string name) {
+    this->filename = name;
+}
