@@ -4,6 +4,7 @@
 #include "listitemsound.h"
 
 #include <QListWidgetItem>
+#include <QListWidget>
 #include <QJsonObject>
 #include <vector>
 #include <QString>
@@ -23,14 +24,15 @@ public:
     void save(QJsonObject &json);
     int key();
     void setKey(int key);
-    void reg();
-    void unreg();
+    void reg(bool regThis = false);
+    void unreg(bool unregThis = false);
 
 private:
+    MainWindow *main;
+
     std::vector<ListItemSound*> sounds;
 
     int _key;
-    MainWindow *main;
     QHotkey *hotkey;
 };
 

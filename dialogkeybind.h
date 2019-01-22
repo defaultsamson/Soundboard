@@ -3,6 +3,8 @@
 
 #include "widgetkeybind.h"
 #include <QDialog>
+#include <QWidget>
+#include <QKeyEvent>
 
 namespace Ui {
 class DialogKeybind;

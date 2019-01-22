@@ -2,6 +2,8 @@
 #include "dialogkeybind.h"
 
 #include <QKeySequence>
+#include <QLineEdit>
+#include <QWidget>
 #include <iostream>
 
 WidgetKeybind::WidgetKeybind(QWidget *parent) :
@@ -11,7 +13,8 @@ WidgetKeybind::WidgetKeybind(QWidget *parent) :
 
 }
 
-void WidgetKeybind::focusInEvent(QFocusEvent *) {
+void WidgetKeybind::focusInEvent(QFocusEvent *e) {
+    QLineEdit::focusInEvent(e);
     this->clearFocus();
     DialogKeybind w(this->parentWidget(), this);
     w.exec();

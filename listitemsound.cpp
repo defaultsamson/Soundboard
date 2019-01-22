@@ -21,15 +21,16 @@ void ListItemSound::setFileName(QString name) {
 }
 
 void ListItemSound::reg() {
-    // TODO register all sounds keybinds
+    this->hotkey->setRegistered(true);
 }
 
 void ListItemSound::unreg() {
-    // TODO register all sounds keybinds
+    this->hotkey->setRegistered(false);
 }
 
 void ListItemSound::load(const QJsonObject &json) {
     this->setText(json["name"].toString());
+    // TODO this->setKey(json["key"].toInt());
     this->setFileName(json["filename"].toString());
 }
 

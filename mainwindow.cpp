@@ -29,26 +29,10 @@ int main(int argc, char *argv[])
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    hasFile(false)
+    hasFile(false),
+    ignoreBoardUpdate(false)
 {
     ui->setupUi(this);
-
-    /*
-    Board *board1 = new Board(this, "First");
-    Board *board2 = new Board(this, "Second");
-    Board *board3 = new Board(this, "Third");
-
-    ui->listBoards->addItem(board1);
-    ui->listBoards->addItem(board2);
-    ui->listBoards->addItem(board3);
-
-    board1->addSound(new Sound("Nut 1"));
-    board1->addSound(new Sound("Nut 2"));
-    board1->addSound(new Sound("Nut 3"));
-    board1->addSound(new Sound("Nut 4"));
-    board1->addSound(new Sound("Nut 5"));
-
-    board3->addSound(new Sound("Succ 1"));*/
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +90,7 @@ void MainWindow::on_actionSettings_triggered()
 void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
 {
     setDebug("[BOARDS] Item Activated: " + std::to_string(ui->listBoards->currentRow()));
-    this->boardEdit();
+    this->editBoard(static_cast<ListItemBoard*>(item));
 }
 
 // SOUNDS
@@ -125,7 +109,9 @@ void MainWindow::setDebug(std::string s) {
 void MainWindow::on_listBoards_currentRowChanged(int currentRow)
 {
     setDebug("[BOARDS] Row Change: " + std::to_string(currentRow));
-    this->displayBoard(currentRow);
+    if (currentRow < 0) return;
+    ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(currentRow));
+    if (board) displayBoard(board);
 }
 
 // Add board item
@@ -133,22 +119,26 @@ void MainWindow::on_buttonAddBoard_clicked()
 {
     ListItemBoard *board = new ListItemBoard(this);
     ui->listBoards->addItem(board);
-    this->boardEdit(board);
+    this->editBoard(board, true);
 }
 
 // Remove board item
 void MainWindow::on_buttonRemoveBoard_clicked()
 {
-    ui->listBoards->takeItem(ui->listBoards->currentRow());
+    int row = ui->listBoards->currentRow();
+    if (row < 0) return;
+    ui->listBoards->takeItem(row);
 }
 
 // Add sound item
 void MainWindow::on_buttonAddSound_clicked()
 {
     int row = ui->listBoards->currentRow();
+    if (row < 0) return;
     ListItemSound *sound = new ListItemSound(this);
     ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(row));
     board->addSound(sound);
+    std::cout << "displaying board" << std::endl;
     this->displayBoard(board);
     // TODO Edit sound
 }
@@ -162,12 +152,14 @@ void MainWindow::on_buttonRemoveSound_clicked()
     board->removeSound(row);
 }
 
-void MainWindow::displayBoard(int row) {
-    if (row < 0) return;
-    this->displayBoard(static_cast<ListItemBoard*>(ui->listBoards->item(row)));
-}
-
 void MainWindow::displayBoard(ListItemBoard *board) {
+    // TODO not do if settings don't want to update visuals
+
+    if (board != ui->listBoards->currentItem()) {
+        ignoreBoardUpdate = true;
+        this->ui->listBoards->setCurrentItem(board);
+        ignoreBoardUpdate = false;
+    }
     board->populateList(this->ui->listSounds);
 }
 
@@ -248,16 +240,16 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_buttonEditBoard_clicked()
 {
-    this->boardEdit();
+    this->editBoard();
 }
 
-void MainWindow::boardEdit() {
-    this->boardEdit(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())));
+void MainWindow::editBoard(bool createNew) {
+    this->editBoard(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
 }
 
-void MainWindow::boardEdit(ListItemBoard *board) {
+void MainWindow::editBoard(ListItemBoard *board, bool createNew) {
     if (!board) return;
-    DialogBoard w(this, board);
+    DialogBoard w(this, board, createNew);
     w.exec();
 }
 
@@ -276,6 +268,18 @@ void MainWindow::setCurrentBoard(ListItemBoard *board) {
     if (this->currentBoard) {
         this->currentBoard->reg();
         // TODO don't do visuals if the settin say not to
-        this->ui->listBoards->setCurrentItem(this->currentBoard);
+        this->displayBoard(this->currentBoard);
+    }
+}
+
+void MainWindow::disableKeybinds() {
+    for (int i = 0; i < this->ui->listBoards->count(); ++i) {
+        static_cast<ListItemBoard*>(this->ui->listBoards->item(i))->unreg(true);
+    }
+}
+
+void MainWindow::enableKeybinds() {
+    for (int i = 0; i < this->ui->listBoards->count(); ++i) {
+        static_cast<ListItemBoard*>(this->ui->listBoards->item(i))->reg(true);
     }
 }

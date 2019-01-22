@@ -19,10 +19,10 @@ public:
     void unreg();
 
 private:
-    QString filename;
-
-    int _key;
     MainWindow *main;
+
+    QString filename;
+    int _key;
     QHotkey *hotkey;
 };
 

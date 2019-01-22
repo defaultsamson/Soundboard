@@ -61,16 +61,20 @@ private slots:
 
     void on_actionNew_triggered();
 
+public slots:
+    void disableKeybinds();
+    void enableKeybinds();
+
 private:
     Ui::MainWindow *ui;
     void setDebug(std::string st);
-    void displayBoard(int row);
     void displayBoard(ListItemBoard *board);
-    void boardEdit();
-    void boardEdit(ListItemBoard *board);
+    void editBoard(bool createNew = false);
+    void editBoard(ListItemBoard *board, bool createNew = false);
     bool hasFile;
     QString fileName;
     ListItemBoard *currentBoard;
+    bool ignoreBoardUpdate;
 };
 
 #endif // MAINWINDOW_H

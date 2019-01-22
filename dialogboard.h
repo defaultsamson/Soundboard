@@ -2,9 +2,10 @@
 #define DIALOGBOARD_H
 
 #include <QDialog>
-#include <QWidget>
 
 #include "listitemboard.h"
+
+class MainWindow;
 
 namespace Ui {
 class DialogBoard;
@@ -15,7 +16,7 @@ class DialogBoard : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogBoard(QWidget *parent, ListItemBoard *board);
+    explicit DialogBoard(MainWindow *main, ListItemBoard *board, bool creatingNew = false);
     ~DialogBoard();
 
 private slots:

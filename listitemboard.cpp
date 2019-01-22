@@ -33,12 +33,14 @@ void ListItemBoard::setKey(int k) {
     this->hotkey->setRegistered(true);
 }
 
-void ListItemBoard::reg() {
+void ListItemBoard::reg(bool regThis) {
+    if (regThis) this->hotkey->setRegistered(true);
     // Register all sounds' keybinds
     for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->reg();
 }
 
-void ListItemBoard::unreg() {
+void ListItemBoard::unreg(bool unregThis) {
+    if (unregThis) this->hotkey->setRegistered(false);
     // Unregister all sounds' keybinds
     for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->unreg();
 }
@@ -52,6 +54,7 @@ void ListItemBoard::addSound(ListItemSound *sound) {
 }
 
 void ListItemBoard::removeSound(int n) {
+    if (n < 0) return;
     delete this->sounds.at(n);
     this->sounds.erase(this->sounds.begin() + n);
 }

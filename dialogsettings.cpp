@@ -1,9 +1,11 @@
 #include "dialogsettings.h"
 #include "ui_dialogsettings.h"
+#include "mainwindow.h"
 
-DialogSettings::DialogSettings(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DialogSettings)
+DialogSettings::DialogSettings(MainWindow *main) :
+    QDialog(main),
+    ui(new Ui::DialogSettings),
+    main(main)
 {
     ui->setupUi(this);
 }
