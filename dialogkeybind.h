@@ -1,7 +1,7 @@
 #ifndef DIALOGKEYBIND_H
 #define DIALOGKEYBIND_H
 
-#include "keybindwidget.h"
+#include "widgetkeybind.h"
 #include <QDialog>
 
 namespace Ui {
@@ -13,7 +13,7 @@ class DialogKeybind : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogKeybind(QWidget *parent, KeybindWidget *text);
+    explicit DialogKeybind(QWidget *parent, WidgetKeybind *text);
     ~DialogKeybind();
 
 protected:
@@ -21,7 +21,7 @@ protected:
 
 private:
     Ui::DialogKeybind *ui;
-    KeybindWidget *text;
+    WidgetKeybind *text;
 };
 
 #endif // DIALOGKEYBIND_H

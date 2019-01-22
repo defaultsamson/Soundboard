@@ -6,6 +6,7 @@
 #include "dialogboard.h"
 #include "dialogsettings.h"
 
+#include <QApplication>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QJsonArray>
@@ -16,6 +17,14 @@
 
 #include <iostream>
 
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+
+    return a.exec();
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

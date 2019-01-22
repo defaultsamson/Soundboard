@@ -4,10 +4,10 @@
 #include <QLineEdit>
 #include <QFocusEvent>
 
-class KeybindWidget : public QLineEdit
+class WidgetKeybind : public QLineEdit
 {
 public:
-    KeybindWidget(QWidget *parent = nullptr);
+    WidgetKeybind(QWidget *parent = nullptr);
     void updateKey(int key);
     int key;
 

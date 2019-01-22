@@ -1,23 +1,23 @@
-#include "keybindwidget.h"
+#include "widgetkeybind.h"
 #include "dialogkeybind.h"
 
 #include <QKeySequence>
 #include <iostream>
 
-KeybindWidget::KeybindWidget(QWidget *parent) :
+WidgetKeybind::WidgetKeybind(QWidget *parent) :
     QLineEdit(parent),
     key(-1)
 {
 
 }
 
-void KeybindWidget::focusInEvent(QFocusEvent *) {
+void WidgetKeybind::focusInEvent(QFocusEvent *) {
     this->clearFocus();
     DialogKeybind w(this->parentWidget(), this);
     w.exec();
 }
 
-void KeybindWidget::updateKey(int key) {
+void WidgetKeybind::updateKey(int key) {
     this->key = key;
     this->setText(key == -1 ? "" : QKeySequence(key).toString());
 }

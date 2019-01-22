@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DialogSettings</class>
- <widget name="DialogSettings" class="QDialog">
+ <widget class="QDialog" name="DialogSettings">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -42,7 +43,7 @@
           </widget>
          </item>
          <item>
-          <widget class="KeybindWidget" name="lineEdit">
+          <widget class="WidgetKeybind" name="lineEdit">
            <property name="cursor">
             <cursorShape>ArrowCursor</cursorShape>
            </property>
@@ -93,7 +94,7 @@
           </widget>
          </item>
          <item>
-          <widget class="KeybindWidget" name="lineEdit_2">
+          <widget class="WidgetKeybind" name="lineEdit_2">
            <property name="cursor">
             <cursorShape>ArrowCursor</cursorShape>
            </property>
@@ -218,9 +219,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KeybindWidget</class>
+   <class>WidgetKeybind</class>
    <extends>QLineEdit</extends>
-   <header>keybindwidget.h</header>
+   <header>widgetkeybind.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

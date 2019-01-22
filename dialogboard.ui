@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DialogBoard</class>
  <widget class="QDialog" name="DialogBoard">
@@ -62,7 +63,7 @@
     </widget>
    </item>
    <item>
-    <widget class="KeybindWidget" name="lineEdiKeybind">
+    <widget class="WidgetKeybind" name="lineEdiKeybind">
      <property name="cursor">
       <cursorShape>ArrowCursor</cursorShape>
      </property>
@@ -147,9 +148,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KeybindWidget</class>
+   <class>WidgetKeybind</class>
    <extends>QLineEdit</extends>
-   <header>keybindwidget.h</header>
+   <header>widgetkeybind.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

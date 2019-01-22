@@ -1,10 +1,10 @@
 #include "dialogkeybind.h"
 #include "ui_dialogkeybind.h"
 
-#include "keybindwidget.h"
+#include "widgetkeybind.h"
 #include <QKeyEvent>
 
-DialogKeybind::DialogKeybind(QWidget *parent, KeybindWidget *text) :
+DialogKeybind::DialogKeybind(QWidget *parent, WidgetKeybind *text) :
     QDialog(parent),
     ui(new Ui::DialogKeybind),
     text(text)

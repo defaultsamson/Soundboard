@@ -25,23 +25,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
         mainwindow.cpp \
-    keybindwidget.cpp \
     dialogboard.cpp \
     dialogkeybind.cpp \
     dialogsettings.cpp \
     listitemboard.cpp \
-    listitemsound.cpp
+    listitemsound.cpp \
+    widgetkeybind.cpp
 
 HEADERS += \
         mainwindow.h \
-    keybindwidget.h \
     dialogboard.h \
     dialogkeybind.h \
     dialogsettings.h \
     listitemboard.h \
-    listitemsound.h
+    listitemsound.h \
+    widgetkeybind.h
 
 FORMS += \
         mainwindow.ui \
