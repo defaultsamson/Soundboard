@@ -1,14 +1,13 @@
-#include "boardedit.h"
-#include "ui_boardedit.h"
+#include "dialogboard.h"
+#include "ui_dialogboard.h"
+
 #include "board.h"
 
 #include <QKeyEvent>
 
-#include <iostream>
-
-BoardEdit::BoardEdit(QWidget *parent, Board *board) :
+DialogBoard::DialogBoard(QWidget *parent, Board *board) :
     QDialog(parent),
-    ui(new Ui::BoardEdit),
+    ui(new Ui::DialogBoard),
     board(board)
 {
     ui->setupUi(this);
@@ -16,20 +15,20 @@ BoardEdit::BoardEdit(QWidget *parent, Board *board) :
     ui->lineEdiKeybind->updateKey(board->key());
 }
 
-BoardEdit::~BoardEdit()
+DialogBoard::~DialogBoard()
 {
     delete ui;
 }
 
 // Save settings
-void BoardEdit::on_pushButtonOK_clicked()
+void DialogBoard::on_pushButtonOK_clicked()
 {
     this->board->setText(this->ui->lineEditName->text().length() > 0 ? this->ui->lineEditName->text() : "New Board");
     this->board->setKey(this->ui->lineEdiKeybind->key);
     this->close();
 }
 
-void BoardEdit::on_pushButtonCancel_clicked()
+void DialogBoard::on_pushButtonCancel_clicked()
 {
     this->close();
 }

@@ -1,5 +1,5 @@
 #include "keybindwidget.h"
-#include "keybinddialog.h"
+#include "dialogkeybind.h"
 
 #include <QKeySequence>
 #include <iostream>
@@ -13,7 +13,7 @@ KeybindWidget::KeybindWidget(QWidget *parent) :
 
 void KeybindWidget::focusInEvent(QFocusEvent *) {
     this->clearFocus();
-    KeybindDialog w(this->parentWidget(), this);
+    DialogKeybind w(this->parentWidget(), this);
     w.exec();
 }
 

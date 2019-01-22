@@ -1,5 +1,5 @@
-#ifndef BOARDEDIT_H
-#define BOARDEDIT_H
+#ifndef DIALOGBOARD_H
+#define DIALOGBOARD_H
 
 #include <QDialog>
 #include <QWidget>
@@ -7,16 +7,16 @@
 #include "board.h"
 
 namespace Ui {
-class BoardEdit;
+class DialogBoard;
 }
 
-class BoardEdit : public QDialog
+class DialogBoard : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit BoardEdit(QWidget *parent, Board *board);
-    ~BoardEdit();
+    explicit DialogBoard(QWidget *parent, Board *board);
+    ~DialogBoard();
 
 private slots:
     void on_pushButtonOK_clicked();
@@ -24,8 +24,8 @@ private slots:
     void on_pushButtonCancel_clicked();
 
 private:
-    Ui::BoardEdit *ui;
+    Ui::DialogBoard *ui;
     Board *board;
 };
 
-#endif // BOARDEDIT_H
+#endif // DIALOGBOARD_H

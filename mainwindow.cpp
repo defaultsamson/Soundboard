@@ -1,10 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "boardedit.h"
 #include "board.h"
 #include "sound.h"
-#include "settingsdialog.h"
+#include "dialogboard.h"
+#include "dialogsettings.h"
 
 #include <QDesktopServices>
 #include <QUrl>
@@ -88,7 +88,7 @@ void MainWindow::on_actionExit_triggered()
 // Settings (e.g. Sound set)
 void MainWindow::on_actionSettings_triggered()
 {
-    SettingsDialog w(this);
+    DialogSettings w(this);
     w.exec();
 }
 
@@ -248,7 +248,7 @@ void MainWindow::boardEdit() {
 
 void MainWindow::boardEdit(Board *board) {
     if (!board) return;
-    BoardEdit w(this, board);
+    DialogBoard w(this, board);
     w.exec();
 }
 
