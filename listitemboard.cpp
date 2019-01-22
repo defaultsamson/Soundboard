@@ -1,6 +1,6 @@
-#include "board.h"
+#include "listitemboard.h"
 #include "mainwindow.h"
-#include "sound.h"
+#include "listitemsound.h"
 
 #include <QListWidgetItem>
 #include <QJsonObject>
@@ -9,7 +9,7 @@
 #include <QHotkey>
 #include <QObject>
 
-Board::Board(MainWindow *main, QString text) :
+ListItemBoard::ListItemBoard(MainWindow *main, QString text) :
     QListWidgetItem(text),
     _key(-1),
     main(main),
@@ -20,12 +20,12 @@ Board::Board(MainWindow *main, QString text) :
     });
 }
 
-Board::~Board() {
+ListItemBoard::~ListItemBoard() {
     for (size_t i = 0; i < this->sounds.size(); ++i) delete this->sounds.at(i);
     delete hotkey;
 }
 
-void Board::setKey(int k) {
+void ListItemBoard::setKey(int k) {
     this->_key = k;
     this->hotkey->setRegistered(false);
     if (k < 0) return;
@@ -33,37 +33,37 @@ void Board::setKey(int k) {
     this->hotkey->setRegistered(true);
 }
 
-void Board::reg() {
+void ListItemBoard::reg() {
     // Register all sounds' keybinds
     for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->reg();
 }
 
-void Board::unreg() {
+void ListItemBoard::unreg() {
     // Unregister all sounds' keybinds
     for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->unreg();
 }
 
-int Board::key() {
+int ListItemBoard::key() {
     return this->_key;
 }
 
-void Board::addSound(Sound *sound) {
+void ListItemBoard::addSound(ListItemSound *sound) {
     this->sounds.push_back(sound);
 }
 
-void Board::removeSound(int n) {
+void ListItemBoard::removeSound(int n) {
     delete this->sounds.at(n);
     this->sounds.erase(this->sounds.begin() + n);
 }
 
-void Board::populateList(QListWidget *list) {
+void ListItemBoard::populateList(QListWidget *list) {
     // Removes items from list
     for (int i = list->count() - 1; i >= 0; --i) list->takeItem(i);
     // Adds items to list
     for (size_t i = 0; i < this->sounds.size(); ++i) list->addItem(this->sounds.at(i));
 }
 
-void Board::load(const QJsonObject &json) {
+void ListItemBoard::load(const QJsonObject &json) {
     this->setText(json["name"].toString());
     this->setKey(json["key"].toInt());
 
@@ -71,13 +71,13 @@ void Board::load(const QJsonObject &json) {
 
     // Loads all the sounds
     for (int i = 0; i < arr.size(); ++i) {
-        Sound *sound = new Sound(this->main);
+        ListItemSound *sound = new ListItemSound(this->main);
         sound->load(arr[i].toObject());
         this->addSound(sound);
     }
 }
 
-void Board::save(QJsonObject &json) {
+void ListItemBoard::save(QJsonObject &json) {
     json["name"] = this->text();
     json["key"] = this->key();
 

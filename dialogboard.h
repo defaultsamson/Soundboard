@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QWidget>
 
-#include "board.h"
+#include "listitemboard.h"
 
 namespace Ui {
 class DialogBoard;
@@ -15,7 +15,7 @@ class DialogBoard : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogBoard(QWidget *parent, Board *board);
+    explicit DialogBoard(QWidget *parent, ListItemBoard *board);
     ~DialogBoard();
 
 private slots:
@@ -25,7 +25,7 @@ private slots:
 
 private:
     Ui::DialogBoard *ui;
-    Board *board;
+    ListItemBoard *board;
 };
 
 #endif // DIALOGBOARD_H

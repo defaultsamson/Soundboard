@@ -6,7 +6,7 @@
 #include <QString>
 #include <QWidget>
 
-#include "board.h"
+#include "listitemboard.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,7 +23,7 @@ public:
     void save();
     void save(bool saveAs);
     void clear();
-    void setCurrentBoard(Board *board);
+    void setCurrentBoard(ListItemBoard *board);
 
 private slots:
 
@@ -65,12 +65,12 @@ private:
     Ui::MainWindow *ui;
     void setDebug(std::string st);
     void displayBoard(int row);
-    void displayBoard(Board *board);
+    void displayBoard(ListItemBoard *board);
     void boardEdit();
-    void boardEdit(Board *board);
+    void boardEdit(ListItemBoard *board);
     bool hasFile;
     QString fileName;
-    Board *currentBoard;
+    ListItemBoard *currentBoard;
 };
 
 #endif // MAINWINDOW_H

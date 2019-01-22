@@ -1,7 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "sound.h"
+#include "listitemsound.h"
 
 #include <QListWidgetItem>
 #include <QJsonObject>
@@ -11,12 +11,12 @@
 
 class MainWindow;
 
-class Board : public QListWidgetItem
+class ListItemBoard : public QListWidgetItem
 {
 public:
-    Board(MainWindow *main, QString text = "New Board");
-    ~Board();
-    void addSound(Sound *sound);
+    ListItemBoard(MainWindow *main, QString text = "New Board");
+    ~ListItemBoard();
+    void addSound(ListItemSound *sound);
     void removeSound(int n);
     void populateList(QListWidget *list);
     void load(const QJsonObject &json);
@@ -27,7 +27,7 @@ public:
     void unreg();
 
 private:
-    std::vector<Sound*> sounds;
+    std::vector<ListItemSound*> sounds;
 
     int _key;
     MainWindow *main;

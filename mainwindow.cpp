@@ -1,8 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "board.h"
-#include "sound.h"
+#include "listitemboard.h"
+#include "listitemsound.h"
 #include "dialogboard.h"
 #include "dialogsettings.h"
 
@@ -122,7 +122,7 @@ void MainWindow::on_listBoards_currentRowChanged(int currentRow)
 // Add board item
 void MainWindow::on_buttonAddBoard_clicked()
 {
-    Board *board = new Board(this);
+    ListItemBoard *board = new ListItemBoard(this);
     ui->listBoards->addItem(board);
     this->boardEdit(board);
 }
@@ -137,8 +137,8 @@ void MainWindow::on_buttonRemoveBoard_clicked()
 void MainWindow::on_buttonAddSound_clicked()
 {
     int row = ui->listBoards->currentRow();
-    Sound *sound = new Sound(this);
-    Board *board = static_cast<Board*>(ui->listBoards->item(row));
+    ListItemSound *sound = new ListItemSound(this);
+    ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(row));
     board->addSound(sound);
     this->displayBoard(board);
     // TODO Edit sound
@@ -149,16 +149,16 @@ void MainWindow::on_buttonRemoveSound_clicked()
 {
     int row = ui->listSounds->currentRow();
     this->ui->listSounds->takeItem(row);
-    Board *board = static_cast<Board*>(ui->listBoards->item(ui->listBoards->currentRow()));
+    ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow()));
     board->removeSound(row);
 }
 
 void MainWindow::displayBoard(int row) {
     if (row < 0) return;
-    this->displayBoard(static_cast<Board*>(ui->listBoards->item(row)));
+    this->displayBoard(static_cast<ListItemBoard*>(ui->listBoards->item(row)));
 }
 
-void MainWindow::displayBoard(Board *board) {
+void MainWindow::displayBoard(ListItemBoard *board) {
     board->populateList(this->ui->listSounds);
 }
 
@@ -190,7 +190,7 @@ void MainWindow::load() {
 
     // Loads all the boards
     for (int i = 0; i < arr.size(); ++i) {
-        Board *board = new Board(this);
+        ListItemBoard *board = new ListItemBoard(this);
         board->load(arr[i].toObject());
         this->ui->listBoards->addItem(board);
     }
@@ -219,7 +219,7 @@ void MainWindow::save(bool saveAs) {
     QJsonArray boards;
     for (int i = 0; i < this->ui->listBoards->count(); ++i) {
         QJsonObject b;
-        static_cast<Board*>(this->ui->listBoards->item(i))->save(b);
+        static_cast<ListItemBoard*>(this->ui->listBoards->item(i))->save(b);
         boards.append(b);
     }
 
@@ -243,10 +243,10 @@ void MainWindow::on_buttonEditBoard_clicked()
 }
 
 void MainWindow::boardEdit() {
-    this->boardEdit(static_cast<Board*>(ui->listBoards->item(ui->listBoards->currentRow())));
+    this->boardEdit(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())));
 }
 
-void MainWindow::boardEdit(Board *board) {
+void MainWindow::boardEdit(ListItemBoard *board) {
     if (!board) return;
     DialogBoard w(this, board);
     w.exec();
@@ -259,7 +259,7 @@ void MainWindow::on_actionNew_triggered()
     this->fileName = "";
 }
 
-void MainWindow::setCurrentBoard(Board *board) {
+void MainWindow::setCurrentBoard(ListItemBoard *board) {
     if (this->currentBoard) {
         this->currentBoard->unreg();
     }

@@ -1,4 +1,4 @@
-#include "sound.h"
+#include "listitemsound.h"
 #include "mainwindow.h"
 
 #include <QListWidgetItem>
@@ -7,7 +7,7 @@
 #include <QHotkey>
 
 
-Sound::Sound(MainWindow *main, QString text) :
+ListItemSound::ListItemSound(MainWindow *main, QString text) :
     QListWidgetItem(text),
     _key(-1),
     main(main),
@@ -16,24 +16,24 @@ Sound::Sound(MainWindow *main, QString text) :
 
 }
 
-void Sound::setFileName(QString name) {
+void ListItemSound::setFileName(QString name) {
     this->filename = name;
 }
 
-void Sound::reg() {
+void ListItemSound::reg() {
     // TODO register all sounds keybinds
 }
 
-void Sound::unreg() {
+void ListItemSound::unreg() {
     // TODO register all sounds keybinds
 }
 
-void Sound::load(const QJsonObject &json) {
+void ListItemSound::load(const QJsonObject &json) {
     this->setText(json["name"].toString());
     this->setFileName(json["filename"].toString());
 }
 
-void Sound::save(QJsonObject &json) {
+void ListItemSound::save(QJsonObject &json) {
     json["name"] = this->text();
     QJsonValue fn(this->filename);
     json["filename"] = fn;

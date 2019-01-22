@@ -1,11 +1,11 @@
 #include "dialogboard.h"
 #include "ui_dialogboard.h"
 
-#include "board.h"
+#include "listitemboard.h"
 
 #include <QKeyEvent>
 
-DialogBoard::DialogBoard(QWidget *parent, Board *board) :
+DialogBoard::DialogBoard(QWidget *parent, ListItemBoard *board) :
     QDialog(parent),
     ui(new Ui::DialogBoard),
     board(board)

@@ -27,21 +27,21 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    board.cpp \
-    sound.cpp \
     keybindwidget.cpp \
     dialogboard.cpp \
     dialogkeybind.cpp \
-    dialogsettings.cpp
+    dialogsettings.cpp \
+    listitemboard.cpp \
+    listitemsound.cpp
 
 HEADERS += \
         mainwindow.h \
-    board.h \
-    sound.h \
     keybindwidget.h \
     dialogboard.h \
     dialogkeybind.h \
-    dialogsettings.h
+    dialogsettings.h \
+    listitemboard.h \
+    listitemsound.h
 
 FORMS += \
         mainwindow.ui \
