@@ -19,6 +19,6 @@ DialogKeybind::~DialogKeybind()
 
 void DialogKeybind::keyPressEvent(QKeyEvent *e) {
     // When a key is presed, update the widget value and close the dialog
-    widget->updateKey(e->key()==Qt::Key_Escape ? -1 : e->key());
+    widget->setKey(e->key()==Qt::Key_Escape ? -1 : e->key());
     close();
 }

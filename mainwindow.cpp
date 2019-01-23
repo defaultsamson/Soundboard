@@ -202,11 +202,11 @@ void MainWindow::displayBoard(ListItemBoard *board) {
 
 void MainWindow::setCurrentBoard(ListItemBoard *board) {
     if (currentBoard) {
-        currentBoard->unreg();
+        currentBoard->unreg(false);
     }
     currentBoard = board;
     if (currentBoard) {
-        currentBoard->reg();
+        currentBoard->reg(false);
         displayBoard(currentBoard);
     }
 }

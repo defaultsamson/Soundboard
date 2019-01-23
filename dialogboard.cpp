@@ -17,7 +17,7 @@ DialogBoard::DialogBoard(MainWindow *main, ListItemBoard *board, bool creatingNe
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : board->text());
-    ui->lineEdiKeybind->updateKey(board->key());
+    ui->lineEdiKeybind->setKey(board->key());
 
     // Disable the keybinds temporarily while the dialog is up
     main->disableKeybinds();
@@ -33,7 +33,7 @@ void DialogBoard::on_pushButtonOK_clicked()
 {
     // Updates the values to the board
     board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
-    board->setKey(ui->lineEdiKeybind->key);
+    board->setKey(ui->lineEdiKeybind->key());
     boardUpdated = true;
     close();
 }

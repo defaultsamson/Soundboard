@@ -19,8 +19,8 @@ public:
     void setFileName(QString name);
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) override;
-    void reg(bool regThis = false) override;
-    void unreg(bool unregThis = false) override;
+    void reg();
+    void unreg() ;
     void trigger() override;
 
 private:

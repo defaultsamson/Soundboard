@@ -15,8 +15,6 @@ public:
     void setKey(int key);
     virtual void load(const QJsonObject &json);
     virtual void save(QJsonObject &json);
-    virtual void reg(bool regThis = false);
-    virtual void unreg(bool unregThis = false);
     virtual void trigger() = 0;
 
 protected:

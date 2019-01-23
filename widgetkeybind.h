@@ -8,11 +8,14 @@ class WidgetKeybind : public QLineEdit
 {
 public:
     WidgetKeybind(QWidget *parent = nullptr);
-    void updateKey(int key);
-    int key;
+    void setKey(int key);
+    int key();
 
 protected:
     void focusInEvent(QFocusEvent *) override;
+
+private:
+    int _key;
 };
 
 #endif // KEYBINDWIDGET_H

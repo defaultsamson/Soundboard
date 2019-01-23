@@ -17,11 +17,11 @@ DialogSettings::~DialogSettings()
 
 void DialogSettings::on_pushButton_2_clicked()
 {
-    this->close();
+    close();
 }
 
 void DialogSettings::on_pushButton_clicked()
 {
     // TODO save the settings
-    this->close();
+    close();
 }

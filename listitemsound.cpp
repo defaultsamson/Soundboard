@@ -21,25 +21,25 @@ ListItemSound::~ListItemSound() {
 }
 
 void ListItemSound::setFileName(QString name) {
-    this->filename = name;
+    filename = name;
 }
 
-void ListItemSound::reg(bool regThis) {
-    this->hotkey->setRegistered(true);
+void ListItemSound::reg() {
+    hotkey->setRegistered(true);
 }
 
-void ListItemSound::unreg(bool unregThis) {
-    this->hotkey->setRegistered(false);
+void ListItemSound::unreg() {
+    hotkey->setRegistered(false);
 }
 
 void ListItemSound::load(const QJsonObject &json) {
     ListItem::load(json);
-    this->setFileName(json["filename"].toString());
+    setFileName(json["filename"].toString());
 }
 
 void ListItemSound::save(QJsonObject &json) {
     ListItem::save(json);
-    QJsonValue fn(this->filename);
+    QJsonValue fn(filename);
     json["filename"] = fn;
 }
 
