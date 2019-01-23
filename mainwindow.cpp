@@ -29,47 +29,43 @@ int main(int argc, char *argv[])
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    hasFile(false),
-    ignoreBoardUpdate(false)
+    hasFile(false)
 {
     ui->setupUi(this);
 }
 
 MainWindow::~MainWindow()
 {
-    this->clear();
+    clear();
     delete ui;
+}
+
+// ******************* BGN MENU ACTIONS *******************
+
+// New
+void MainWindow::on_actionNew_triggered()
+{
+    clear();
+    hasFile = false;
+    fileName = "";
+}
+
+// Open
+void MainWindow::on_actionOpen_triggered()
+{
+    load();
 }
 
 // Save
 void MainWindow::on_actionSave_triggered()
 {
-    this->save();
+    save();
 }
 
 // Save As
 void MainWindow::on_actionSaveAs_triggered()
 {
-    this->save(true);
-}
-
-// Github Page
-void MainWindow::on_actionGitHub_triggered()
-{
-    QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard", QUrl::TolerantMode));
-}
-
-// Update
-void MainWindow::on_actionUpdate_triggered()
-{
-    // TODO check properly instead of just linking to the download page
-    QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard/releases", QUrl::TolerantMode));
-}
-
-// Wiki Page
-void MainWindow::on_actionWiki_triggered()
-{
-    QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard/wiki", QUrl::TolerantMode));
+    save(true);
 }
 
 // Exit program
@@ -85,36 +81,61 @@ void MainWindow::on_actionSettings_triggered()
     w.exec();
 }
 
-// BOARDS
-// Double clicked, enter edit mode
-void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
+// Themes (e.g. dark theme, light theme, customizer??)
+void MainWindow::on_actionTheme_triggered()
 {
-    setDebug("[BOARDS] Item Activated: " + std::to_string(ui->listBoards->currentRow()));
-    this->editBoard(static_cast<ListItemBoard*>(item));
+
 }
 
-// SOUNDS
-// Double clicked, enter edit mode
-void MainWindow::on_listSounds_itemActivated(QListWidgetItem *item)
+// Wiki Page
+void MainWindow::on_actionWiki_triggered()
 {
-    setDebug("[SOUNDS] Item Activated: " + std::to_string(ui->listBoards->currentRow()));
+    QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard/wiki", QUrl::TolerantMode));
 }
 
-void MainWindow::setDebug(std::string s) {
-    ui->label_3->setText(QString::fromStdString(s));
+// Github Page
+void MainWindow::on_actionGitHub_triggered()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard", QUrl::TolerantMode));
 }
 
+// Update
+void MainWindow::on_actionUpdate_triggered()
+{
+    // TODO check properly instead of just linking to the download page
+    QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard/releases", QUrl::TolerantMode));
+}
+
+// ******************* END MENU ACTIONS *******************
+// ******************* BGN LIST ACTIONS *******************
+
+// Board item changed
 void MainWindow::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
     setCurrentBoard(static_cast<ListItemBoard*>(current));
 }
+
+// Board item double clicked, enter edit mode
+void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
+{
+    editBoard(static_cast<ListItemBoard*>(item));
+}
+
+// Sound item double clicked, enter edit mode
+void MainWindow::on_listSounds_itemActivated(QListWidgetItem *item)
+{
+    // TODO
+}
+
+// ******************* END LIST ACTIONS *******************
+// ******************* BGN BUTTON ACTIONS *******************
 
 // Add board item
 void MainWindow::on_buttonAddBoard_clicked()
 {
     ListItemBoard *board = new ListItemBoard(this);
     ui->listBoards->addItem(board);
-    this->editBoard(board, true);
+    editBoard(board, true);
 }
 
 // Remove board item
@@ -123,6 +144,35 @@ void MainWindow::on_buttonRemoveBoard_clicked()
     removeBoard(ui->listBoards->currentRow());
 }
 
+void MainWindow::on_buttonEditBoard_clicked()
+{
+    editBoard();
+}
+
+// Add sound item
+void MainWindow::on_buttonAddSound_clicked()
+{
+    if (!currentBoard) return;
+    ListItemSound *sound = new ListItemSound(this, currentBoard);
+    currentBoard->addSound(sound);
+    displayBoard(currentBoard);
+    // TODO Edit sound
+}
+
+// Remove sound item
+void MainWindow::on_buttonRemoveSound_clicked()
+{
+    removeSound(ui->listSounds->currentRow());
+}
+
+void MainWindow::on_buttonEditSound_clicked()
+{
+    // TODO
+}
+
+// ******************* END BUTTON ACTIONS *******************
+// ******************* BGN BOARD FUNCTIONS *******************
+
 void MainWindow::removeBoard(ListItemBoard *board) {
     removeBoard(ui->listBoards->row(board));
 }
@@ -130,6 +180,35 @@ void MainWindow::removeBoard(ListItemBoard *board) {
 void MainWindow::removeBoard(int row) {
     if (row < 0 || row >= ui->listBoards->count()) return;
     delete ui->listBoards->takeItem(row);
+}
+
+void MainWindow::editBoard(bool createNew) {
+    editBoard(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
+}
+
+void MainWindow::editBoard(ListItemBoard *board, bool createNew) {
+    if (!board) return;
+    DialogBoard w(this, board, createNew);
+    w.exec();
+}
+
+void MainWindow::displayBoard(ListItemBoard *board) {
+    // TODO not do if settings don't want to update visuals
+    if (board != ui->listBoards->currentItem()) {
+        ui->listBoards->setCurrentItem(board);
+    }
+    board->populateList(ui->listSounds);
+}
+
+void MainWindow::setCurrentBoard(ListItemBoard *board) {
+    if (currentBoard) {
+        currentBoard->unreg();
+    }
+    currentBoard = board;
+    if (currentBoard) {
+        currentBoard->reg();
+        displayBoard(currentBoard);
+    }
 }
 
 void MainWindow::removeSound(ListItemSound *sound) {
@@ -142,37 +221,12 @@ void MainWindow::removeSound(int row) {
     displayBoard(currentBoard);
 }
 
-// Add sound item
-void MainWindow::on_buttonAddSound_clicked()
-{
-    if (!currentBoard) return;
-    ListItemSound *sound = new ListItemSound(this, currentBoard);
-    currentBoard->addSound(sound);
-    this->displayBoard(currentBoard);
-    // TODO Edit sound
-}
-
-// Remove sound item
-void MainWindow::on_buttonRemoveSound_clicked()
-{
-    removeSound(ui->listSounds->currentRow());
-}
-
-void MainWindow::displayBoard(ListItemBoard *board) {
-    // TODO not do if settings don't want to update visuals
-    if (board != ui->listBoards->currentItem()) {
-        ignoreBoardUpdate = true;
-        this->ui->listBoards->setCurrentItem(board);
-        ignoreBoardUpdate = false;
-    }
-    board->populateList(this->ui->listSounds);
-}
+// ******************* END BOARD FUNCTIONS *******************
+// ******************* BGN FILE FUNCTIONS *******************
 
 void MainWindow::clear() {
-    for (int i = this->ui->listSounds->count() - 1; i >= 0; --i) this->ui->listSounds->takeItem(i);
-    for (int i = this->ui->listBoards->count() - 1; i >= 0; --i) {
-        delete this->ui->listBoards->takeItem(i);
-    }
+    for (int i = ui->listSounds->count() - 1; i >= 0; --i) ui->listSounds->takeItem(i);
+    for (int i = ui->listBoards->count() - 1; i >= 0; --i) delete ui->listBoards->takeItem(i);
 }
 
 void MainWindow::load() {
@@ -189,30 +243,26 @@ void MainWindow::load() {
     QJsonObject obj = loadDoc.object();
     QJsonArray arr = obj["boards"].toArray();
 
-    this->hasFile = true;
-    this->fileName = fn;
+    hasFile = true;
+    fileName = fn;
 
-    this->clear();
+    clear();
 
     // Loads all the boards
     for (int i = 0; i < arr.size(); ++i) {
         ListItemBoard *board = new ListItemBoard(this);
         board->load(arr[i].toObject());
-        this->ui->listBoards->addItem(board);
+        ui->listBoards->addItem(board);
     }
-}
-
-void MainWindow::save() {
-    this->save(false);
 }
 
 void MainWindow::save(bool saveAs) {
-    if (!this->hasFile || saveAs) {
+    if (!hasFile || saveAs) {
         // Let the user choose a save file
-        this->fileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
+        fileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
     }
 
-    QFile file(this->fileName);
+    QFile file(fileName);
 
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning("Couldn't open save file.");
@@ -223,9 +273,9 @@ void MainWindow::save(bool saveAs) {
 
     // Creates an array of boards
     QJsonArray boards;
-    for (int i = 0; i < this->ui->listBoards->count(); ++i) {
+    for (int i = 0; i < ui->listBoards->count(); ++i) {
         QJsonObject b;
-        static_cast<ListItemBoard*>(this->ui->listBoards->item(i))->save(b);
+        static_cast<ListItemBoard*>(ui->listBoards->item(i))->save(b);
         boards.append(b);
     }
 
@@ -235,56 +285,19 @@ void MainWindow::save(bool saveAs) {
     QJsonDocument saveDoc(json);
     file.write(saveDoc.toJson());
 
-    this->hasFile = true;
+    hasFile = true;
 }
 
-void MainWindow::on_actionOpen_triggered()
-{
-    this->load();
-}
+// ******************* END FILE FUNCTIONS *******************
 
-void MainWindow::on_buttonEditBoard_clicked()
-{
-    this->editBoard();
-}
-
-void MainWindow::editBoard(bool createNew) {
-    this->editBoard(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
-}
-
-void MainWindow::editBoard(ListItemBoard *board, bool createNew) {
-    if (!board) return;
-    DialogBoard w(this, board, createNew);
-    w.exec();
-}
-
-void MainWindow::on_actionNew_triggered()
-{
-    this->clear();
-    this->hasFile = false;
-    this->fileName = "";
-}
-
-void MainWindow::setCurrentBoard(ListItemBoard *board) {
-    if (this->currentBoard) {
-        this->currentBoard->unreg();
-    }
-    this->currentBoard = board;
-    if (this->currentBoard) {
-        this->currentBoard->reg();
-        // TODO don't do visuals if the settin say not to
-        this->displayBoard(this->currentBoard);
+void MainWindow::enableKeybinds() {
+    for (int i = 0; i < ui->listBoards->count(); ++i) {
+        static_cast<ListItemBoard*>(ui->listBoards->item(i))->reg(true);
     }
 }
 
 void MainWindow::disableKeybinds() {
-    for (int i = 0; i < this->ui->listBoards->count(); ++i) {
-        static_cast<ListItemBoard*>(this->ui->listBoards->item(i))->unreg(true);
-    }
-}
-
-void MainWindow::enableKeybinds() {
-    for (int i = 0; i < this->ui->listBoards->count(); ++i) {
-        static_cast<ListItemBoard*>(this->ui->listBoards->item(i))->reg(true);
+    for (int i = 0; i < ui->listBoards->count(); ++i) {
+        static_cast<ListItemBoard*>(ui->listBoards->item(i))->unreg(true);
     }
 }
