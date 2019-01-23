@@ -31,7 +31,8 @@ SOURCES += \
     dialogsettings.cpp \
     listitemboard.cpp \
     listitemsound.cpp \
-    widgetkeybind.cpp
+    widgetkeybind.cpp \
+    dialogsound.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -40,13 +41,15 @@ HEADERS += \
     dialogsettings.h \
     listitemboard.h \
     listitemsound.h \
-    widgetkeybind.h
+    widgetkeybind.h \
+    dialogsound.h
 
 FORMS += \
         mainwindow.ui \
     dialogboard.ui \
     dialogkeybind.ui \
-    dialogsettings.ui
+    dialogsettings.ui \
+    dialogsound.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

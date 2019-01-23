@@ -16,10 +16,11 @@ class ListItemBoard : public QListWidgetItem
 {
 public:
     static QString NEW_BOARD;
-    ListItemBoard(MainWindow *main, QString text = NEW_BOARD);
+    ListItemBoard(MainWindow *main);
     ~ListItemBoard();
     void addSound(ListItemSound *sound);
     void removeSound(int n);
+    void removeSound(ListItemSound *sound);
     void populateList(QListWidget *list);
     void load(const QJsonObject &json);
     void save(QJsonObject &json);

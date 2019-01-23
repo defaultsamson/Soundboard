@@ -4,20 +4,21 @@
 #include "mainwindow.h"
 #include "listitemboard.h"
 
-#include <QKeyEvent>
 #include <QObject>
 
 DialogBoard::DialogBoard(MainWindow *main, ListItemBoard *board, bool creatingNew) :
     QDialog(main),
     ui(new Ui::DialogBoard),
-    board(board)
+    board(board),
+    main(main),
+    creatingNew(creatingNew)
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : board->text());
     ui->lineEdiKeybind->updateKey(board->key());
 
     main->disableKeybinds();
-    QObject::connect(this, SIGNAL(finished(int)), main, SLOT(enableKeybinds()));
+    QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
 }
 
 DialogBoard::~DialogBoard()
@@ -28,13 +29,21 @@ DialogBoard::~DialogBoard()
 // Save settings
 void DialogBoard::on_pushButtonOK_clicked()
 {
-    this->board->setText(this->ui->lineEditName->text().length() > 0 ? this->ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
-    this->board->setKey(this->ui->lineEdiKeybind->key);
-    this->close();
+    board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
+    board->setKey(ui->lineEdiKeybind->key);
+    didSomething = true;
+    close();
 }
 
 void DialogBoard::on_pushButtonCancel_clicked()
 {
-    this->close();
+    close();
 }
 
+void DialogBoard::onClose() {
+    // Removes the board from the list if it's new and cancelled
+    if (!didSomething && creatingNew) {
+        main->removeBoard(board);
+    }
+    main->enableKeybinds();
+}

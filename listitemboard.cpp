@@ -9,42 +9,46 @@
 #include <QHotkey>
 #include <QObject>
 
+#include <iostream>
+
 QString ListItemBoard::NEW_BOARD = "New Board";
 
-ListItemBoard::ListItemBoard(MainWindow *main, QString text) :
-    QListWidgetItem(text),
+ListItemBoard::ListItemBoard(MainWindow *main) :
+    QListWidgetItem(),
     _key(-1),
     main(main),
-    hotkey(new QHotkey(this->main))
+    hotkey(new QHotkey(main))
 {
-    QObject::connect(this->hotkey, &QHotkey::activated, this->main, [&](){
-        this->main->setCurrentBoard(this);
+    setText(NEW_BOARD);
+
+    QObject::connect(this->hotkey, &QHotkey::activated, main, [&](){
+        main->setCurrentBoard(this);
     });
 }
 
 ListItemBoard::~ListItemBoard() {
-    for (size_t i = 0; i < this->sounds.size(); ++i) delete this->sounds.at(i);
+    for (size_t i = 0; i < sounds.size(); ++i) delete sounds.at(i);
     delete hotkey;
 }
 
 void ListItemBoard::setKey(int k) {
-    this->_key = k;
-    this->hotkey->setRegistered(false);
+    _key = k;
+    hotkey->setRegistered(false);
     if (k < 0) return;
-    this->hotkey->setShortcut(QKeySequence(k), false);
-    this->hotkey->setRegistered(true);
+    hotkey->setShortcut(QKeySequence(k), false);
+    hotkey->setRegistered(true);
 }
 
 void ListItemBoard::reg(bool regThis) {
-    if (regThis) this->hotkey->setRegistered(true);
+    if (regThis && _key >= 0) hotkey->setRegistered(true);
     // Register all sounds' keybinds
-    for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->reg();
+    for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->reg();
 }
 
 void ListItemBoard::unreg(bool unregThis) {
-    if (unregThis) this->hotkey->setRegistered(false);
+    if (unregThis) hotkey->setRegistered(false);
     // Unregister all sounds' keybinds
-    for (size_t i = 0; i < this->sounds.size(); ++i) this->sounds.at(i)->unreg();
+    for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->unreg();
 }
 
 int ListItemBoard::key() {
@@ -52,42 +56,55 @@ int ListItemBoard::key() {
 }
 
 void ListItemBoard::addSound(ListItemSound *sound) {
-    this->sounds.push_back(sound);
+    sounds.push_back(sound);
 }
 
 void ListItemBoard::removeSound(int n) {
     if (n < 0) return;
-    delete this->sounds.at(n);
-    this->sounds.erase(this->sounds.begin() + n);
+    delete sounds.at(n);
+    sounds.erase(sounds.begin() + n);
+}
+
+void ListItemBoard::removeSound(ListItemSound *sound) {
+    int index = -1;
+    for (size_t i = 0; i < sounds.size(); ++i) {
+        if (sound == sounds.at(i)) {
+            index = i;
+            break;
+        }
+    }
+    if (index >= 0) {
+        removeSound(index);
+    }
 }
 
 void ListItemBoard::populateList(QListWidget *list) {
     // Removes items from list
     for (int i = list->count() - 1; i >= 0; --i) list->takeItem(i);
     // Adds items to list
-    for (size_t i = 0; i < this->sounds.size(); ++i) list->addItem(this->sounds.at(i));
+    for (size_t i = 0; i < sounds.size(); ++i) list->addItem(sounds.at(i));
 }
 
 void ListItemBoard::load(const QJsonObject &json) {
-    this->setText(json["name"].toString());
-    this->setKey(json["key"].toInt());
+    setText(json["name"].toString());
+    setKey(json["key"].toInt());
 
     QJsonArray arr = json["sounds"].toArray();
 
     // Loads all the sounds
     for (int i = 0; i < arr.size(); ++i) {
-        ListItemSound *sound = new ListItemSound(this->main);
+        ListItemSound *sound = new ListItemSound(main, this);
         sound->load(arr[i].toObject());
-        this->addSound(sound);
+        addSound(sound);
     }
 }
 
 void ListItemBoard::save(QJsonObject &json) {
-    json["name"] = this->text();
-    json["key"] = this->key();
+    json["name"] = text();
+    json["key"] = key();
 
     QJsonArray sounds;
-    for (size_t i = 0; i < this->sounds.size(); ++i) {
+    for (size_t i = 0; i < sounds.size(); ++i) {
         QJsonObject s;
         this->sounds.at(i)->save(s);
         sounds.append(s);

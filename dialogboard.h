@@ -1,9 +1,10 @@
 #ifndef DIALOGBOARD_H
 #define DIALOGBOARD_H
 
-#include <QDialog>
-
 #include "listitemboard.h"
+
+#include <QDialog>
+#include <QCloseEvent>
 
 class MainWindow;
 
@@ -24,9 +25,14 @@ private slots:
 
     void on_pushButtonCancel_clicked();
 
+    void onClose();
+
 private:
     Ui::DialogBoard *ui;
     ListItemBoard *board;
+    MainWindow *main;
+    bool didSomething = false;
+    bool creatingNew;
 };
 
 #endif // DIALOGBOARD_H
