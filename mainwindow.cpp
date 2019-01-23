@@ -4,6 +4,7 @@
 #include "listitemboard.h"
 #include "listitemsound.h"
 #include "dialogboard.h"
+#include "dialogsound.h"
 #include "dialogsettings.h"
 
 #include <QApplication>
@@ -124,7 +125,7 @@ void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
 // Sound item double clicked, enter edit mode
 void MainWindow::on_listSounds_itemActivated(QListWidgetItem *item)
 {
-    // TODO
+    editSound(static_cast<ListItemSound*>(item));
 }
 
 // ******************* END LIST ACTIONS *******************
@@ -156,7 +157,7 @@ void MainWindow::on_buttonAddSound_clicked()
     ListItemSound *sound = new ListItemSound(this, currentBoard);
     currentBoard->addSound(sound);
     displayBoard(currentBoard);
-    // TODO Edit sound
+    editSound(sound, true);
 }
 
 // Remove sound item
@@ -167,7 +168,7 @@ void MainWindow::on_buttonRemoveSound_clicked()
 
 void MainWindow::on_buttonEditSound_clicked()
 {
-    // TODO
+    editSound();
 }
 
 // ******************* END BUTTON ACTIONS *******************
@@ -211,8 +212,8 @@ void MainWindow::setCurrentBoard(ListItemBoard *board) {
     }
 }
 
-void MainWindow::playSound(ListItemSound *sounds) {
-    ui->listSounds->setCurrentItem(sounds);
+void MainWindow::playSound(ListItemSound *sound) {
+    ui->listSounds->setCurrentItem(sound);
     // TODO play
 }
 
@@ -224,6 +225,16 @@ void MainWindow::removeSound(int row) {
     if (row < 0 || row >= ui->listSounds->count()) return;
     delete ui->listSounds->takeItem(row);
     displayBoard(currentBoard);
+}
+
+void MainWindow::editSound(bool createNew) {
+    editSound(static_cast<ListItemSound*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
+}
+
+void MainWindow::editSound(ListItemSound *sound, bool createNew) {
+    if (!sound) return;
+    DialogSound w(this, sound, createNew);
+    w.exec();
 }
 
 // ******************* END BOARD FUNCTIONS *******************

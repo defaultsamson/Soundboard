@@ -20,8 +20,8 @@ public:
     ~DialogBoard();
 
 private slots:
-    void on_pushButtonOK_clicked();
-    void on_pushButtonCancel_clicked();
+    void on_buttonBox_accepted();
+    void on_buttonBox_rejected();
     void onClose();
 
 private:

@@ -68,14 +68,14 @@ void ListItemBoard::load(const QJsonObject &json) {
 void ListItemBoard::save(QJsonObject &json) {
     ListItem::save(json);
 
-    QJsonArray sounds;
+    QJsonArray arr;
     for (size_t i = 0; i < sounds.size(); ++i) {
         QJsonObject s;
-        this->sounds.at(i)->save(s);
-        sounds.append(s);
+        sounds.at(i)->save(s);
+        arr.append(s);
     }
 
-    json["sounds"] = sounds;
+    json["sounds"] = arr;
 }
 
 void ListItemBoard::reg(bool regThis) {

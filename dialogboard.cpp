@@ -4,7 +4,6 @@
 #include "mainwindow.h"
 #include "listitemboard.h"
 
-#include <QKeyEvent>
 #include <QObject>
 
 DialogBoard::DialogBoard(MainWindow *main, ListItemBoard *board, bool creatingNew) :
@@ -29,7 +28,7 @@ DialogBoard::~DialogBoard()
     delete ui;
 }
 
-void DialogBoard::on_pushButtonOK_clicked()
+void DialogBoard::on_buttonBox_accepted()
 {
     // Updates the values to the board
     board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
@@ -38,7 +37,7 @@ void DialogBoard::on_pushButtonOK_clicked()
     close();
 }
 
-void DialogBoard::on_pushButtonCancel_clicked()
+void DialogBoard::on_buttonBox_rejected()
 {
     close();
 }
@@ -51,4 +50,3 @@ void DialogBoard::onClose() {
     // Re-enable the keybinds
     main->enableKeybinds();
 }
-

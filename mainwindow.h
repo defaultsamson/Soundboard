@@ -68,7 +68,9 @@ private:
 
     void displayBoard(ListItemBoard *board);
     void editBoard(bool createNew = false);
-    void editBoard(ListItemBoard *board, bool createNew = false);
+    void editBoard(ListItemBoard *sound, bool createNew = false);
+    void editSound(bool createNew = false);
+    void editSound(ListItemSound *sound, bool createNew = false);
 };
 
 #endif // MAINWINDOW_H
