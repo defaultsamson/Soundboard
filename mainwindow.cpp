@@ -4,7 +4,6 @@
 #include "listitemboard.h"
 #include "listitemsound.h"
 #include "dialogboard.h"
-#include "dialogsound.h"
 #include "dialogsettings.h"
 
 #include <QApplication>
@@ -40,22 +39,6 @@ MainWindow::~MainWindow()
 {
     this->clear();
     delete ui;
-}
-
-// ***************************** MENU BUTTONS *****************************
-
-// New
-void MainWindow::on_actionNew_triggered()
-{
-    this->clear();
-    this->hasFile = false;
-    this->fileName = "";
-}
-
-// Open
-void MainWindow::on_actionOpen_triggered()
-{
-    this->load();
 }
 
 // Save
@@ -102,8 +85,34 @@ void MainWindow::on_actionSettings_triggered()
     w.exec();
 }
 
-// ***************************** END *****************************
-// ***************************** BOARD BUTTONS *****************************
+// BOARDS
+// Double clicked, enter edit mode
+void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
+{
+    setDebug("[BOARDS] Item Activated: " + std::to_string(ui->listBoards->currentRow()));
+    this->editBoard(static_cast<ListItemBoard*>(item));
+}
+
+// SOUNDS
+// Double clicked, enter edit mode
+void MainWindow::on_listSounds_itemActivated(QListWidgetItem *item)
+{
+    setDebug("[SOUNDS] Item Activated: " + std::to_string(ui->listBoards->currentRow()));
+}
+
+void MainWindow::setDebug(std::string s) {
+    ui->label_3->setText(QString::fromStdString(s));
+}
+
+// BOARDS
+// Row change, load up the sounds in this row
+void MainWindow::on_listBoards_currentRowChanged(int currentRow)
+{
+    setDebug("[BOARDS] Row Change: " + std::to_string(currentRow));
+    if (currentRow < 0) return;
+    ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(currentRow));
+    if (board) displayBoard(board);
+}
 
 // Add board item
 void MainWindow::on_buttonAddBoard_clicked()
@@ -121,38 +130,17 @@ void MainWindow::on_buttonRemoveBoard_clicked()
     ui->listBoards->takeItem(row);
 }
 
-// Edit board item
-void MainWindow::on_buttonEditBoard_clicked()
-{
-    this->editBoard();
-}
-
-// Double clicked board, enter edit mode
-void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
-{
-    this->editBoard(static_cast<ListItemBoard*>(item));
-}
-
-// Display all the sounds from the selected board when it's selected
-void MainWindow::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
-{
-    ListItemBoard *board = static_cast<ListItemBoard*>(current);
-    if (board) displayBoard(board);
-}
-
-// ***************************** END *****************************
-// ***************************** SOUND BUTTONS *****************************
-
 // Add sound item
 void MainWindow::on_buttonAddSound_clicked()
 {
     int row = ui->listBoards->currentRow();
     if (row < 0) return;
+    ListItemSound *sound = new ListItemSound(this);
     ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(row));
-    ListItemSound *sound = new ListItemSound(this, board);
     board->addSound(sound);
+    std::cout << "displaying board" << std::endl;
     this->displayBoard(board);
-    this->editSound(sound, true);
+    // TODO Edit sound
 }
 
 // Remove sound item
@@ -162,19 +150,6 @@ void MainWindow::on_buttonRemoveSound_clicked()
     this->ui->listSounds->takeItem(row);
     ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow()));
     board->removeSound(row);
-}
-
-void MainWindow::on_buttonEditSound_clicked()
-{
-    this->editSound();
-}
-
-// ***************************** END *****************************
-
-// Double clicked sound, enter edit mode
-void MainWindow::on_listSounds_itemActivated(QListWidgetItem *item)
-{
-    this->editSound(static_cast<ListItemSound*>(item));
 }
 
 void MainWindow::displayBoard(ListItemBoard *board) {
@@ -258,6 +233,16 @@ void MainWindow::save(bool saveAs) {
     this->hasFile = true;
 }
 
+void MainWindow::on_actionOpen_triggered()
+{
+    this->load();
+}
+
+void MainWindow::on_buttonEditBoard_clicked()
+{
+    this->editBoard();
+}
+
 void MainWindow::editBoard(bool createNew) {
     this->editBoard(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
 }
@@ -268,14 +253,11 @@ void MainWindow::editBoard(ListItemBoard *board, bool createNew) {
     w.exec();
 }
 
-void MainWindow::editSound(bool createNew) {
-    this->editSound(static_cast<ListItemSound*>(ui->listSounds->item(ui->listSounds->currentRow())), createNew);
-}
-
-void MainWindow::editSound(ListItemSound *sound, bool createNew) {
-    if (!sound) return;
-    DialogSound w(this, sound, createNew);
-    w.exec();
+void MainWindow::on_actionNew_triggered()
+{
+    this->clear();
+    this->hasFile = false;
+    this->fileName = "";
 }
 
 void MainWindow::setCurrentBoard(ListItemBoard *board) {
@@ -285,7 +267,7 @@ void MainWindow::setCurrentBoard(ListItemBoard *board) {
     this->currentBoard = board;
     if (this->currentBoard) {
         this->currentBoard->reg();
-        // TODO don't do visuals if the settins say not to
+        // TODO don't do visuals if the settin say not to
         this->displayBoard(this->currentBoard);
     }
 }
@@ -300,18 +282,4 @@ void MainWindow::enableKeybinds() {
     for (int i = 0; i < this->ui->listBoards->count(); ++i) {
         static_cast<ListItemBoard*>(this->ui->listBoards->item(i))->reg(true);
     }
-}
-
-void MainWindow::removeBoard(ListItemBoard *board) {
-    delete ui->listBoards->takeItem(ui->listBoards->row(board));
-}
-
-void MainWindow::removeSound(ListItemSound *sound) {
-    ListItemBoard *board = sound->board();
-    std::cout << "removing1: " << sound << std::endl;
-    std::cout << "removing2: " << board << std::endl;
-    board->removeSound(sound);
-    std::cout << "removing3" << std::endl;
-    displayBoard(board); // Note: board should always be currentBoard at this point
-    std::cout << "removing4" << std::endl;
 }

@@ -1,7 +1,5 @@
 #include "listitemsound.h"
-
 #include "mainwindow.h"
-#include "listitemboard.h"
 
 #include <QListWidgetItem>
 #include <QJsonObject>
@@ -10,53 +8,35 @@
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 
-ListItemSound::ListItemSound(MainWindow *main, ListItemBoard *board) :
-    QListWidgetItem(),
-    main(main),
-    _board(board),
+ListItemSound::ListItemSound(MainWindow *main, QString text) :
+    QListWidgetItem(text),
     _key(-1),
+    main(main),
     hotkey(new QHotkey(this->main))
 {
-    setText(NEW_SOUND);
+
 }
 
 void ListItemSound::setFileName(QString name) {
-    filename = name;
-}
-
-void ListItemSound::setKey(int k) {
-    _key = k;
-    hotkey->setRegistered(false);
-    if (k < 0) return;
-    hotkey->setShortcut(QKeySequence(k), false);
-    hotkey->setRegistered(true);
-}
-
-ListItemBoard *ListItemSound::board() {
-    return _board;
-}
-
-int ListItemSound::key() {
-    return _key;
+    this->filename = name;
 }
 
 void ListItemSound::reg() {
-    if (_key >= 0) hotkey->setRegistered(true);
+    this->hotkey->setRegistered(true);
 }
 
 void ListItemSound::unreg() {
-    hotkey->setRegistered(false);
+    this->hotkey->setRegistered(false);
 }
 
 void ListItemSound::load(const QJsonObject &json) {
-    setText(json["name"].toString());
-    setKey(json["key"].toInt());
-    setFileName(json["filename"].toString());
+    this->setText(json["name"].toString());
+    // TODO this->setKey(json["key"].toInt());
+    this->setFileName(json["filename"].toString());
 }
 
 void ListItemSound::save(QJsonObject &json) {
-    json["name"] = text();
-    json["key"] = key();
-    QJsonValue fn(filename);
+    json["name"] = this->text();
+    QJsonValue fn(this->filename);
     json["filename"] = fn;
 }

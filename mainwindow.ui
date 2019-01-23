@@ -221,6 +221,13 @@
       </widget>
      </widget>
     </item>
+    <item>
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Debug text</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
