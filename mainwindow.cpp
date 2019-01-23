@@ -202,19 +202,22 @@ void MainWindow::displayBoard(ListItemBoard *board) {
 }
 
 void MainWindow::setCurrentBoard(ListItemBoard *board) {
+    if (currentBoard == board) return;
     if (currentBoard) {
         currentBoard->unreg(false);
     }
     currentBoard = board;
     if (currentBoard) {
-        currentBoard->reg(false);
+        currentBoard->reg(false, true);
         displayBoard(currentBoard);
     }
 }
 
 void MainWindow::playSound(ListItemSound *sound) {
+    // TODO don't do display if the settings say not to
     ui->listSounds->setCurrentItem(sound);
-    // TODO play
+    // TODO play audio
+
 }
 
 void MainWindow::removeSound(ListItemSound *sound) {
@@ -269,6 +272,10 @@ void MainWindow::load() {
         ListItemBoard *board = new ListItemBoard(this);
         board->load(arr[i].toObject());
         ui->listBoards->addItem(board);
+        // Set the first board as the active board
+        if (i == 0) {
+            setCurrentBoard(board);
+        }
     }
     enableKeybinds();
 }
@@ -309,8 +316,9 @@ void MainWindow::save(bool saveAs) {
 
 void MainWindow::enableKeybinds() {
     for (int i = 0; i < ui->listBoards->count(); ++i) {
-        static_cast<ListItemBoard*>(ui->listBoards->item(i))->reg(true);
+        static_cast<ListItemBoard*>(ui->listBoards->item(i))->reg(true, false);
     }
+    if (currentBoard) currentBoard->reg(false, true);
 }
 
 void MainWindow::disableKeybinds() {

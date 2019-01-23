@@ -75,10 +75,10 @@ void ListItemBoard::save(QJsonObject &json) {
     json["sounds"] = arr;
 }
 
-void ListItemBoard::reg(bool regThis) {
+void ListItemBoard::reg(bool regThis, bool regSounds) {
     if (regThis) hotkey->setRegistered(true);
     // Register all sounds' keybinds
-    for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->reg();
+    if (regSounds) for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->reg();
 }
 
 void ListItemBoard::unreg(bool unregThis) {

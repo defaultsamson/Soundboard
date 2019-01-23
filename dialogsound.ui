@@ -50,6 +50,29 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="labelKeybind">
+     <property name="text">
+      <string>Keybind</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="WidgetKeybind" name="lineEdiKeybind">
+     <property name="cursor">
+      <cursorShape>ArrowCursor</cursorShape>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="labelFile">
      <property name="text">
       <string>Audio File</string>
@@ -74,7 +97,10 @@
       <item>
        <widget class="QLineEdit" name="lineEditFile">
         <property name="placeholderText">
-         <string>Please Choose File</string>
+         <string>Please choose a file</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -86,29 +112,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="labelKeybind">
-     <property name="text">
-      <string>Keybind</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="WidgetKeybind" name="lineEdiKeybind">
-     <property name="cursor">
-      <cursorShape>ArrowCursor</cursorShape>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::ClickFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="clearButtonEnabled">
-      <bool>false</bool>
-     </property>
     </widget>
    </item>
    <item>
@@ -134,7 +137,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QSlider" name="horizontalSlider">
+       <widget class="QSlider" name="sliderVolume">
         <property name="maximum">
          <number>100</number>
         </property>
@@ -166,7 +169,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox">
+       <widget class="QSpinBox" name="spinBoxVolume">
         <property name="maximum">
          <number>100</number>
         </property>

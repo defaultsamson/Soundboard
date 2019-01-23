@@ -24,7 +24,7 @@ public:
     void populateList(QListWidget *list);
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) override;
-    void reg(bool regThis);
+    void reg(bool regThis, bool regSounds);
     void unreg(bool unregThis);
     void trigger() override;
 

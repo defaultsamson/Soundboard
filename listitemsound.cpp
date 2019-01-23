@@ -5,13 +5,15 @@
 #include <QJsonObject>
 #include <QString>
 #include <QHotkey>
+#include <QSound>
 #include <iostream>
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 
 ListItemSound::ListItemSound(MainWindow *main, ListItemBoard *board) :
     ListItem(main),
-    board(board)
+    board(board),
+    audio(nullptr)
 {
     setText(NEW_SOUND);
 }
@@ -21,7 +23,21 @@ ListItemSound::~ListItemSound() {
 }
 
 void ListItemSound::setFileName(QString name) {
-    filename = name;
+    _filename = name;
+    if (audio) delete audio;
+    audio = new QSound(name);
+}
+
+QString ListItemSound::filename() {
+    return _filename;
+}
+
+void ListItemSound::setVolume(int v) {
+    _volume = v;
+}
+
+int ListItemSound::volume() {
+    return _volume;
 }
 
 void ListItemSound::reg() {
@@ -35,14 +51,16 @@ void ListItemSound::unreg() {
 void ListItemSound::load(const QJsonObject &json) {
     ListItem::load(json);
     setFileName(json["filename"].toString());
+    setVolume(json["volume"].toInt());
 }
 
 void ListItemSound::save(QJsonObject &json) {
     ListItem::save(json);
-    QJsonValue fn(filename);
-    json["filename"] = fn;
+    json["filename"] = filename();
+    json["volume"] = volume();
 }
 
 void ListItemSound::trigger() {
+    audio->play();
     main->playSound(this);
 }

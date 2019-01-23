@@ -15,13 +15,12 @@ DialogSettings::~DialogSettings()
     delete ui;
 }
 
-void DialogSettings::on_pushButton_2_clicked()
+void DialogSettings::on_buttonBox_accepted()
 {
-    close();
+
 }
 
-void DialogSettings::on_pushButton_clicked()
+void DialogSettings::on_buttonBox_rejected()
 {
-    // TODO save the settings
-    close();
+
 }

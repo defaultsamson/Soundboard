@@ -18,9 +18,10 @@ public:
     ~DialogSettings();
 
 private slots:
-    void on_pushButton_2_clicked();
 
-    void on_pushButton_clicked();
+    void on_buttonBox_accepted();
+
+    void on_buttonBox_rejected();
 
 private:
     Ui::DialogSettings *ui;
