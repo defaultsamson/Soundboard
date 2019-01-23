@@ -10,11 +10,8 @@
 QString ListItemSound::NEW_SOUND = "New Sound";
 
 ListItemSound::ListItemSound(MainWindow *main, ListItemBoard *board) :
-    QListWidgetItem(),
-    main(main),
-    board(board),
-    _key(-1),
-    hotkey(new QHotkey(this->main))
+    ListItem(main),
+    board(board)
 {
     setText(NEW_SOUND);
 }
@@ -27,22 +24,25 @@ void ListItemSound::setFileName(QString name) {
     this->filename = name;
 }
 
-void ListItemSound::reg() {
+void ListItemSound::reg(bool regThis) {
     this->hotkey->setRegistered(true);
 }
 
-void ListItemSound::unreg() {
+void ListItemSound::unreg(bool unregThis) {
     this->hotkey->setRegistered(false);
 }
 
 void ListItemSound::load(const QJsonObject &json) {
-    this->setText(json["name"].toString());
-    // TODO this->setKey(json["key"].toInt());
+    ListItem::load(json);
     this->setFileName(json["filename"].toString());
 }
 
 void ListItemSound::save(QJsonObject &json) {
-    json["name"] = this->text();
+    ListItem::save(json);
     QJsonValue fn(this->filename);
     json["filename"] = fn;
+}
+
+void ListItemSound::trigger() {
+    main->playSound(this);
 }

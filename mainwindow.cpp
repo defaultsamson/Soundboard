@@ -211,6 +211,11 @@ void MainWindow::setCurrentBoard(ListItemBoard *board) {
     }
 }
 
+void MainWindow::playSound(ListItemSound *sounds) {
+    ui->listSounds->setCurrentItem(sounds);
+    // TODO play
+}
+
 void MainWindow::removeSound(ListItemSound *sound) {
     removeSound(ui->listSounds->row(sound));
 }
@@ -254,6 +259,7 @@ void MainWindow::load() {
         board->load(arr[i].toObject());
         ui->listBoards->addItem(board);
     }
+    enableKeybinds();
 }
 
 void MainWindow::save(bool saveAs) {
@@ -300,4 +306,8 @@ void MainWindow::disableKeybinds() {
     for (int i = 0; i < ui->listBoards->count(); ++i) {
         static_cast<ListItemBoard*>(ui->listBoards->item(i))->unreg(true);
     }
+}
+
+void MainWindow::trigger(ListItem *item) {
+    item->trigger();
 }

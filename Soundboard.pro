@@ -31,7 +31,8 @@ SOURCES += \
     dialogsettings.cpp \
     listitemboard.cpp \
     listitemsound.cpp \
-    widgetkeybind.cpp
+    widgetkeybind.cpp \
+    listitem.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -40,7 +41,8 @@ HEADERS += \
     dialogsettings.h \
     listitemboard.h \
     listitemsound.h \
-    widgetkeybind.h
+    widgetkeybind.h \
+    listitem.h
 
 FORMS += \
         mainwindow.ui \

@@ -1,7 +1,8 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include <QListWidgetItem>
+#include "listitem.h"
+
 #include <QString>
 #include <QJsonObject>
 #include <QHotkey>
@@ -9,24 +10,23 @@
 class MainWindow;
 class ListItemBoard;
 
-class ListItemSound : public QListWidgetItem
+class ListItemSound : public ListItem
 {
 public:
     static QString NEW_SOUND;
     ListItemSound(MainWindow *main, ListItemBoard *board);
-    ~ListItemSound();
+    ~ListItemSound() override;
     void setFileName(QString name);
-    void load(const QJsonObject &json);
-    void save(QJsonObject &json);
-    void reg();
-    void unreg();
+    void load(const QJsonObject &json) override;
+    void save(QJsonObject &json) override;
+    void reg(bool regThis = false) override;
+    void unreg(bool unregThis = false) override;
+    void trigger() override;
 
 private:
     MainWindow *main;
     ListItemBoard *board;
     QString filename;
-    int _key;
-    QHotkey *hotkey;
 };
 
 #endif // SOUND_H

@@ -6,6 +6,7 @@
 #include <QString>
 #include <QWidget>
 
+#include "listitem.h"
 #include "listitemboard.h"
 #include "listitemsound.h"
 
@@ -28,6 +29,8 @@ public:
     void removeBoard(int row);
     void removeSound(ListItemSound *sound);
     void removeSound(int row);
+    void trigger(ListItem *item);
+    void playSound(ListItemSound *sound);
 
 private slots:
 

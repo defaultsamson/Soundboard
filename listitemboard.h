@@ -2,8 +2,8 @@
 #define BOARD_H
 
 #include "listitemsound.h"
+#include "listitem.h"
 
-#include <QListWidgetItem>
 #include <QListWidget>
 #include <QJsonObject>
 #include <vector>
@@ -12,28 +12,25 @@
 
 class MainWindow;
 
-class ListItemBoard : public QListWidgetItem
+class ListItemBoard : public ListItem
 {
 public:
     static QString NEW_BOARD;
-    ListItemBoard(MainWindow *main, QString text = NEW_BOARD);
-    ~ListItemBoard();
+    ListItemBoard(MainWindow *main);
+    ~ListItemBoard() override;
     void addSound(ListItemSound *sound);
     void removeSound(int n, bool deleteSound = true);
     void removeSound(ListItemSound *sound, bool deleteSound = true);
     void populateList(QListWidget *list);
-    void load(const QJsonObject &json);
-    void save(QJsonObject &json);
-    int key();
-    void setKey(int key);
-    void reg(bool regThis = false);
-    void unreg(bool unregThis = false);
+    void load(const QJsonObject &json) override;
+    void save(QJsonObject &json) override;
+    void reg(bool regThis = false) override;
+    void unreg(bool unregThis = false) override;
+    void trigger() override;
 
 private:
     MainWindow *main;
     std::vector<ListItemSound*> sounds;
-    int _key;
-    QHotkey *hotkey;
 };
 
 #endif // BOARD_H
