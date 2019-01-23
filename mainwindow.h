@@ -24,6 +24,8 @@ public:
     void save(bool saveAs);
     void clear();
     void setCurrentBoard(ListItemBoard *board);
+    void removeBoard(ListItemBoard *board);
+    void removeBoard(int row);
 
 private slots:
 

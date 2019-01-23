@@ -125,9 +125,16 @@ void MainWindow::on_buttonAddBoard_clicked()
 // Remove board item
 void MainWindow::on_buttonRemoveBoard_clicked()
 {
-    int row = ui->listBoards->currentRow();
-    if (row < 0) return;
-    ui->listBoards->takeItem(row);
+    removeBoard(ui->listBoards->currentRow());
+}
+
+void MainWindow::removeBoard(ListItemBoard *board) {
+    removeBoard(ui->listBoards->row(board));
+}
+
+void MainWindow::removeBoard(int row) {
+    if (row < 0 || row >= ui->listBoards->count()) return;
+    delete ui->listBoards->takeItem(row);
 }
 
 // Add sound item

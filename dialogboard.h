@@ -24,9 +24,14 @@ private slots:
 
     void on_pushButtonCancel_clicked();
 
+    void onClose();
+
 private:
     Ui::DialogBoard *ui;
+    MainWindow *main;
     ListItemBoard *board;
+    bool creatingNew;
+    bool didSomething = false;
 };
 
 #endif // DIALOGBOARD_H
