@@ -104,14 +104,9 @@ void MainWindow::setDebug(std::string s) {
     ui->label_3->setText(QString::fromStdString(s));
 }
 
-// BOARDS
-// Row change, load up the sounds in this row
-void MainWindow::on_listBoards_currentRowChanged(int currentRow)
+void MainWindow::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    setDebug("[BOARDS] Row Change: " + std::to_string(currentRow));
-    if (currentRow < 0) return;
-    ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(currentRow));
-    if (board) displayBoard(board);
+    setCurrentBoard(static_cast<ListItemBoard*>(current));
 }
 
 // Add board item
@@ -137,31 +132,34 @@ void MainWindow::removeBoard(int row) {
     delete ui->listBoards->takeItem(row);
 }
 
+void MainWindow::removeSound(ListItemSound *sound) {
+    removeSound(ui->listSounds->row(sound));
+}
+
+void MainWindow::removeSound(int row) {
+    if (row < 0 || row >= ui->listSounds->count()) return;
+    delete ui->listSounds->takeItem(row);
+    displayBoard(currentBoard);
+}
+
 // Add sound item
 void MainWindow::on_buttonAddSound_clicked()
 {
-    int row = ui->listBoards->currentRow();
-    if (row < 0) return;
-    ListItemSound *sound = new ListItemSound(this);
-    ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(row));
-    board->addSound(sound);
-    std::cout << "displaying board" << std::endl;
-    this->displayBoard(board);
+    if (!currentBoard) return;
+    ListItemSound *sound = new ListItemSound(this, currentBoard);
+    currentBoard->addSound(sound);
+    this->displayBoard(currentBoard);
     // TODO Edit sound
 }
 
 // Remove sound item
 void MainWindow::on_buttonRemoveSound_clicked()
 {
-    int row = ui->listSounds->currentRow();
-    this->ui->listSounds->takeItem(row);
-    ListItemBoard *board = static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow()));
-    board->removeSound(row);
+    removeSound(ui->listSounds->currentRow());
 }
 
 void MainWindow::displayBoard(ListItemBoard *board) {
     // TODO not do if settings don't want to update visuals
-
     if (board != ui->listBoards->currentItem()) {
         ignoreBoardUpdate = true;
         this->ui->listBoards->setCurrentItem(board);

@@ -13,8 +13,9 @@ QString ListItemBoard::NEW_BOARD = "New Board";
 
 ListItemBoard::ListItemBoard(MainWindow *main, QString text) :
     QListWidgetItem(text),
-    _key(-1),
     main(main),
+    sounds(),
+    _key(-1),
     hotkey(new QHotkey(this->main))
 {
     QObject::connect(this->hotkey, &QHotkey::activated, this->main, [&](){
@@ -55,10 +56,20 @@ void ListItemBoard::addSound(ListItemSound *sound) {
     this->sounds.push_back(sound);
 }
 
-void ListItemBoard::removeSound(int n) {
+void ListItemBoard::removeSound(int n, bool deleteSound) {
     if (n < 0) return;
-    delete this->sounds.at(n);
+    if (deleteSound) delete this->sounds.at(n);
     this->sounds.erase(this->sounds.begin() + n);
+}
+
+void ListItemBoard::removeSound(ListItemSound *sound, bool deleteSound) {
+    int n = -1;
+    std::vector<ListItemSound *>::iterator iter = std::find(sounds.begin(), sounds.end(), sound);
+    if(iter != sounds.end())
+    {
+        n = std::distance(sounds.begin(), iter);
+    }
+    removeSound(n, deleteSound);
 }
 
 void ListItemBoard::populateList(QListWidget *list) {
@@ -76,7 +87,7 @@ void ListItemBoard::load(const QJsonObject &json) {
 
     // Loads all the sounds
     for (int i = 0; i < arr.size(); ++i) {
-        ListItemSound *sound = new ListItemSound(this->main);
+        ListItemSound *sound = new ListItemSound(this->main, this);
         sound->load(arr[i].toObject());
         this->addSound(sound);
     }

@@ -7,12 +7,14 @@
 #include <QHotkey>
 
 class MainWindow;
+class ListItemBoard;
 
 class ListItemSound : public QListWidgetItem
 {
 public:
     static QString NEW_SOUND;
-    ListItemSound(MainWindow *main, QString text = NEW_SOUND);
+    ListItemSound(MainWindow *main, ListItemBoard *board);
+    ~ListItemSound();
     void setFileName(QString name);
     void load(const QJsonObject &json);
     void save(QJsonObject &json);
@@ -21,7 +23,7 @@ public:
 
 private:
     MainWindow *main;
-
+    ListItemBoard *board;
     QString filename;
     int _key;
     QHotkey *hotkey;

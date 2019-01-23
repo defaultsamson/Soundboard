@@ -5,16 +5,22 @@
 #include <QJsonObject>
 #include <QString>
 #include <QHotkey>
+#include <iostream>
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 
-ListItemSound::ListItemSound(MainWindow *main, QString text) :
-    QListWidgetItem(text),
-    _key(-1),
+ListItemSound::ListItemSound(MainWindow *main, ListItemBoard *board) :
+    QListWidgetItem(),
     main(main),
+    board(board),
+    _key(-1),
     hotkey(new QHotkey(this->main))
 {
+    setText(NEW_SOUND);
+}
 
+ListItemSound::~ListItemSound() {
+    board->removeSound(this, false);
 }
 
 void ListItemSound::setFileName(QString name) {

@@ -7,6 +7,7 @@
 #include <QWidget>
 
 #include "listitemboard.h"
+#include "listitemsound.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +27,8 @@ public:
     void setCurrentBoard(ListItemBoard *board);
     void removeBoard(ListItemBoard *board);
     void removeBoard(int row);
+    void removeSound(ListItemSound *sound);
+    void removeSound(int row);
 
 private slots:
 
@@ -47,8 +50,6 @@ private slots:
 
     void on_listSounds_itemActivated(QListWidgetItem *item);
 
-    void on_listBoards_currentRowChanged(int currentRow);
-
     void on_buttonAddBoard_clicked();
 
     void on_buttonRemoveBoard_clicked();
@@ -62,6 +63,8 @@ private slots:
     void on_buttonEditBoard_clicked();
 
     void on_actionNew_triggered();
+
+    void on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
 public slots:
     void disableKeybinds();

@@ -19,7 +19,8 @@ public:
     ListItemBoard(MainWindow *main, QString text = NEW_BOARD);
     ~ListItemBoard();
     void addSound(ListItemSound *sound);
-    void removeSound(int n);
+    void removeSound(int n, bool deleteSound = true);
+    void removeSound(ListItemSound *sound, bool deleteSound = true);
     void populateList(QListWidget *list);
     void load(const QJsonObject &json);
     void save(QJsonObject &json);
@@ -30,9 +31,7 @@ public:
 
 private:
     MainWindow *main;
-
     std::vector<ListItemSound*> sounds;
-
     int _key;
     QHotkey *hotkey;
 };
