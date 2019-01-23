@@ -16,6 +16,7 @@ WidgetKeybind::WidgetKeybind(QWidget *parent) :
 void WidgetKeybind::setKey(int key) {
     _key = key;
     setText(key == -1 ? "" : QKeySequence(key).toString());
+    setPlaceholderText("Click here to set key");
 }
 
 int WidgetKeybind::key() {

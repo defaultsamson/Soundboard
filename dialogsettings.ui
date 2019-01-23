@@ -91,9 +91,6 @@
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
-           <property name="placeholderText">
-            <string>Click here to set key</string>
-           </property>
           </widget>
          </item>
          <item>
@@ -103,9 +100,6 @@
            </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="placeholderText">
-            <string>Click here to set key</string>
            </property>
           </widget>
          </item>
