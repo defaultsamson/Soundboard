@@ -29,7 +29,6 @@ public:
     void trigger() override;
 
 private:
-    MainWindow *main;
     std::vector<ListItemSound*> sounds;
 };
 

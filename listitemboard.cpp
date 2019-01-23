@@ -10,13 +10,10 @@
 #include <QHotkey>
 #include <QObject>
 
-#include <iostream>
-
 QString ListItemBoard::NEW_BOARD = "New Board";
 
 ListItemBoard::ListItemBoard(MainWindow *main) :
-    ListItem(main),
-    main(main)
+    ListItem(main)
 {
     setText(NEW_BOARD);
 }

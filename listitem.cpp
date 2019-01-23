@@ -5,6 +5,7 @@
 #include <QObject>
 
 ListItem::ListItem(MainWindow *main):
+    main(main),
     _key(-1),
     hotkey(new QHotkey(main))
 {

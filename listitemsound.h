@@ -24,7 +24,6 @@ public:
     void trigger() override;
 
 private:
-    MainWindow *main;
     ListItemBoard *board;
     QString filename;
 };

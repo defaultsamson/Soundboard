@@ -4,7 +4,6 @@
 #include <QKeySequence>
 #include <QLineEdit>
 #include <QWidget>
-#include <iostream>
 
 WidgetKeybind::WidgetKeybind(QWidget *parent) :
     QLineEdit(parent),

@@ -18,6 +18,7 @@ public:
     virtual void trigger() = 0;
 
 protected:
+    MainWindow *main;
     int _key;
     QHotkey *hotkey;
 };
