@@ -28,7 +28,7 @@ DialogBoard::~DialogBoard()
 // Save settings
 void DialogBoard::on_pushButtonOK_clicked()
 {
-    this->board->setText(this->ui->lineEditName->text().length() > 0 ? this->ui->lineEditName->text() : "New Board");
+    this->board->setText(this->ui->lineEditName->text().length() > 0 ? this->ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
     this->board->setKey(this->ui->lineEdiKeybind->key);
     this->close();
 }

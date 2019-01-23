@@ -6,6 +6,7 @@
 #include <QString>
 #include <QHotkey>
 
+QString ListItemSound::NEW_SOUND = "New Sound";
 
 ListItemSound::ListItemSound(MainWindow *main, QString text) :
     QListWidgetItem(text),

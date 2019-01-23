@@ -9,6 +9,8 @@
 #include <QHotkey>
 #include <QObject>
 
+QString ListItemBoard::NEW_BOARD = "New Board";
+
 ListItemBoard::ListItemBoard(MainWindow *main, QString text) :
     QListWidgetItem(text),
     _key(-1),

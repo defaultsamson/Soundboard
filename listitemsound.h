@@ -11,7 +11,8 @@ class MainWindow;
 class ListItemSound : public QListWidgetItem
 {
 public:
-    ListItemSound(MainWindow *main, QString text = "New Sound");
+    static QString NEW_SOUND;
+    ListItemSound(MainWindow *main, QString text = NEW_SOUND);
     void setFileName(QString name);
     void load(const QJsonObject &json);
     void save(QJsonObject &json);

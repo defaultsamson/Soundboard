@@ -15,7 +15,8 @@ class MainWindow;
 class ListItemBoard : public QListWidgetItem
 {
 public:
-    ListItemBoard(MainWindow *main, QString text = "New Board");
+    static QString NEW_BOARD;
+    ListItemBoard(MainWindow *main, QString text = NEW_BOARD);
     ~ListItemBoard();
     void addSound(ListItemSound *sound);
     void removeSound(int n);
