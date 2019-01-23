@@ -4,10 +4,10 @@
 #include "widgetkeybind.h"
 #include <QKeyEvent>
 
-DialogKeybind::DialogKeybind(QWidget *parent, WidgetKeybind *text) :
+DialogKeybind::DialogKeybind(QWidget *parent, WidgetKeybind *widget) :
     QDialog(parent),
     ui(new Ui::DialogKeybind),
-    text(text)
+    widget(widget)
 {
     ui->setupUi(this);
 }
@@ -18,6 +18,7 @@ DialogKeybind::~DialogKeybind()
 }
 
 void DialogKeybind::keyPressEvent(QKeyEvent *e) {
-    this->text->updateKey(e->key()==Qt::Key_Escape ? -1 : e->key());
-    this->close();
+    // When a key is presed, update the widget value and close the dialog
+    widget->updateKey(e->key()==Qt::Key_Escape ? -1 : e->key());
+    close();
 }

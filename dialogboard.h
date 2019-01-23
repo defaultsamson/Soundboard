@@ -21,9 +21,7 @@ public:
 
 private slots:
     void on_pushButtonOK_clicked();
-
     void on_pushButtonCancel_clicked();
-
     void onClose();
 
 private:
@@ -31,7 +29,7 @@ private:
     MainWindow *main;
     ListItemBoard *board;
     bool creatingNew;
-    bool didSomething = false;
+    bool boardUpdated;
 };
 
 #endif // DIALOGBOARD_H

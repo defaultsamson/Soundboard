@@ -23,7 +23,7 @@ protected:
 
 private:
     Ui::DialogKeybind *ui;
-    WidgetKeybind *text;
+    WidgetKeybind *widget;
 };
 
 #endif // DIALOGKEYBIND_H
