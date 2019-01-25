@@ -5,7 +5,10 @@
 #include <QJsonObject>
 #include <QString>
 #include <QHotkey>
-#include <QSound>
+#include <QSoundEffect>
+#include <QUrl>
+#include <QAudio>
+#include <QAudioOutput>
 #include <iostream>
 
 QString ListItemSound::NEW_SOUND = "New Sound";
@@ -13,7 +16,9 @@ QString ListItemSound::NEW_SOUND = "New Sound";
 ListItemSound::ListItemSound(MainWindow *main, ListItemBoard *board) :
     ListItem(main),
     board(board),
-    audio(nullptr)
+    file(nullptr),
+    _filenameChanged(false),
+    _volumeChanged(false)
 {
     setText(NEW_SOUND);
 }
@@ -22,10 +27,29 @@ ListItemSound::~ListItemSound() {
     board->removeSound(this, false);
 }
 
+void ListItemSound::reload() {
+    if (_filenameChanged) {
+        QAudioOutput *audio;
+        QFile f(filename());
+
+
+
+        //audio.setSource(QUrl::fromUserInput(filename()));
+    }
+    if (_volumeChanged) {
+
+        //qreal linearVolume = QAudio::convertVolume(_volume / qreal(100), QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
+        //m_audioOutput->setVolume(linearVolume);
+
+        //audio.setVolume(static_cast<double>(volume()) / static_cast<double>(100));
+    }
+    _filenameChanged = false;
+    _volumeChanged = false;
+}
+
 void ListItemSound::setFileName(QString name) {
     _filename = name;
-    if (audio) delete audio;
-    audio = new QSound(name);
+    _filenameChanged = true;
 }
 
 QString ListItemSound::filename() {
@@ -34,6 +58,7 @@ QString ListItemSound::filename() {
 
 void ListItemSound::setVolume(int v) {
     _volume = v;
+    _volumeChanged = false;
 }
 
 int ListItemSound::volume() {
@@ -52,6 +77,7 @@ void ListItemSound::load(const QJsonObject &json) {
     ListItem::load(json);
     setFileName(json["filename"].toString());
     setVolume(json["volume"].toInt());
+    reload();
 }
 
 void ListItemSound::save(QJsonObject &json) {
@@ -61,6 +87,6 @@ void ListItemSound::save(QJsonObject &json) {
 }
 
 void ListItemSound::trigger() {
-    audio->play();
+    //audio.play();
     main->playSound(this);
 }

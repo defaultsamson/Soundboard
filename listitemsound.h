@@ -6,7 +6,7 @@
 #include <QString>
 #include <QJsonObject>
 #include <QHotkey>
-#include <QSound>
+#include <QFile>
 
 class MainWindow;
 class ListItemBoard;
@@ -17,6 +17,7 @@ public:
     static QString NEW_SOUND;
     ListItemSound(MainWindow *main, ListItemBoard *board);
     ~ListItemSound() override;
+    void reload();
     void setFileName(QString name);
     QString filename();
     void setVolume(int v);
@@ -31,7 +32,9 @@ private:
     ListItemBoard *board;
     QString _filename;
     int _volume;
-    QSound *audio;
+    QFile *file;
+    bool _filenameChanged;
+    bool _volumeChanged;
 };
 
 #endif // SOUND_H
