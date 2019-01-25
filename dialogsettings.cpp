@@ -10,7 +10,8 @@ DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
     ui(new Ui::DialogSettings),
     main(main),
-    audio(nullptr)
+    audio(nullptr),
+    stream(nullptr)
 {
     ui->setupUi(this);
 
@@ -24,7 +25,9 @@ DialogSettings::DialogSettings(MainWindow *main) :
     connect(box, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
 
     // Initialize the default
-    initializeAudio(ui->comboBoxOutputDevice->itemData(0).value<QAudioDeviceInfo>());
+    if (ui->comboBoxOutputDevice->count() > 0) {
+        initializeAudio(ui->comboBoxOutputDevice->itemData(0).value<QAudioDeviceInfo>());
+    }
 }
 
 DialogSettings::~DialogSettings()
@@ -55,56 +58,23 @@ void DialogSettings::initializeAudio(const QAudioDeviceInfo &deviceInfo)
     qDebug() << "Initializing audio...";
     this->deviceInfo = deviceInfo;
     QAudioFormat format = deviceInfo.preferredFormat();
-    /*
-    QAudioFormat format;
-    format.setSampleRate(44100);
-    format.setChannelCount(2);
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
 
-    if (!deviceInfo.isFormatSupported(format)) {
-        qWarning() << "Default format not supported - trying to use nearest";
-        format = deviceInfo.nearestFormat(format);
-    }*/
-
+    if (stream) delete stream;
+    stream = new AudioFileStream();
+    if (!stream->init(format))
+    {
+        qWarning() << "Failed to init audio stream";
+        delete stream;
+        return;
+    }
     if (audio) delete audio;
     audio = new QAudioOutput(deviceInfo, format);
-    connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleStateChanged(QAudio::State)));
-
+    audio->start(stream);
 }
 
 void DialogSettings::on_pushButtonOutput_clicked()
 {
     // TEST SOUND
     qDebug() << "Testing audio";
-
-    //audio->stop();
-    //sourceFile.close();
-    //sourceFile.setFileName("/home/samson/Desktop/queen/succ.wav");
-    //sourceFile.open(QIODevice::ReadOnly);
-
-    //audio->start(&sourceFile);
-}
-
-void DialogSettings::handleStateChanged(QAudio::State newState)
-{
-    switch (newState) {
-        case QAudio::IdleState:
-            // Finished playing (no more data)
-            audio->stop();
-            break;
-
-        case QAudio::StoppedState:
-            // Stopped for other reasons
-            if (audio->error() != QAudio::NoError) {
-                // Error handling
-            }
-            break;
-
-        default:
-            // ... other cases as appropriate
-            break;
-    }
+    stream->play("/home/samson/Desktop/succ.flac");
 }

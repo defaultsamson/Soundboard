@@ -6,6 +6,7 @@
 #include <QAudioOutput>
 #include <QFile>
 #include <QAudioDecoder>
+#include "audiofilestream.h"
 
 class MainWindow;
 
@@ -26,14 +27,13 @@ private slots:
     void on_buttonBox_rejected();
     void on_pushButtonOutput_clicked();
 
-    void handleStateChanged(QAudio::State newState);
-
 private:
     Ui::DialogSettings *ui;
     MainWindow *main;
     void deviceChanged(int index);
     void initializeAudio(const QAudioDeviceInfo &deviceInfo);
     QAudioOutput *audio;
+    AudioFileStream *stream;
     QAudioDeviceInfo deviceInfo;
 };
 
