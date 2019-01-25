@@ -9,13 +9,12 @@ WidgetKeybind::WidgetKeybind(QWidget *parent) :
     QLineEdit(parent),
     _key(-1)
 {
-
+    setPlaceholderText("Click here to set key");
 }
 
 void WidgetKeybind::setKey(int key) {
     _key = key;
     setText(key == -1 ? "" : QKeySequence(key).toString());
-    setPlaceholderText("Click here to set key");
 }
 
 int WidgetKeybind::key() {

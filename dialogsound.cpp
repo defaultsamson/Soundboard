@@ -39,6 +39,7 @@ void DialogSound::on_buttonBox_accepted()
     sound->setKey(ui->lineEdiKeybind->key());
     sound->setFileName(ui->lineEditFile->text());
     sound->setVolume(ui->sliderVolume->value());
+    sound->reload();
     soundUpdated = true;
     close();
 }
