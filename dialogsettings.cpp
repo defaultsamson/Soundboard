@@ -11,9 +11,7 @@
 DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
     ui(new Ui::DialogSettings),
-    main(main),
-    audio(nullptr),
-    stream(nullptr)
+    main(main)
 {
     ui->setupUi(this);
 
@@ -35,8 +33,6 @@ DialogSettings::DialogSettings(MainWindow *main) :
 DialogSettings::~DialogSettings()
 {
     delete ui;
-    audio->stop();
-    delete audio;
 }
 
 void DialogSettings::on_buttonBox_accepted()
@@ -58,30 +54,13 @@ void DialogSettings::deviceChanged(int index)
 void DialogSettings::initializeAudio(const QAudioDeviceInfo &deviceInfo)
 {
     qDebug() << "Initializing audio...";
-    this->deviceInfo = deviceInfo;
-    QAudioFormat format = deviceInfo.preferredFormat();
-
-    if (stream) delete stream;
-    stream = new AudioFileStream();
-    if (!stream->init(format))
-    {
-        qWarning() << "Failed to init audio stream";
-        delete stream;
-        return;
-    }
-
-    connect(stream, &AudioFileStream::update, this, [&]() {
-        ui->outputBar->setLevel(stream->level());
-    });
-    if (audio) delete audio;
-    audio = new QAudioOutput(deviceInfo, format);
-    audio->start(stream);
+    audio.init(deviceInfo);
+    audio.setFile("/home/samson/Desktop/succ.flac");
 }
 
 void DialogSettings::on_pushButtonOutput_clicked()
 {
-    // TEST SOUND
     qDebug() << "Testing audio";
-    stream->stop();
-    stream->play("/home/samson/Desktop/succ.flac");
+    audio.stop();
+    audio.play();
 }

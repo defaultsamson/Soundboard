@@ -20,7 +20,7 @@ public:
 
     enum State { Playing, Stopped };
 
-    void play(const QString &filePath);
+    void play(QFile &file);
     void stop();
 
     bool atEnd() const override;

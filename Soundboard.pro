@@ -35,7 +35,8 @@ SOURCES += \
     listitem.cpp \
     dialogsound.cpp \
     audiofilestream.cpp \
-    widgetaudio.cpp
+    widgetaudio.cpp \
+    audioobject.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -48,7 +49,8 @@ HEADERS += \
     listitem.h \
     dialogsound.h \
     audiofilestream.h \
-    widgetaudio.h
+    widgetaudio.h \
+    audioobject.h
 
 FORMS += \
         mainwindow.ui \

@@ -171,18 +171,9 @@ qint64 AudioFileStream::writeData(const char* data, qint64 len)
 }
 
 // Start play audio file
-void AudioFileStream::play(const QString &filePath)
-{
-    clear();
+void AudioFileStream::play(QFile &file) {
 
-    m_file.setFileName(filePath);
-
-    if (!m_file.open(QIODevice::ReadOnly))
-    {
-        return;
-    }
-
-    m_decoder.setSourceDevice(&m_file);
+    m_decoder.setSourceDevice(&file);
     m_decoder.start();
 
     m_state = State::Playing;
@@ -197,10 +188,11 @@ void AudioFileStream::stop()
     emit stateChanged(m_state);
 }
 
-
 void AudioFileStream::clear()
 {
     m_decoder.stop();
+    m_input.reset();
+    m_output.reset();
     m_data.clear();
     isDecodingFinished = false;
 }
