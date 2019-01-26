@@ -29,8 +29,8 @@ ListItemSound::~ListItemSound() {
 
 void ListItemSound::reload() {
     if (_filenameChanged) {
-        QAudioOutput *audio;
-        QFile f(filename());
+        //QAudioOutput *audio;
+        //QFile f(filename());
 
 
 

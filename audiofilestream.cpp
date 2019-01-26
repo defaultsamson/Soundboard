@@ -55,6 +55,7 @@ bool AudioFileStream::init(const QAudioFormat& format)
             break;
         case QAudioFormat::Float:
             m_maxAmplitude = 0x7fffffff; // Kind of
+            break;
         default:
             break;
         }
@@ -83,7 +84,7 @@ bool AudioFileStream::init(const QAudioFormat& format)
 // AudioOutput device (like speaker) call this function for get new audio data
 qint64 AudioFileStream::readData(char* data, qint64 len)
 {
-    memset(data, 0, len);
+    memset(data, 0, static_cast<size_t>(len));
 
     if (m_state == State::Playing)
     {
@@ -93,7 +94,7 @@ qint64 AudioFileStream::readData(char* data, qint64 len)
         // Other word this emulate QAudioProbe behaviour for retrieve audio data which of sent to output device (speaker).
         if (len > 0)
         {
-            QByteArray buff(data, len);
+            QByteArray buff(data, static_cast<int>(len));
             emit newData(buff);
         }
 

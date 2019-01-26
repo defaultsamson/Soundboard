@@ -28,7 +28,7 @@ void ListItemBoard::addSound(ListItemSound *sound) {
 
 void ListItemBoard::removeSound(int n, bool deleteSound) {
     if (n < 0) return;
-    if (deleteSound) delete sounds.at(n);
+    if (deleteSound) delete sounds.at(static_cast<size_t>(n));
     sounds.erase(sounds.begin() + n);
 }
 
@@ -37,7 +37,7 @@ void ListItemBoard::removeSound(ListItemSound *sound, bool deleteSound) {
     std::vector<ListItemSound *>::iterator iter = std::find(sounds.begin(), sounds.end(), sound);
     if(iter != sounds.end())
     {
-        n = std::distance(sounds.begin(), iter);
+        n = static_cast<int>(std::distance(sounds.begin(), iter));
     }
     removeSound(n, deleteSound);
 }

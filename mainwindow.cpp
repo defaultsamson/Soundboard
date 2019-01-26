@@ -111,7 +111,7 @@ void MainWindow::on_actionUpdate_triggered()
 // ******************* BGN LIST ACTIONS *******************
 
 // Board item changed
-void MainWindow::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+void MainWindow::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem * /* previous */)
 {
     setCurrentBoard(static_cast<ListItemBoard*>(current));
 }
