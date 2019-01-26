@@ -82,5 +82,6 @@ void DialogSettings::on_pushButtonOutput_clicked()
 {
     // TEST SOUND
     qDebug() << "Testing audio";
+    stream->stop();
     stream->play("/home/samson/Desktop/succ.flac");
 }

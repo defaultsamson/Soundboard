@@ -105,7 +105,7 @@ qint64 AudioFileStream::readData(char* data, qint64 len)
         }
     }
 
-    // TODO only do this stuff if the program wants to be displayed
+    // TODO only do this stuff if the program wants the current output to be displayed
     if (m_maxAmplitude) {
         Q_ASSERT(m_format.sampleSize() % 8 == 0);
         const int channelBytes = m_format.sampleSize() / 8;
@@ -212,8 +212,6 @@ bool AudioFileStream::atEnd() const
         && m_output.atEnd()
         && isDecodingFinished;
 }
-
-
 
 /////////////////////////////////////////////////////////////////////
 // QAudioDecoder logic this methods responsible for decode audio file and put audio data to stream buffer
