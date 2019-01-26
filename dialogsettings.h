@@ -34,6 +34,7 @@ private:
     MainWindow *main;
     void initializeAudio(const QAudioDeviceInfo &deviceInfo);
     AudioObject audio;
+    bool pause = false;
 };
 
 #endif // DIALOGSETTINGS_H

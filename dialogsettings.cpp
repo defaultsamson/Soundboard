@@ -61,6 +61,11 @@ void DialogSettings::initializeAudio(const QAudioDeviceInfo &deviceInfo)
 void DialogSettings::on_pushButtonOutput_clicked()
 {
     qDebug() << "Testing audio";
-    audio.stop();
-    audio.play();
+    if (pause) {
+        pause = false;
+        audio.pause();
+    } else {
+        pause = true;
+        audio.play();
+    }
 }

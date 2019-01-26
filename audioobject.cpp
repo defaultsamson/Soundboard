@@ -25,21 +25,24 @@ void AudioObject::init(const QAudioDeviceInfo &info) {
 
 void AudioObject::stop() {
     stream.stop();
-    //output->stop();
+    paused = false;
 }
 
 // TODO test this
 void AudioObject::pause() {
     output->suspend();
+    paused = true;
 }
 
 void AudioObject::play() {
-    if (!paused) {
+    if (paused) {
+        output->resume();
+        paused = false;
+    } else {
         // plays fgrom beginning of file
-        qDebug() << "SHID";
         stream.stop();
+        stream.play(file);
     }
-    stream.play(file);
 }
 
 void AudioObject::setFile(const QString &filename) {

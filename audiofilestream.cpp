@@ -191,8 +191,10 @@ void AudioFileStream::stop()
 void AudioFileStream::clear()
 {
     m_decoder.stop();
-    m_input.reset();
-    m_output.reset();
+    //m_input.reset();
+    m_input.seek(0);
+    //m_output.reset();
+    m_output.seek(0);
     m_data.clear();
     isDecodingFinished = false;
 }
