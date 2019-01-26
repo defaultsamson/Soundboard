@@ -34,7 +34,8 @@ SOURCES += \
     widgetkeybind.cpp \
     listitem.cpp \
     dialogsound.cpp \
-    audiofilestream.cpp
+    audiofilestream.cpp \
+    widgetaudio.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,7 +47,8 @@ HEADERS += \
     widgetkeybind.h \
     listitem.h \
     dialogsound.h \
-    audiofilestream.h
+    audiofilestream.h \
+    widgetaudio.h
 
 FORMS += \
         mainwindow.ui \

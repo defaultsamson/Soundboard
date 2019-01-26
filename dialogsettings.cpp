@@ -5,6 +5,8 @@
 #include <QAudioDeviceInfo>
 #include <QAudioDecoder>
 #include <QBuffer>
+#include <QObject>
+#include <QProgressBar>
 
 DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
@@ -67,6 +69,10 @@ void DialogSettings::initializeAudio(const QAudioDeviceInfo &deviceInfo)
         delete stream;
         return;
     }
+
+    connect(stream, &AudioFileStream::update, this, [&]() {
+        ui->outputBar->setLevel(stream->level());
+    });
     if (audio) delete audio;
     audio = new QAudioOutput(deviceInfo, format);
     audio->start(stream);

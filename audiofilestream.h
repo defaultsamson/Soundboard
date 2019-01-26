@@ -25,6 +25,8 @@ public:
 
     bool atEnd() const override;
 
+    qreal level() const { return m_level; }
+
 protected:
     qint64 readData(char* data, qint64 maxlen) override;
     qint64 writeData(const char* data, qint64 len) override;
@@ -36,6 +38,8 @@ private:
     QByteArray m_data;
     QAudioDecoder m_decoder;
     QAudioFormat m_format;
+    quint32 m_maxAmplitude = 0;
+    qreal m_level = 0.0; // 0.0 <= m_level <= 1.0
 
     State m_state;
 
@@ -43,6 +47,9 @@ private:
     bool isDecodingFinished;
 
     void clear();
+
+signals:
+    void update();
 
 private slots:
     void bufferReady();
