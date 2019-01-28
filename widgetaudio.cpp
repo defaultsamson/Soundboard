@@ -14,11 +14,12 @@ void WidgetAudio::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
 
-    painter.setPen(Qt::gray);
+    painter.setPen(palette().color(QPalette::Dark));
     painter.drawRect(QRect(painter.viewport().left(),
                            painter.viewport().top(),
                            painter.viewport().right(),
                            painter.viewport().bottom()));
+
     if (m_level > 0.0) {
         int pos = static_cast<int>((painter.viewport().right() - painter.viewport().left() - 1) * m_level);
         Qt::GlobalColor colour = m_level >= 0.85 ? Qt::red : (m_level >= 0.7 ? Qt::yellow : Qt::green);

@@ -31,6 +31,8 @@ public:
     void removeSound(int row);
     void trigger(ListItem *item);
     void playSound(ListItemSound *sound);
+    void setDefaultTheme();
+    void setDarkTheme(bool set = true);
 
 private slots:
 
@@ -56,6 +58,8 @@ private slots:
     void on_buttonRemoveSound_clicked();
     void on_buttonEditSound_clicked();
 
+    void on_actionTheme_toggled(bool checked);
+
 public slots:
     void enableKeybinds();
     void disableKeybinds();
@@ -65,6 +69,9 @@ private:
     bool hasFile;
     QString fileName;
     ListItemBoard *currentBoard;
+
+    QPalette darkPalette;
+    QPalette defaultPalette;
 
     void displayBoard(ListItemBoard *board);
     void editBoard(bool createNew = false);
