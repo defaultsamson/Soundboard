@@ -28,7 +28,6 @@ void AudioObject::stop() {
     paused = false;
 }
 
-// TODO test this
 void AudioObject::pause() {
     output->suspend();
     paused = true;
@@ -39,7 +38,7 @@ void AudioObject::play() {
         output->resume();
         paused = false;
     } else {
-        // plays fgrom beginning of file
+        // plays from beginning of file
         stream.stop();
         stream.play(file);
     }

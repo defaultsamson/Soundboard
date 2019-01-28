@@ -3,10 +3,11 @@
 
 #include <QListWidgetItem>
 #include <QHotkey>
+#include <QObject>
 
 class MainWindow;
 
-class ListItem : public QListWidgetItem
+class ListItem : public QListWidgetItem, public QObject
 {
 public:
     ListItem(MainWindow *main);

@@ -24,31 +24,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    /*
-    QPalette p = qApp->palette();
-    p.setColor(QPalette::Window, QColor(53,53,53));
-    p.setColor(QPalette::Button, QColor(53,53,53));
-    p.setColor(QPalette::Highlight, QColor(142,45,197));
-    p.setColor(QPalette::ButtonText, QColor(255,255,255));
-    p.setColor(QPalette::WindowText, QColor(255,255,255));
-    qApp->setPalette(p);
-*/
-
-    // qApp->setPalette(palette);
-    /*
-    QFile f(":qdarkstyle/style.qss");
-    if (!f.exists())
-    {
-        printf("Unable to set stylesheet, file not found\n");
-    }
-    else
-    {
-        f.open(QFile::ReadOnly | QFile::Text);
-        QTextStream ts(&f);
-        qApp->setStyleSheet(ts.readAll());
-    }
-*/
-
     return a.exec();
 }
 
@@ -381,16 +356,8 @@ void MainWindow::trigger(ListItem *item) {
     item->trigger();
 }
 
-void MainWindow::setDefaultTheme() {
-    setDarkTheme(false);
-}
-
 void MainWindow::setDarkTheme(bool set) {
-    if (set) {
-        qApp->setPalette(darkPalette);
-    } else {
-        qApp->setPalette(defaultPalette);
-    }
+    qApp->setPalette(set ? darkPalette : defaultPalette);
 }
 
 void MainWindow::on_actionTheme_toggled(bool checked) {

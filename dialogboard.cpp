@@ -30,7 +30,6 @@ DialogBoard::~DialogBoard()
 
 void DialogBoard::on_buttonBox_accepted()
 {
-    // Updates the values to the board
     board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
     board->setKey(ui->lineEdiKeybind->key());
     boardUpdated = true;

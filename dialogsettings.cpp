@@ -7,7 +7,6 @@
 #include <QBuffer>
 #include <QObject>
 #include <QProgressBar>
-
 DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
     ui(new Ui::DialogSettings),

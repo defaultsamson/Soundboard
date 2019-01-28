@@ -31,7 +31,6 @@ public:
     void removeSound(int row);
     void trigger(ListItem *item);
     void playSound(ListItemSound *sound);
-    void setDefaultTheme();
     void setDarkTheme(bool set = true);
 
 private slots:

@@ -4,16 +4,14 @@
 #include <QHotkey>
 #include <QObject>
 
-ListItem::ListItem(MainWindow *main):
+ListItem::ListItem(MainWindow *main) :
+    QObject(main),
     main(main),
     _key(-1),
     hotkey(new QHotkey(main))
 {
-    // Sets up the keybind (must pass back to the
-    // main window before the ListItem can touch it)
-    QObject::connect(hotkey, &QHotkey::activated, main, [&](){
-        main->trigger(this);
-    });
+    // Sets up the keybind
+    QObject::connect(hotkey, &QHotkey::activated, this, &ListItem::trigger);
 }
 
 ListItem::~ListItem() {
