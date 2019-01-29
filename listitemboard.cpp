@@ -76,7 +76,6 @@ void ListItemBoard::save(QJsonObject &json) {
 }
 
 void ListItemBoard::reg(bool regThis, bool regSounds) {
-    qDebug() << "nud1: " << regThis << ", " << regSounds;
     if (regThis) hotkey->setRegistered(true);
     // Register all sounds' keybinds
     if (regSounds) for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->reg();

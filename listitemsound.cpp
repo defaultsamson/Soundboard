@@ -88,5 +88,6 @@ void ListItemSound::save(QJsonObject &json) {
 
 void ListItemSound::trigger() {
     //audio.play();
-    main->playSound(this);
+    main->setCurrentSound(this);
+    // TODO give this an AudioObject
 }

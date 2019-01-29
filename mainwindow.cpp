@@ -238,11 +238,10 @@ void MainWindow::setCurrentBoard(ListItemBoard *board) {
     }
 }
 
-void MainWindow::playSound(ListItemSound *sound) {
+void MainWindow::setCurrentSound(ListItemSound *sound) {
     // TODO don't do display if the settings say not to
     ui->listSounds->setCurrentItem(sound);
     // TODO play audio
-
 }
 
 void MainWindow::removeSound(ListItemSound *sound) {
@@ -350,10 +349,6 @@ void MainWindow::disableKeybinds() {
     for (int i = 0; i < ui->listBoards->count(); ++i) {
         static_cast<ListItemBoard*>(ui->listBoards->item(i))->unreg(true);
     }
-}
-
-void MainWindow::trigger(ListItem *item) {
-    item->trigger();
 }
 
 void MainWindow::setDarkTheme(bool set) {

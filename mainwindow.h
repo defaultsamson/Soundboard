@@ -27,10 +27,9 @@ public:
     void setCurrentBoard(ListItemBoard *board);
     void removeBoard(ListItemBoard *board);
     void removeBoard(int row);
+    void setCurrentSound(ListItemSound *sound);
     void removeSound(ListItemSound *sound);
     void removeSound(int row);
-    void trigger(ListItem *item);
-    void playSound(ListItemSound *sound);
     void setDarkTheme(bool set = true);
 
 private slots:
@@ -67,7 +66,7 @@ private:
     Ui::MainWindow *ui;
     bool hasFile;
     QString fileName;
-    ListItemBoard *currentBoard;
+    ListItemBoard *currentBoard = nullptr;
 
     QPalette darkPalette;
     QPalette defaultPalette;
