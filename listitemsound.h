@@ -8,14 +8,14 @@
 #include <QHotkey>
 #include <QFile>
 
-class MainWindow;
+class Main;
 class ListItemBoard;
 
 class ListItemSound : public ListItem
 {
 public:
     static QString NEW_SOUND;
-    ListItemSound(MainWindow *main, ListItemBoard *board);
+    ListItemSound(Main *main, ListItemBoard *board);
     ~ListItemSound() override;
     void reload();
     void setFileName(QString name);

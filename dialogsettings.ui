@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>594</width>
-    <height>405</height>
+    <width>500</width>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,36 @@
    <property name="bottomMargin">
     <number>6</number>
    </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>General</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QCheckBox" name="checkBoxDarkTheme">
+        <property name="text">
+         <string>Dark Theme</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxFocusVisuals">
+        <property name="text">
+         <string>Update visuals when window not focussed</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxTrayMinimize">
+        <property name="text">
+         <string>Minimize to tray (TODO)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">

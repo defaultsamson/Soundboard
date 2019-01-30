@@ -4,7 +4,7 @@
 #include <QHotkey>
 #include <QObject>
 
-ListItem::ListItem(MainWindow *main) :
+ListItem::ListItem(Main *main) :
     QObject(main),
     main(main),
     _key(-1),

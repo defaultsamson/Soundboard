@@ -15,26 +15,37 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFileDialog>
-
-#include <iostream>
+#include <QSettings>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+    Main w;
     w.show();
+
+    /*
+    QString dir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    if (!dir.isEmpty()) {
+        // TODO w.loadSettings(dir + "settings.json");
+        // TODO w.saveSettings(dir + "settings.json");
+        w.load(dir + "default.json");
+    }*/
 
     return a.exec();
 }
 
-MainWindow::MainWindow(QWidget *parent) :
+QString Main::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/Soundboard/";
+QString Main::SETTINGS_FILE = "settings.ini";
+QString Main::DEFAULT_SOUNDBOARD = "default.json";
+QString Main::DARK_THEME = "dark_theme";
+
+Main::Main(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    hasFile(false)
+    _settings(new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat)),
+    defaultPalette(qApp->palette())
 {
     ui->setupUi(this);
-
-    defaultPalette = qApp->palette();
 
     // Colours from https://github.com/Jorgen-VikingGod/Qt-Frameless-Window-DarkStyle/blob/master/DarkStyle.cpp
     // (mirror): https://stackoverflow.com/a/45634644/1902411
@@ -58,9 +69,11 @@ MainWindow::MainWindow(QWidget *parent) :
     darkPalette.setColor(QPalette::Disabled, QPalette::Highlight, QColor(80, 80, 80));
     darkPalette.setColor(QPalette::HighlightedText, Qt::white);
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
+
+    setDarkTheme(settings()->value(DARK_THEME, false).toBool());
 }
 
-MainWindow::~MainWindow()
+Main::~Main()
 {
     clear();
     delete ui;
@@ -69,7 +82,7 @@ MainWindow::~MainWindow()
 // ******************* BGN MENU ACTIONS *******************
 
 // New
-void MainWindow::on_actionNew_triggered()
+void Main::on_actionNew_triggered()
 {
     clear();
     hasFile = false;
@@ -77,56 +90,50 @@ void MainWindow::on_actionNew_triggered()
 }
 
 // Open
-void MainWindow::on_actionOpen_triggered()
+void Main::on_actionOpen_triggered()
 {
     load();
 }
 
 // Save
-void MainWindow::on_actionSave_triggered()
+void Main::on_actionSave_triggered()
 {
     save();
 }
 
 // Save As
-void MainWindow::on_actionSaveAs_triggered()
+void Main::on_actionSaveAs_triggered()
 {
     save(true);
 }
 
 // Exit program
-void MainWindow::on_actionExit_triggered()
+void Main::on_actionExit_triggered()
 {
     QApplication::quit();
 }
 
 // Settings (e.g. Sound set)
-void MainWindow::on_actionSettings_triggered()
+void Main::on_actionSettings_triggered()
 {
     DialogSettings w(this);
     w.exec();
 }
 
-// Themes (e.g. dark theme, light theme, customizer??)
-void MainWindow::on_actionTheme_triggered()
-{
-
-}
-
 // Wiki Page
-void MainWindow::on_actionWiki_triggered()
+void Main::on_actionWiki_triggered()
 {
     QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard/wiki", QUrl::TolerantMode));
 }
 
 // Github Page
-void MainWindow::on_actionGitHub_triggered()
+void Main::on_actionGitHub_triggered()
 {
     QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard", QUrl::TolerantMode));
 }
 
 // Update
-void MainWindow::on_actionUpdate_triggered()
+void Main::on_actionUpdate_triggered()
 {
     // TODO check properly instead of just linking to the download page
     QDesktopServices::openUrl(QUrl("https://github.com/qwertysam/Soundboard/releases", QUrl::TolerantMode));
@@ -136,19 +143,19 @@ void MainWindow::on_actionUpdate_triggered()
 // ******************* BGN LIST ACTIONS *******************
 
 // Board item changed
-void MainWindow::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem * /* previous */)
+void Main::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem * /* previous */)
 {
     setCurrentBoard(static_cast<ListItemBoard*>(current));
 }
 
 // Board item double clicked, enter edit mode
-void MainWindow::on_listBoards_itemActivated(QListWidgetItem *item)
+void Main::on_listBoards_itemActivated(QListWidgetItem *item)
 {
     editBoard(static_cast<ListItemBoard*>(item));
 }
 
 // Sound item double clicked, enter edit mode
-void MainWindow::on_listSounds_itemActivated(QListWidgetItem *item)
+void Main::on_listSounds_itemActivated(QListWidgetItem *item)
 {
     editSound(static_cast<ListItemSound*>(item));
 }
@@ -157,7 +164,7 @@ void MainWindow::on_listSounds_itemActivated(QListWidgetItem *item)
 // ******************* BGN BUTTON ACTIONS *******************
 
 // Add board item
-void MainWindow::on_buttonAddBoard_clicked()
+void Main::on_buttonAddBoard_clicked()
 {
     ListItemBoard *board = new ListItemBoard(this);
     ui->listBoards->addItem(board);
@@ -165,18 +172,18 @@ void MainWindow::on_buttonAddBoard_clicked()
 }
 
 // Remove board item
-void MainWindow::on_buttonRemoveBoard_clicked()
+void Main::on_buttonRemoveBoard_clicked()
 {
     removeBoard(ui->listBoards->currentRow());
 }
 
-void MainWindow::on_buttonEditBoard_clicked()
+void Main::on_buttonEditBoard_clicked()
 {
     editBoard();
 }
 
 // Add sound item
-void MainWindow::on_buttonAddSound_clicked()
+void Main::on_buttonAddSound_clicked()
 {
     if (!currentBoard) return;
     ListItemSound *sound = new ListItemSound(this, currentBoard);
@@ -186,12 +193,12 @@ void MainWindow::on_buttonAddSound_clicked()
 }
 
 // Remove sound item
-void MainWindow::on_buttonRemoveSound_clicked()
+void Main::on_buttonRemoveSound_clicked()
 {
     removeSound(ui->listSounds->currentRow());
 }
 
-void MainWindow::on_buttonEditSound_clicked()
+void Main::on_buttonEditSound_clicked()
 {
     editSound();
 }
@@ -199,26 +206,26 @@ void MainWindow::on_buttonEditSound_clicked()
 // ******************* END BUTTON ACTIONS *******************
 // ******************* BGN BOARD FUNCTIONS *******************
 
-void MainWindow::removeBoard(ListItemBoard *board) {
+void Main::removeBoard(ListItemBoard *board) {
     removeBoard(ui->listBoards->row(board));
 }
 
-void MainWindow::removeBoard(int row) {
+void Main::removeBoard(int row) {
     if (row < 0 || row >= ui->listBoards->count()) return;
     delete ui->listBoards->takeItem(row);
 }
 
-void MainWindow::editBoard(bool createNew) {
+void Main::editBoard(bool createNew) {
     editBoard(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
 }
 
-void MainWindow::editBoard(ListItemBoard *board, bool createNew) {
+void Main::editBoard(ListItemBoard *board, bool createNew) {
     if (!board) return;
     DialogBoard w(this, board, createNew);
     w.exec();
 }
 
-void MainWindow::displayBoard(ListItemBoard *board) {
+void Main::displayBoard(ListItemBoard *board) {
     // TODO not do if settings don't want to update visuals
     if (board != ui->listBoards->currentItem()) {
         ui->listBoards->setCurrentItem(board);
@@ -226,7 +233,7 @@ void MainWindow::displayBoard(ListItemBoard *board) {
     board->populateList(ui->listSounds);
 }
 
-void MainWindow::setCurrentBoard(ListItemBoard *board) {
+void Main::setCurrentBoard(ListItemBoard *board) {
     if (currentBoard == board) return;
     if (currentBoard) {
         currentBoard->unreg(false);
@@ -238,27 +245,27 @@ void MainWindow::setCurrentBoard(ListItemBoard *board) {
     }
 }
 
-void MainWindow::setCurrentSound(ListItemSound *sound) {
+void Main::setCurrentSound(ListItemSound *sound) {
     // TODO don't do display if the settings say not to
     ui->listSounds->setCurrentItem(sound);
     // TODO play audio
 }
 
-void MainWindow::removeSound(ListItemSound *sound) {
+void Main::removeSound(ListItemSound *sound) {
     removeSound(ui->listSounds->row(sound));
 }
 
-void MainWindow::removeSound(int row) {
+void Main::removeSound(int row) {
     if (row < 0 || row >= ui->listSounds->count()) return;
     delete ui->listSounds->takeItem(row);
     displayBoard(currentBoard);
 }
 
-void MainWindow::editSound(bool createNew) {
+void Main::editSound(bool createNew) {
     editSound(static_cast<ListItemSound*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
 }
 
-void MainWindow::editSound(ListItemSound *sound, bool createNew) {
+void Main::editSound(ListItemSound *sound, bool createNew) {
     if (!sound) return;
     DialogSound w(this, sound, createNew);
     w.exec();
@@ -267,14 +274,16 @@ void MainWindow::editSound(ListItemSound *sound, bool createNew) {
 // ******************* END BOARD FUNCTIONS *******************
 // ******************* BGN FILE FUNCTIONS *******************
 
-void MainWindow::clear() {
+void Main::clear() {
     for (int i = ui->listSounds->count() - 1; i >= 0; --i) ui->listSounds->takeItem(i);
     for (int i = ui->listBoards->count() - 1; i >= 0; --i) delete ui->listBoards->takeItem(i);
 }
 
-void MainWindow::load() {
-    QString fn = QFileDialog::getOpenFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
+void Main::load() {
+    load(QFileDialog::getOpenFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)")));
+}
 
+void Main::load(const QString fn) {
     QFile file(fn);
 
     if (!file.open(QIODevice::ReadOnly)) {
@@ -304,7 +313,7 @@ void MainWindow::load() {
     enableKeybinds();
 }
 
-void MainWindow::save(bool saveAs) {
+void Main::save(bool saveAs) {
     if (!hasFile || saveAs) {
         // Let the user choose a save file
         fileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
@@ -338,23 +347,24 @@ void MainWindow::save(bool saveAs) {
 
 // ******************* END FILE FUNCTIONS *******************
 
-void MainWindow::enableKeybinds() {
+void Main::enableKeybinds() {
     for (int i = 0; i < ui->listBoards->count(); ++i) {
         static_cast<ListItemBoard*>(ui->listBoards->item(i))->reg(true, false);
     }
     if (currentBoard) currentBoard->reg(false, true);
 }
 
-void MainWindow::disableKeybinds() {
+void Main::disableKeybinds() {
     for (int i = 0; i < ui->listBoards->count(); ++i) {
         static_cast<ListItemBoard*>(ui->listBoards->item(i))->unreg(true);
     }
 }
 
-void MainWindow::setDarkTheme(bool set) {
+void Main::setDarkTheme(bool set) {
     qApp->setPalette(set ? darkPalette : defaultPalette);
+    settings()->setValue(DARK_THEME, set);
 }
 
-void MainWindow::on_actionTheme_toggled(bool checked) {
-    setDarkTheme(checked);
+QSettings *Main::settings() {
+    return _settings;
 }

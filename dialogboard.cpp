@@ -6,13 +6,12 @@
 
 #include <QObject>
 
-DialogBoard::DialogBoard(MainWindow *main, ListItemBoard *board, bool creatingNew) :
+DialogBoard::DialogBoard(Main *main, ListItemBoard *board, bool creatingNew) :
     QDialog(main),
     ui(new Ui::DialogBoard),
     main(main),
     board(board),
-    creatingNew(creatingNew),
-    boardUpdated(false)
+    creatingNew(creatingNew)
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : board->text());

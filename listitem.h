@@ -5,12 +5,12 @@
 #include <QHotkey>
 #include <QObject>
 
-class MainWindow;
+class Main;
 
 class ListItem : public QListWidgetItem, public QObject
 {
 public:
-    ListItem(MainWindow *main);
+    ListItem(Main *main);
     ~ListItem();
     int key();
     void setKey(int key);
@@ -19,7 +19,7 @@ public:
     virtual void trigger() = 0;
 
 protected:
-    MainWindow *main;
+    Main *main;
     int _key;
     QHotkey *hotkey;
 };

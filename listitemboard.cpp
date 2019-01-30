@@ -12,7 +12,7 @@
 
 QString ListItemBoard::NEW_BOARD = "New Board";
 
-ListItemBoard::ListItemBoard(MainWindow *main) :
+ListItemBoard::ListItemBoard(Main *main) :
     ListItem(main)
 {
     setText(NEW_BOARD);

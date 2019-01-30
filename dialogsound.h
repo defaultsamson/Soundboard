@@ -5,7 +5,7 @@
 
 #include "listitemsound.h"
 
-class MainWindow;
+class Main;
 
 namespace Ui {
 class DialogSound;
@@ -16,7 +16,7 @@ class DialogSound : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogSound(MainWindow *main, ListItemSound *sound, bool creatingNew = false);
+    explicit DialogSound(Main *main, ListItemSound *sound, bool creatingNew = false);
     ~DialogSound();
 
 private slots:
@@ -29,7 +29,7 @@ private slots:
 
 private:
     Ui::DialogSound *ui;
-    MainWindow *main;
+    Main *main;
     ListItemSound *sound;
     bool creatingNew;
     bool soundUpdated;

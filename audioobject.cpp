@@ -1,9 +1,11 @@
 #include "audioobject.h"
+#include "audiofilestream.h"
 
 #include <QAudioDeviceInfo>
 #include <QAudioFormat>
 #include <QAudioOutput>
 #include <QString>
+#include <QObject>
 
 AudioObject::AudioObject()
 {
@@ -12,19 +14,23 @@ AudioObject::AudioObject()
 
 void AudioObject::init(const QAudioDeviceInfo &info) {
     if (output) output->stop();
-    stream.stop();
+    _stream.stop();
     QAudioFormat format = info.preferredFormat();
-    if (!stream.init(format)) {
+    if (!_stream.init(format)) {
         qWarning() << "Failed to init audio stream";
         // TODO error message to user
         return;
     }
     output.reset(new QAudioOutput(info, format));
-    output->start(&stream);
+    output->start(&_stream);
+}
+
+AudioFileStream &AudioObject::stream() {
+    return _stream;
 }
 
 void AudioObject::stop() {
-    stream.stop();
+    _stream.stop();
     paused = false;
 }
 
@@ -39,8 +45,8 @@ void AudioObject::play() {
         paused = false;
     } else {
         // plays from beginning of file
-        stream.stop();
-        stream.play(file);
+        _stream.stop();
+        _stream.play(file);
     }
 }
 

@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QString>
 #include <QWidget>
+#include <QSettings>
 
 #include "listitem.h"
 #include "listitemboard.h"
@@ -14,14 +15,19 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class Main : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    static QString DEFAULT_DIR;
+    static QString SETTINGS_FILE;
+    static QString DEFAULT_SOUNDBOARD;
+    static QString DARK_THEME;
+    explicit Main(QWidget *parent = nullptr);
+    ~Main();
     void load();
+    void load(const QString fn);
     void save(bool saveAs = false);
     void clear();
     void setCurrentBoard(ListItemBoard *board);
@@ -31,7 +37,7 @@ public:
     void removeSound(ListItemSound *sound);
     void removeSound(int row);
     void setDarkTheme(bool set = true);
-
+    QSettings *settings();
 private slots:
 
     void on_actionNew_triggered();
@@ -40,7 +46,6 @@ private slots:
     void on_actionSaveAs_triggered();
     void on_actionExit_triggered();
     void on_actionSettings_triggered();
-    void on_actionTheme_triggered();
     void on_actionWiki_triggered();
     void on_actionGitHub_triggered();
     void on_actionUpdate_triggered();
@@ -56,17 +61,16 @@ private slots:
     void on_buttonRemoveSound_clicked();
     void on_buttonEditSound_clicked();
 
-    void on_actionTheme_toggled(bool checked);
-
 public slots:
     void enableKeybinds();
     void disableKeybinds();
 
 private:
     Ui::MainWindow *ui;
-    bool hasFile;
+    bool hasFile = false;
     QString fileName;
     ListItemBoard *currentBoard = nullptr;
+    QSettings *_settings;
 
     QPalette darkPalette;
     QPalette defaultPalette;

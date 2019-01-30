@@ -48,9 +48,6 @@ private:
 
     void clear();
 
-signals:
-    void update();
-
 private slots:
     void bufferReady();
     void finished();
@@ -58,6 +55,7 @@ private slots:
 signals:
     void stateChanged(AudioFileStream::State state);
     void newData(const QByteArray& data);
+    void update(qreal m_level);
 };
 
 #endif // AUDIOFILESTREAM_H

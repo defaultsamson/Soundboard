@@ -16,10 +16,11 @@ public:
     void stop();
     void pause();
     void init(const QAudioDeviceInfo &info);
+    AudioFileStream &stream();
 
 private:
     QScopedPointer<QAudioOutput> output;
-    AudioFileStream stream;
+    AudioFileStream _stream;
     QAudioDeviceInfo info;
     QFile file;
     bool paused = false;

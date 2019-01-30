@@ -1,18 +1,21 @@
 #include "dialogsettings.h"
 #include "ui_dialogsettings.h"
 #include "mainwindow.h"
+#include "audioobject.h"
 
 #include <QAudioDeviceInfo>
-#include <QAudioDecoder>
 #include <QBuffer>
 #include <QObject>
 #include <QProgressBar>
-DialogSettings::DialogSettings(MainWindow *main) :
+
+DialogSettings::DialogSettings(Main *main) :
     QDialog(main),
     ui(new Ui::DialogSettings),
     main(main)
 {
     ui->setupUi(this);
+
+    ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
 
     QComboBox *box = ui->comboBoxOutputDevice;
     const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
@@ -55,6 +58,10 @@ void DialogSettings::initializeAudio(const QAudioDeviceInfo &deviceInfo)
     qDebug() << "Initializing audio...";
     audio.init(deviceInfo);
     audio.setFile("/home/samson/Desktop/succ.flac");
+    // Sets up audio bar
+    connect(&audio.stream(), &AudioFileStream::update, this, [&](qreal level) {
+        ui->outputBar->setLevel(level);
+    });
 }
 
 void DialogSettings::on_pushButtonOutput_clicked()
@@ -67,4 +74,9 @@ void DialogSettings::on_pushButtonOutput_clicked()
         pause = true;
         audio.play();
     }
+}
+
+void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
+{
+    main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
 }

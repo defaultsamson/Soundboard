@@ -5,7 +5,7 @@
 
 #include "listitemboard.h"
 
-class MainWindow;
+class Main;
 
 namespace Ui {
 class DialogBoard;
@@ -16,7 +16,7 @@ class DialogBoard : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogBoard(MainWindow *main, ListItemBoard *board, bool creatingNew = false);
+    explicit DialogBoard(Main *main, ListItemBoard *board, bool creatingNew = false);
     ~DialogBoard();
 
 private slots:
@@ -26,10 +26,10 @@ private slots:
 
 private:
     Ui::DialogBoard *ui;
-    MainWindow *main;
+    Main *main;
     ListItemBoard *board;
     bool creatingNew;
-    bool boardUpdated;
+    bool boardUpdated = false;
 };
 
 #endif // DIALOGBOARD_H

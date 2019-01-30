@@ -155,9 +155,8 @@ qint64 AudioFileStream::readData(char* data, qint64 len)
 
         maxValue = qMin(maxValue, m_maxAmplitude);
         m_level = qreal(maxValue) / m_maxAmplitude;
-
+        emit update(m_level);
     }
-    emit update();
 
     return len;
 }

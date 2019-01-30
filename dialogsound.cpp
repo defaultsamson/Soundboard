@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QFileDialog>
 
-DialogSound::DialogSound(MainWindow *main, ListItemSound *sound, bool creatingNew) :
+DialogSound::DialogSound(Main *main, ListItemSound *sound, bool creatingNew) :
     QDialog(main),
     ui(new Ui::DialogSound),
     main(main),

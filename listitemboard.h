@@ -10,13 +10,13 @@
 #include <QString>
 #include <QHotkey>
 
-class MainWindow;
+class Main;
 
 class ListItemBoard : public ListItem
 {
 public:
     static QString NEW_BOARD;
-    ListItemBoard(MainWindow *main);
+    ListItemBoard(Main *main);
     ~ListItemBoard() override;
     void addSound(ListItemSound *sound);
     void removeSound(int n, bool deleteSound = true);
