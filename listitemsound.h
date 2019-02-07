@@ -5,7 +5,6 @@
 
 #include <QString>
 #include <QJsonObject>
-#include <QHotkey>
 #include <QFile>
 
 class Main;

@@ -8,7 +8,7 @@ QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-QMAKE_LFLAGS += -no-pie
+# QMAKE_LFLAGS += -no-pie
 
 TARGET = Soundboard
 TEMPLATE = app
@@ -61,10 +61,30 @@ FORMS += \
     dialogsettings.ui \
     dialogsound.ui
 
+# QHotkey (from qhotkey.pri)
+PUBLIC_HEADERS += $$PWD/QHotkey/qhotkey.h \
+        $$PWD/QHotkey/QHotkey
+
+HEADERS += $$PUBLIC_HEADERS \
+        $$PWD/QHotkey/qhotkey_p.h
+
+SOURCES += $$PWD/QHotkey/qhotkey.cpp
+
+mac: SOURCES += $$PWD/QHotkey/qhotkey_mac.cpp
+else:win32: SOURCES += $$PWD/QHotkey/qhotkey_win.cpp
+else:unix: SOURCES += $$PWD/QHotkey/qhotkey_x11.cpp
+
+INCLUDEPATH += $$PWD/QHotkey
+
+# QHotkey (from qhotkey.prc)
+mac: LIBS += -framework Carbon
+else:win32: LIBS += -luser32
+else:unix {
+        QT += x11extras
+        LIBS += -lX11
+}
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-!ReleaseBuild:!DebugBuild:!system(qpmx -d $$shell_quote($$_PRO_FILE_PWD_) --qmake-run init $$QPMX_EXTRA_OPTIONS $$shell_quote($$QMAKE_QMAKE) $$shell_quote($$OUT_PWD)): error(qpmx initialization failed. Check the compilation log for details.)
-else: include($$OUT_PWD/qpmx_generated.pri)

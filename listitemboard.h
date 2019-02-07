@@ -8,7 +8,6 @@
 #include <QJsonObject>
 #include <vector>
 #include <QString>
-#include <QHotkey>
 
 class Main;
 
