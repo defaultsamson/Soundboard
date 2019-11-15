@@ -25,39 +25,39 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        mainwindow.cpp \
-    dialogboard.cpp \
-    dialogkeybind.cpp \
-    dialogsettings.cpp \
-    listitemboard.cpp \
-    listitemsound.cpp \
-    widgetkeybind.cpp \
-    listitem.cpp \
-    dialogsound.cpp \
-    audiofilestream.cpp \
-    widgetaudio.cpp \
-    audioobject.cpp
+        src/mainwindow.cpp \
+    src/Dialog/dialogboard.cpp \
+    src/Dialog/dialogkeybind.cpp \
+    src/Dialog/dialogsettings.cpp \
+    src/Widget/listitemboard.cpp \
+    src/Widget/listitemsound.cpp \
+    src/Widget/widgetkeybind.cpp \
+    src/Widget/listitem.cpp \
+    src/Dialog/dialogsound.cpp \
+    src/Audio/audiofilestream.cpp \
+    src/Widget/widgetaudio.cpp \
+    src/Audio/audioobject.cpp
 
 HEADERS += \
-        mainwindow.h \
-    dialogboard.h \
-    dialogkeybind.h \
-    dialogsettings.h \
-    listitemboard.h \
-    listitemsound.h \
-    widgetkeybind.h \
-    listitem.h \
-    dialogsound.h \
-    audiofilestream.h \
-    widgetaudio.h \
-    audioobject.h
+        src/mainwindow.h \
+    src/Dialog/dialogboard.h \
+    src/Dialog/dialogkeybind.h \
+    src/Dialog/dialogsettings.h \
+    src/Widget/listitemboard.h \
+    src/Widget/listitemsound.h \
+    src/Widget/widgetkeybind.h \
+    src/Widget/listitem.h \
+    src/Dialog/dialogsound.h \
+    src/Audio/audiofilestream.h \
+    src/Widget/widgetaudio.h \
+    src/Audio/audioobject.h
 
 FORMS += \
-        mainwindow.ui \
-    dialogboard.ui \
-    dialogkeybind.ui \
-    dialogsettings.ui \
-    dialogsound.ui
+        src/mainwindow.ui \
+    src/Dialog/dialogboard.ui \
+    src/Dialog/dialogkeybind.ui \
+    src/Dialog/dialogsettings.ui \
+    src/Dialog/dialogsound.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

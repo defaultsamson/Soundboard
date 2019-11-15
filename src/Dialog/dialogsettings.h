@@ -6,8 +6,8 @@
 #include <QAudioOutput>
 #include <QFile>
 #include <QAudioDecoder>
-#include "audiofilestream.h"
-#include "audioobject.h"
+#include "../Audio/audiofilestream.h"
+#include "../Audio/audioobject.h"
 
 class Main;
 

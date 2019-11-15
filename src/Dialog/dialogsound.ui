@@ -227,12 +227,12 @@
   <customwidget>
    <class>WidgetKeybind</class>
    <extends>QLineEdit</extends>
-   <header>widgetkeybind.h</header>
+   <header>src/Widget/widgetkeybind.h</header>
   </customwidget>
   <customwidget>
    <class>WidgetAudio</class>
    <extends>QWidget</extends>
-   <header>widgetaudio.h</header>
+   <header>src/Widget/widgetaudio.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

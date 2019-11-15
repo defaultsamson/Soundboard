@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "listitemboard.h"
-#include "listitemsound.h"
-#include "dialogboard.h"
-#include "dialogsound.h"
-#include "dialogsettings.h"
+#include "Widget/listitemboard.h"
+#include "Widget/listitemsound.h"
+#include "Dialog/dialogboard.h"
+#include "Dialog/dialogsound.h"
+#include "Dialog/dialogsettings.h"
 
 #include <QApplication>
 #include <QDesktopServices>

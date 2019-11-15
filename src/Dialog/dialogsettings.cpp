@@ -1,7 +1,7 @@
 #include "dialogsettings.h"
 #include "ui_dialogsettings.h"
-#include "mainwindow.h"
-#include "audioobject.h"
+#include "../mainwindow.h"
+#include "../Audio/audioobject.h"
 
 #include <QAudioDeviceInfo>
 #include <QBuffer>

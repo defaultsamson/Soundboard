@@ -1,8 +1,8 @@
 #include "dialogsound.h"
 #include "ui_dialogsound.h"
 
-#include "mainwindow.h"
-#include "listitemsound.h"
+#include "../mainwindow.h"
+#include "../Widget/listitemsound.h"
 
 #include <QObject>
 #include <QFileDialog>

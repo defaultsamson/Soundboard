@@ -1,5 +1,5 @@
 #include "widgetkeybind.h"
-#include "dialogkeybind.h"
+#include "../Dialog/dialogkeybind.h"
 
 #include <QKeySequence>
 #include <QLineEdit>

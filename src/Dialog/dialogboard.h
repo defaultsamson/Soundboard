@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include "listitemboard.h"
+#include "../Widget/listitemboard.h"
 
 class Main;
 

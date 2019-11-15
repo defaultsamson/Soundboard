@@ -1,6 +1,6 @@
 #include "listitemboard.h"
 
-#include "mainwindow.h"
+#include "../mainwindow.h"
 #include "listitemsound.h"
 #include "listitem.h"
 

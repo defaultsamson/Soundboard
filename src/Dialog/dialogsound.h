@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include "listitemsound.h"
+#include "../Widget/listitemsound.h"
 
 class Main;
 

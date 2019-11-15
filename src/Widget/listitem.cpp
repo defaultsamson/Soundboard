@@ -1,6 +1,6 @@
 #include "listitem.h"
 
-#include "mainwindow.h"
+#include "../mainwindow.h"
 #include <QHotkey>
 #include <QObject>
 

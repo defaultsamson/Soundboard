@@ -7,9 +7,9 @@
 #include <QWidget>
 #include <QSettings>
 
-#include "listitem.h"
-#include "listitemboard.h"
-#include "listitemsound.h"
+#include "Widget/listitem.h"
+#include "Widget/listitemboard.h"
+#include "Widget/listitemsound.h"
 
 namespace Ui {
 class MainWindow;

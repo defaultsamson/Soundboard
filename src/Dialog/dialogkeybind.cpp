@@ -1,7 +1,7 @@
 #include "dialogkeybind.h"
 #include "ui_dialogkeybind.h"
 
-#include "widgetkeybind.h"
+#include "../Widget/widgetkeybind.h"
 #include <QKeyEvent>
 
 DialogKeybind::DialogKeybind(QWidget *parent, WidgetKeybind *widget) :
