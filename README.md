@@ -1,5 +1,5 @@
 # Soundboard
-A Soundboard written in C++ with Qt 5.12.0
+A Soundboard written in C++ with Qt 5.12.5
 
 ## Contributing
 1. Install [Qt 5.12.0](https://www.qt.io/download) (the free open source version is fine)
