@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Soundboard
+Exec=Soundboard
+Icon=soundboard
+Categories=Development;
+Name[en_CA]=soundboard.desktop
