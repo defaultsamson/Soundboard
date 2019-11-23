@@ -15,5 +15,5 @@ If you'd like to compile it to an AppImage
     - Note: Personally, I download each one as their .AppImage from the releases page, and I rename all the files from `linuxdeploy-x86_64.AppImage` to `linuxdeploy`, `appimagetool-x86_64.AppImage` to `appimagetool`, etc.
 6. Run `./appimage-ify.sh <linux deploy executable> <build dir> [optional: Qt's qmake executable]`
     - For example, mine looks like `./appimage-ify.sh linuxdeploy ../build-Soundboard-Desktop_Qt_5_12_5_GCC_64bit-Debug/ ~/Qt/5.12.5/gcc_64/bin/qmake`
-    - If the program errors "Failed to run plugin: qt (exit code: 6)", try running `export QMAKE=/path/to/Qt/qmake` first. For example, mine is `export QMAKE=~/Qt/5.12.5/gcc_64/bin/qmake`
-7. If everything wend according to plan, it should've exported a Soundboard AppImage to the current directory
+    - If the program errors `Failed to run plugin: qt (exit code: 6)`, try running `export QMAKE=/path/to/Qt/qmake` first. For example, mine is `export QMAKE=~/Qt/5.12.5/gcc_64/bin/qmake`
+7. If everything went according to plan, it should've exported a Soundboard AppImage to the current working directory
