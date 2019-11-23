@@ -1,4 +1,7 @@
 Soundboard.pro.user*
+.qmake.stash
+AppDir
+Soundboard*.AppImage
 
 # Prerequisites
 *.d
