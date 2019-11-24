@@ -24,6 +24,9 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 CONFIG += c++11
 
+# This enables the X11 library to be used. Handles keypresses
+# LIBS += -lX11
+
 SOURCES += \
         src/mainwindow.cpp \
     src/Dialog/dialogboard.cpp \

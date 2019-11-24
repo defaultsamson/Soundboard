@@ -88,5 +88,6 @@ void ListItemBoard::unreg(bool unregThis) {
 }
 
 void ListItemBoard::trigger() {
+    ListItem::trigger();
     main->setCurrentBoard(this);
 }
