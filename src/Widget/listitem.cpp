@@ -5,9 +5,8 @@
 #include <QObject>
 #include <iostream>
 
+#include <X11/XKBlib.h>
 #include <X11/Xlib.h>
-#include <X11/keysym.h>
-#include <unistd.h>
 
 ListItem::ListItem(Main *main) :
     QObject(main),
@@ -45,7 +44,7 @@ void ListItem::save(QJsonObject &json) {
 
 // The key code to be sent.
 // A full list of available codes can be found in /usr/include/X11/keysymdef.h
-#define KEYCODE1 XK_a
+//#define KEYCODE1 XK_a
 
 // Function to create a keyboard event
 XKeyEvent createKeyEvent(Display *display, Window &win, Window &winRoot, bool press, KeySym keycode, int modifiers) {
@@ -86,8 +85,8 @@ void ListItem::trigger() {
     int    revert;
     XGetInputFocus(display, &winFocus, &revert);
 
-    std::cout << "noice: " << XK_1 << std::endl;
-    KeySym nativKeyCode = XKeycodeToKeysym(display, KeyCode(hotkey->currentNativeShortcut().key), 0);
+    //std::cout << "noice: " << XK_1 << std::endl;
+    KeySym nativKeyCode = XkbKeycodeToKeysym(display, KeyCode(hotkey->currentNativeShortcut().key), 0, 0);
     std::cout << "noice: " << nativKeyCode << std::endl;
 
     // Send a fake key press event to the window.
