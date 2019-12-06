@@ -1,7 +1,7 @@
 #include "dialogsound.h"
 #include "ui_dialogsound.h"
 
-#include "../mainwindow.h"
+#include "../mainapp.h"
 #include "../Widget/listitemsound.h"
 
 #include <QObject>

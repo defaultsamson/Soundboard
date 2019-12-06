@@ -1,6 +1,6 @@
 #include "dialogsettings.h"
 #include "ui_dialogsettings.h"
-#include "../mainwindow.h"
+#include "../mainapp.h"
 #include "../Audio/audioobject.h"
 
 #include <QAudioDeviceInfo>

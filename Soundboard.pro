@@ -28,7 +28,6 @@ CONFIG += c++11
 # LIBS += -lX11
 
 SOURCES += \
-        src/mainwindow.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
@@ -39,10 +38,10 @@ SOURCES += \
     src/Dialog/dialogsound.cpp \
     src/Audio/audiofilestream.cpp \
     src/Widget/widgetaudio.cpp \
-    src/Audio/audioobject.cpp
+    src/Audio/audioobject.cpp \
+    src/mainapp.cpp
 
 HEADERS += \
-        src/mainwindow.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
@@ -53,14 +52,15 @@ HEADERS += \
     src/Dialog/dialogsound.h \
     src/Audio/audiofilestream.h \
     src/Widget/widgetaudio.h \
-    src/Audio/audioobject.h
+    src/Audio/audioobject.h \
+    src/mainapp.h
 
 FORMS += \
-        src/mainwindow.ui \
     src/Dialog/dialogboard.ui \
     src/Dialog/dialogkeybind.ui \
     src/Dialog/dialogsettings.ui \
-    src/Dialog/dialogsound.ui
+    src/Dialog/dialogsound.ui \
+    src/mainapp.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -1,5 +1,5 @@
 #include "listitemsound.h"
-#include "../mainwindow.h"
+#include "../mainapp.h"
 
 #include <QListWidgetItem>
 #include <QJsonObject>

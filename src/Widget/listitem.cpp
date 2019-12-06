@@ -1,12 +1,14 @@
 #include "listitem.h"
 
-#include "../mainwindow.h"
+#include "../mainapp.h"
 #include <QHotkey>
 #include <QObject>
 #include <iostream>
 
+#ifdef Q_OS_LINUX
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
+#endif
 
 ListItem::ListItem(Main *main) :
     QObject(main),

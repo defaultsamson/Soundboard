@@ -1,7 +1,7 @@
 #include "dialogboard.h"
 #include "ui_dialogboard.h"
 
-#include "../mainwindow.h"
+#include "../mainapp.h"
 #include "../Widget/listitemboard.h"
 
 #include <QObject>
