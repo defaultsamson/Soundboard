@@ -1,5 +1,5 @@
 #include "mainapp.h"
-#include "ui_mainwindow.h"
+#include "ui_mainapp.h"
 
 #include "Widget/listitemboard.h"
 #include "Widget/listitemsound.h"
@@ -41,7 +41,7 @@ QString Main::DARK_THEME = "dark_theme";
 
 Main::Main(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
+    ui(new Ui::MainApp),
     _settings(new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat)),
     defaultPalette(qApp->palette())
 {
