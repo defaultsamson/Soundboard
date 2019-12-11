@@ -1,6 +1,7 @@
 #include "mainapp.h"
 #include "ui_mainwindow.h"
 
+#include "Audio/audioengine.h"
 #include "Widget/listitemboard.h"
 #include "Widget/listitemsound.h"
 #include "Dialog/dialogboard.h"
@@ -42,6 +43,7 @@ QString Main::DARK_THEME = "dark_theme";
 Main::Main(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    _audio(),
     _settings(new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat)),
     defaultPalette(qApp->palette())
 {
@@ -271,13 +273,13 @@ void Main::editSound(ListItemSound *sound, bool createNew) {
     w.exec();
 }
 
-// ******************* END BOARD FUNCTIONS *******************
-// ******************* BGN FILE FUNCTIONS *******************
-
 void Main::clear() {
     for (int i = ui->listSounds->count() - 1; i >= 0; --i) ui->listSounds->takeItem(i);
     for (int i = ui->listBoards->count() - 1; i >= 0; --i) delete ui->listBoards->takeItem(i);
 }
+
+// ******************* END BOARD FUNCTIONS *******************
+// ******************* BGN FILE FUNCTIONS *******************
 
 void Main::load() {
     load(QFileDialog::getOpenFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)")));
@@ -363,6 +365,10 @@ void Main::disableKeybinds() {
 void Main::setDarkTheme(bool set) {
     qApp->setPalette(set ? darkPalette : defaultPalette);
     settings()->setValue(DARK_THEME, set);
+}
+
+AudioEngine *Main::audio() {
+    return _audio;
 }
 
 QSettings *Main::settings() {

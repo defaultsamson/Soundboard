@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QSettings>
 
+#include "Audio/audioengine.h"
 #include "Widget/listitem.h"
 #include "Widget/listitemboard.h"
 #include "Widget/listitemsound.h"
@@ -38,6 +39,7 @@ public:
     void removeSound(int row);
     void setDarkTheme(bool set = true);
     QSettings *settings();
+    AudioEngine *audio();
 private slots:
 
     void on_actionNew_triggered();
@@ -70,6 +72,7 @@ private:
     bool hasFile = false;
     QString fileName;
     ListItemBoard *currentBoard = nullptr;
+    AudioEngine *_audio;
     QSettings *_settings;
 
     QPalette darkPalette;

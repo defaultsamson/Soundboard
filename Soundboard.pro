@@ -28,6 +28,7 @@ CONFIG += c++11
 # LIBS += -lX11
 
 SOURCES += \
+    src/Audio/audioengine.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
@@ -42,6 +43,7 @@ SOURCES += \
     src/mainapp.cpp
 
 HEADERS += \
+    src/Audio/audioengine.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
