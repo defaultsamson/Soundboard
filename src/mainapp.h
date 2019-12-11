@@ -13,7 +13,7 @@
 #include "Widget/listitemsound.h"
 
 namespace Ui {
-class MainWindow;
+class MainApp;
 }
 
 class Main : public QMainWindow
@@ -68,7 +68,7 @@ public slots:
     void disableKeybinds();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainApp *ui;
     bool hasFile = false;
     QString fileName;
     ListItemBoard *currentBoard = nullptr;

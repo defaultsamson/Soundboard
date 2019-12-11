@@ -48,6 +48,7 @@ void ListItem::save(QJsonObject &json) {
 // A full list of available codes can be found in /usr/include/X11/keysymdef.h
 //#define KEYCODE1 XK_a
 
+#ifdef Q_OS_LINUX
 // Function to create a keyboard event
 XKeyEvent createKeyEvent(Display *display, Window &win, Window &winRoot, bool press, KeySym keycode, int modifiers) {
    XKeyEvent event;
@@ -72,8 +73,11 @@ XKeyEvent createKeyEvent(Display *display, Window &win, Window &winRoot, bool pr
 
    return event;
 }
+#endif
+
 
 void ListItem::trigger() {
+#ifdef Q_OS_LINUX
     // Obtain the X11 display.
     Display *display = XOpenDisplay(nullptr);
     if(display == nullptr)
@@ -103,4 +107,5 @@ void ListItem::trigger() {
 
     XCloseDisplay(display);
     // std::cout << "NOICE MEME" << std::endl;
+    #endif
 }
