@@ -64,6 +64,13 @@ FORMS += \
     src/Dialog/dialogsound.ui \
     src/mainapp.ui
 
+# Sources for HotkeyPass
+HEADERS += src/Hotkey/hotkeypass.h
+SOURCES += src/Hotkey/hotkeypass.cpp
+mac: SOURCES += src/Hotkey/hotkeypass_mac.cpp
+else:win32: SOURCES += src/Hotkey/hotkeypass_win.cpp
+else:unix: SOURCES += src/Hotkey/hotkeypass_x11.cpp
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
