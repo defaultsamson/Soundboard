@@ -105,6 +105,8 @@ void Main::contextMenuBoard(const QPoint &pos) {
 
     // Handle global position
     QPoint globalPos = ui->listBoards->mapToGlobal(pos);
+    globalPos.setX(globalPos.x() + 1); // makes right clicking feel more natural
+    globalPos.setY(globalPos.y() + 1);
 
     // Create menu and insert some actions
     QMenu myMenu;
@@ -125,6 +127,8 @@ void Main::contextMenuSound(const QPoint &pos) {
 
     // Handle global position
     QPoint globalPos = ui->listSounds->mapToGlobal(pos);
+    globalPos.setX(globalPos.x() + 1); // makes right clicking feel more natural
+    globalPos.setY(globalPos.y() + 1);
 
     // Create menu and insert some actions
     QMenu myMenu;
