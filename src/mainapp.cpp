@@ -224,7 +224,7 @@ void Main::onSoundMoved(const QModelIndex &parent, int start, int end, const QMo
     // We can ignore "end" since we know that there will always only be one item being moved
     if (row > start) row -= 1; // This is because the row variable refers to the index of the space inbetween each item index, this converts it to the item index itself
     // std::cout << "Moved from " << start << " to " << row << std::endl;
-    currentBoard->swapSounds(start, row);
+    if (start >= 0 && row >= 0) currentBoard->moveSound(static_cast<size_t>(start), static_cast<size_t>(row));
 }
 
 void Main::on_listSounds_itemClicked(QListWidgetItem *item) {

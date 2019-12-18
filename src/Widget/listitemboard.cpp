@@ -42,8 +42,15 @@ void ListItemBoard::removeSound(ListItemSound *sound, bool deleteSound) {
     removeSound(n, deleteSound);
 }
 
-void ListItemBoard::swapSounds(int first, int second) {
-    std::swap(sounds[static_cast<size_t>(first)], sounds[static_cast<size_t>(second)]);
+void ListItemBoard::moveSound(size_t from, size_t to) {
+    if (from >= sounds.size() || to >= sounds.size()) return;
+    if (from < to) {
+        // Moves "from" right to "to", shifting everything inbeween to the left by 1
+        for (size_t i = from; i < to; ++i) std::swap(sounds[i], sounds[i + 1]);
+    } else {
+        // Moves "from" left to "to", shifting everything inbeween to the right by 1
+        for (size_t i = from; i > to; --i) std::swap(sounds[i], sounds[i - 1]);
+    }
 }
 
 int ListItemBoard::soundsCount() {

@@ -22,7 +22,7 @@ public:
     void removeSound(int n, bool deleteSound = true);
     void removeSound(ListItemSound *sound, bool deleteSound = true);
     int soundsCount();
-    void swapSounds(int first, int second);
+    void moveSound(size_t from, size_t to);
     void populateList(QListWidget *list);
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) override;
