@@ -16,6 +16,8 @@ QString ListItemSound::NEW_SOUND = "New Sound";
 ListItemSound::ListItemSound(Main *main, ListItemBoard *board) :
     ListItem(main),
     board(board),
+    _filename(""),
+    _volume(100),
     file(nullptr),
     _filenameChanged(false),
     _volumeChanged(false)

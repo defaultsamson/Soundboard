@@ -6,6 +6,7 @@
 #include <QString>
 #include <QWidget>
 #include <QSettings>
+#include <QModelIndex>
 
 #include "Audio/audioengine.h"
 #include "Widget/listitem.h"
@@ -63,6 +64,13 @@ private slots:
     void on_buttonRemoveSound_clicked();
     void on_buttonEditSound_clicked();
 
+    void onSoundMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
+    void contextMenuBoard(const QPoint &pos);
+    void contextMenuSound(const QPoint &pos);
+
+    void on_listSounds_itemClicked(QListWidgetItem *item);
+    void on_listBoards_itemClicked(QListWidgetItem *item);
+
 public slots:
     void enableKeybinds();
     void disableKeybinds();
@@ -83,6 +91,7 @@ private:
     void editBoard(ListItemBoard *sound, bool createNew = false);
     void editSound(bool createNew = false);
     void editSound(ListItemSound *sound, bool createNew = false);
+    ListItemSound *currentSound();
 };
 
 #endif // MAINWINDOW_H

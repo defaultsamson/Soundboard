@@ -17,6 +17,9 @@
 #include <QJsonObject>
 #include <QFileDialog>
 #include <QSettings>
+#include <QModelIndex>
+#include <QObject>
+#include <QAbstractItemModel>
 
 #include <iostream>
 
@@ -50,6 +53,15 @@ Main::Main(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Sets up the onSoundMoved event
+    QObject::connect(ui->listSounds->model(), &QAbstractItemModel::rowsMoved, this, &Main::onSoundMoved);
+
+    // Sets up right click context menus for the Boards and Sounds lists
+    ui->listSounds->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(ui->listSounds, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuSound(QPoint)));
+    ui->listBoards->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(ui->listBoards, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuBoard(QPoint)));
+
     // Colours from https://github.com/Jorgen-VikingGod/Qt-Frameless-Window-DarkStyle/blob/master/DarkStyle.cpp
     // (mirror): https://stackoverflow.com/a/45634644/1902411
     darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
@@ -80,6 +92,47 @@ Main::~Main()
 {
     clear();
     delete ui;
+}
+
+// https://stackoverflow.com/questions/31383519/qt-rightclick-on-qlistwidget-opens-contextmenu-and-delete-item
+void Main::contextMenuBoard(const QPoint &pos) {
+    int row = ui->listBoards->indexAt(pos).row();
+    // Do nothing if the mouse isn't hovering over anything
+    if (row < 0) return;
+
+    // Select the current board (have to do this or else Qt is too slow when switching items really fast)
+    setCurrentBoard(static_cast<ListItemBoard*>(ui->listBoards->item(row)));
+
+    // Handle global position
+    QPoint globalPos = ui->listBoards->mapToGlobal(pos);
+
+    // Create menu and insert some actions
+    QMenu myMenu;
+    myMenu.addAction("Edit", this, [&]() { editBoard(); });
+    myMenu.addAction("Delete",  this, [&]() { removeBoard(currentBoard); });
+
+    // Show context menu at handling position
+    myMenu.exec(globalPos);
+}
+
+void Main::contextMenuSound(const QPoint &pos) {
+    int row = ui->listSounds->indexAt(pos).row();
+    // Do nothing if the mouse isn't hovering over anything
+    if (row < 0) return;
+
+    // Select the current sound (have to do this or else Qt is too slow when switching items really fast)
+    ui->listSounds->setCurrentRow(row);
+
+    // Handle global position
+    QPoint globalPos = ui->listSounds->mapToGlobal(pos);
+
+    // Create menu and insert some actions
+    QMenu myMenu;
+    myMenu.addAction("Edit", this, [&]() { editSound(); });
+    myMenu.addAction("Delete",  this, [&]() { removeSound(currentSound()); });
+
+    // Show context menu at handling position
+    myMenu.exec(globalPos);
 }
 
 // ******************* BGN MENU ACTIONS *******************
@@ -163,6 +216,23 @@ void Main::on_listSounds_itemActivated(QListWidgetItem *item)
     editSound(static_cast<ListItemSound*>(item));
 }
 
+void Main::onSoundMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row) {
+    // We can ignore "end" since we know that there will always only be one item being moved
+    if (row > start) row -= 1; // This is because the row variable refers to the index of the space inbetween each item index, this converts it to the item index itself
+    // std::cout << "Moved from " << start << " to " << row << std::endl;
+    currentBoard->swapSounds(start, row);
+}
+
+void Main::on_listSounds_itemClicked(QListWidgetItem *item) {
+    ui->buttonEditSound->setEnabled(true);
+    ui->buttonRemoveSound->setEnabled(true);
+}
+
+void Main::on_listBoards_itemClicked(QListWidgetItem *item) {
+    ui->buttonEditBoard->setEnabled(true);
+    ui->buttonRemoveBoard->setEnabled(true);
+}
+
 // ******************* END LIST ACTIONS *******************
 // ******************* BGN BUTTON ACTIONS *******************
 
@@ -178,7 +248,7 @@ void Main::on_buttonAddBoard_clicked()
 // Remove board item
 void Main::on_buttonRemoveBoard_clicked()
 {
-    removeBoard(ui->listBoards->currentRow());
+    removeBoard(currentBoard);
 }
 
 void Main::on_buttonEditBoard_clicked()
@@ -193,14 +263,16 @@ void Main::on_buttonAddSound_clicked()
     ListItemSound *sound = new ListItemSound(this, currentBoard);
     currentBoard->addSound(sound);
     displayBoard(currentBoard);
-    ui->listSounds->setItemSelected(sound, true);
+    setCurrentSound(sound);
+    ui->buttonEditSound->setEnabled(true);
+    ui->buttonRemoveSound->setEnabled(true);
     editSound(sound, true);
 }
 
 // Remove sound item
 void Main::on_buttonRemoveSound_clicked()
 {
-    removeSound(ui->listSounds->currentRow());
+    removeSound(currentSound());
 }
 
 void Main::on_buttonEditSound_clicked()
@@ -221,7 +293,7 @@ void Main::removeBoard(int row) {
 }
 
 void Main::editBoard(bool createNew) {
-    editBoard(static_cast<ListItemBoard*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
+    editBoard(currentBoard, createNew);
 }
 
 void Main::editBoard(ListItemBoard *board, bool createNew) {
@@ -236,6 +308,9 @@ void Main::displayBoard(ListItemBoard *board) {
         ui->listBoards->setCurrentItem(board);
     }
     board->populateList(ui->listSounds);
+    ui->buttonAddSound->setEnabled(true);
+    ui->buttonEditSound->setEnabled(ui->listSounds->currentRow() >= 0); // highlight if a sound is selected
+    ui->buttonRemoveSound->setEnabled(ui->listSounds->currentRow() >= 0); // highlight if a sound is selected
 }
 
 void Main::setCurrentBoard(ListItemBoard *board) {
@@ -247,6 +322,17 @@ void Main::setCurrentBoard(ListItemBoard *board) {
     if (currentBoard) {
         currentBoard->reg(false, true);
         displayBoard(currentBoard);
+
+        ui->buttonEditBoard->setEnabled(true);
+        ui->buttonRemoveBoard->setEnabled(true);
+    } else {
+
+        ui->buttonEditBoard->setEnabled(false);
+        ui->buttonRemoveBoard->setEnabled(false);
+
+        ui->buttonAddSound->setEnabled(false);
+        ui->buttonEditSound->setEnabled(false);
+        ui->buttonRemoveSound->setEnabled(false);
     }
 }
 
@@ -267,7 +353,7 @@ void Main::removeSound(int row) {
 }
 
 void Main::editSound(bool createNew) {
-    editSound(static_cast<ListItemSound*>(ui->listSounds->item(ui->listSounds->currentRow())), createNew);
+    editSound(currentSound(), createNew);
 }
 
 void Main::editSound(ListItemSound *sound, bool createNew) {
@@ -279,6 +365,10 @@ void Main::editSound(ListItemSound *sound, bool createNew) {
 void Main::clear() {
     for (int i = ui->listSounds->count() - 1; i >= 0; --i) ui->listSounds->takeItem(i);
     for (int i = ui->listBoards->count() - 1; i >= 0; --i) delete ui->listBoards->takeItem(i);
+}
+
+ListItemSound* Main::currentSound() {
+    return static_cast<ListItemSound*>(ui->listSounds->item(ui->listSounds->currentRow()));
 }
 
 // ******************* END BOARD FUNCTIONS *******************

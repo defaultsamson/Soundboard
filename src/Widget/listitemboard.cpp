@@ -42,6 +42,14 @@ void ListItemBoard::removeSound(ListItemSound *sound, bool deleteSound) {
     removeSound(n, deleteSound);
 }
 
+void ListItemBoard::swapSounds(int first, int second) {
+    std::swap(sounds[static_cast<size_t>(first)], sounds[static_cast<size_t>(second)]);
+}
+
+int ListItemBoard::soundsCount() {
+    return static_cast<int>(sounds.size());
+}
+
 void ListItemBoard::populateList(QListWidget *list) {
     // Removes items from list
     for (int i = list->count() - 1; i >= 0; --i) list->takeItem(i);
