@@ -97,21 +97,21 @@ Main::~Main()
 // https://stackoverflow.com/questions/31383519/qt-rightclick-on-qlistwidget-opens-contextmenu-and-delete-item
 void Main::contextMenuBoard(const QPoint &pos) {
     int row = ui->listBoards->indexAt(pos).row();
-    // Do nothing if the mouse isn't hovering over anything
-    if (row < 0) return;
-
-    // Select the current board (have to do this or else Qt is too slow when switching items really fast)
-    setCurrentBoard(static_cast<ListItemBoard*>(ui->listBoards->item(row)));
+    QMenu myMenu;
+    // If the mouse is hovering over something
+    if (row >= 0) {
+        // Select the current board (have to do this or else Qt is too slow when switching items really fast)
+        setCurrentBoard(static_cast<ListItemBoard*>(ui->listBoards->item(row)));
+        myMenu.addAction("Edit", this, [&]() { editBoard(); });
+        myMenu.addAction("Delete",  this, [&]() { removeBoard(currentBoard); });
+    } else {
+        myMenu.addAction("Create", this, [&]() { addBoard(); });
+    }
 
     // Handle global position
     QPoint globalPos = ui->listBoards->mapToGlobal(pos);
     globalPos.setX(globalPos.x() + 1); // makes right clicking feel more natural
     globalPos.setY(globalPos.y() + 1);
-
-    // Create menu and insert some actions
-    QMenu myMenu;
-    myMenu.addAction("Edit", this, [&]() { editBoard(); });
-    myMenu.addAction("Delete",  this, [&]() { removeBoard(currentBoard); });
 
     // Show context menu at handling position
     myMenu.exec(globalPos);
@@ -119,21 +119,21 @@ void Main::contextMenuBoard(const QPoint &pos) {
 
 void Main::contextMenuSound(const QPoint &pos) {
     int row = ui->listSounds->indexAt(pos).row();
-    // Do nothing if the mouse isn't hovering over anything
-    if (row < 0) return;
-
-    // Select the current sound (have to do this or else Qt is too slow when switching items really fast)
-    ui->listSounds->setCurrentRow(row);
+    QMenu myMenu;
+    // If the mouse is hovering over something
+    if (row >= 0) {
+        // Select the current board (have to do this or else Qt is too slow when switching items really fast)
+        ui->listSounds->setCurrentRow(row);
+        myMenu.addAction("Edit", this, [&]() { editSound(); });
+        myMenu.addAction("Delete",  this, [&]() { removeSound(currentSound()); });
+    } else {
+        myMenu.addAction("Create", this, [&]() { addSound(); });
+    }
 
     // Handle global position
     QPoint globalPos = ui->listSounds->mapToGlobal(pos);
     globalPos.setX(globalPos.x() + 1); // makes right clicking feel more natural
     globalPos.setY(globalPos.y() + 1);
-
-    // Create menu and insert some actions
-    QMenu myMenu;
-    myMenu.addAction("Edit", this, [&]() { editSound(); });
-    myMenu.addAction("Delete",  this, [&]() { removeSound(currentSound()); });
 
     // Show context menu at handling position
     myMenu.exec(globalPos);
@@ -243,10 +243,7 @@ void Main::on_listBoards_itemClicked(QListWidgetItem *item) {
 // Add board item
 void Main::on_buttonAddBoard_clicked()
 {
-    ListItemBoard *board = new ListItemBoard(this);
-    ui->listBoards->addItem(board);
-    setCurrentBoard(board);
-    editBoard(board, true);
+    addBoard();
 }
 
 // Remove board item
@@ -263,14 +260,7 @@ void Main::on_buttonEditBoard_clicked()
 // Add sound item
 void Main::on_buttonAddSound_clicked()
 {
-    if (!currentBoard) return;
-    ListItemSound *sound = new ListItemSound(this, currentBoard);
-    currentBoard->addSound(sound);
-    displayBoard(currentBoard);
-    setCurrentSound(sound);
-    ui->buttonEditSound->setEnabled(true);
-    ui->buttonRemoveSound->setEnabled(true);
-    editSound(sound, true);
+    addSound();
 }
 
 // Remove sound item
@@ -286,6 +276,24 @@ void Main::on_buttonEditSound_clicked()
 
 // ******************* END BUTTON ACTIONS *******************
 // ******************* BGN BOARD FUNCTIONS *******************
+
+void Main::addBoard() {
+    ListItemBoard *board = new ListItemBoard(this);
+    ui->listBoards->addItem(board);
+    setCurrentBoard(board);
+    editBoard(board, true);
+}
+
+void Main::addSound() {
+    if (!currentBoard) return;
+    ListItemSound *sound = new ListItemSound(this, currentBoard);
+    currentBoard->addSound(sound);
+    displayBoard(currentBoard);
+    setCurrentSound(sound);
+    ui->buttonEditSound->setEnabled(true);
+    ui->buttonRemoveSound->setEnabled(true);
+    editSound(sound, true);
+}
 
 void Main::removeBoard(ListItemBoard *board) {
     removeBoard(ui->listBoards->row(board));

@@ -112,7 +112,7 @@
           <item>
            <widget class="QPushButton" name="buttonAddBoard">
             <property name="text">
-             <string>Add</string>
+             <string>Create</string>
             </property>
            </widget>
           </item>
@@ -214,7 +214,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Add</string>
+             <string>Create</string>
             </property>
            </widget>
           </item>

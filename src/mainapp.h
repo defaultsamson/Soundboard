@@ -91,6 +91,8 @@ private:
     void editBoard(ListItemBoard *sound, bool createNew = false);
     void editSound(bool createNew = false);
     void editSound(ListItemSound *sound, bool createNew = false);
+    void addBoard();
+    void addSound();
     ListItemSound *currentSound();
 };
 
