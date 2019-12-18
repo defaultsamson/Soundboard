@@ -2,6 +2,7 @@ Soundboard.pro.user*
 .qmake.stash
 AppDir
 Soundboard*.AppImage
+installer/packaged
 
 # Prerequisites
 *.d

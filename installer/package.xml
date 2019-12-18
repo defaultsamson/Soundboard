@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>The root component</DisplayName>
+    <Description>Install this example.</Description>
+    <Version>0.1</Version>
+    <ReleaseDate>2019-12-18</ReleaseDate>
+</Package>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<Installer>
+    <Name>Soundboard</Name>
+    <Version>0.1</Version>
+    <Title>Soundboard Setup</Title>
+    <Publisher>Samson Close</Publisher>
+    <ProductUrl>https://github.com/qwertysam/Soundboard</ProductUrl>
+    <InstallerWindowIcon>soundboard.png</InstallerWindowIcon>
+    <InstallerApplicationIcon>soundboard.ico</InstallerApplicationIcon>
+    <RunProgram>@TargetDir@/Soundboard.exe</RunProgram>
+    <RunProgramDescription>Run the Soundboard now.</RunProgramDescription>
+    <StartMenuDir>Soundboard</StartMenuDir>
+    <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
+
+    <TargetDir>@HomeDir@/Soundboard</TargetDir>
+    <AdminTargetDir>@RootDir@/Soundboard</AdminTargetDir>
+</Installer>
