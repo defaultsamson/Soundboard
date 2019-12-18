@@ -118,6 +118,7 @@ void Main::contextMenuBoard(const QPoint &pos) {
 }
 
 void Main::contextMenuSound(const QPoint &pos) {
+    if (!currentBoard) return;
     int row = ui->listSounds->indexAt(pos).row();
     QMenu myMenu;
     // If the mouse is hovering over something
