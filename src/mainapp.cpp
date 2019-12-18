@@ -18,6 +18,8 @@
 #include <QFileDialog>
 #include <QSettings>
 
+#include <iostream>
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -169,6 +171,7 @@ void Main::on_buttonAddBoard_clicked()
 {
     ListItemBoard *board = new ListItemBoard(this);
     ui->listBoards->addItem(board);
+    setCurrentBoard(board);
     editBoard(board, true);
 }
 
@@ -190,6 +193,7 @@ void Main::on_buttonAddSound_clicked()
     ListItemSound *sound = new ListItemSound(this, currentBoard);
     currentBoard->addSound(sound);
     displayBoard(currentBoard);
+    ui->listSounds->setItemSelected(sound, true);
     editSound(sound, true);
 }
 
@@ -263,7 +267,7 @@ void Main::removeSound(int row) {
 }
 
 void Main::editSound(bool createNew) {
-    editSound(static_cast<ListItemSound*>(ui->listBoards->item(ui->listBoards->currentRow())), createNew);
+    editSound(static_cast<ListItemSound*>(ui->listSounds->item(ui->listSounds->currentRow())), createNew);
 }
 
 void Main::editSound(ListItemSound *sound, bool createNew) {

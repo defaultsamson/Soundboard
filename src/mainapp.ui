@@ -85,7 +85,11 @@
          </spacer>
         </item>
         <item>
-         <widget class="QListWidget" name="listBoards"/>
+         <widget class="QListWidget" name="listBoards">
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::InternalMove</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_3">
@@ -174,7 +178,11 @@
          </spacer>
         </item>
         <item>
-         <widget class="QListWidget" name="listSounds"/>
+         <widget class="QListWidget" name="listSounds">
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::InternalMove</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_4">
