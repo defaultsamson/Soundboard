@@ -11,7 +11,5 @@
     <RunProgramDescription>Run the Soundboard now.</RunProgramDescription>
     <StartMenuDir>Soundboard</StartMenuDir>
     <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
-
-    <TargetDir>@HomeDir@/Soundboard</TargetDir>
-    <AdminTargetDir>@RootDir@/Soundboard</AdminTargetDir>
+    <TargetDir>@ApplicationsDirX64@/Soundboard</TargetDir>
 </Installer>
