@@ -30,6 +30,8 @@ private slots:
     void deviceChanged(int index);
     void on_checkBoxDarkTheme_stateChanged(int arg1);
 
+    void on_pushButtonRefresh_clicked();
+
 private:
     Ui::DialogSettings *ui;
     Main *main;
@@ -37,6 +39,7 @@ private:
     bool pause = false;
 
     void initializeAudio(const QAudioDeviceInfo &deviceInfo);
+    void refreshDeviceSelection();
 };
 
 #endif // DIALOGSETTINGS_H

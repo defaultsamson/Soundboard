@@ -17,14 +17,9 @@ DialogSettings::DialogSettings(Main *main) :
 
     ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
 
-    QComboBox *box = ui->comboBoxOutputDevice;
-    const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
-    box->addItem(defaultDeviceInfo.deviceName(), qVariantFromValue(defaultDeviceInfo));
-    for (auto &deviceInfo: QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
-        if (deviceInfo != defaultDeviceInfo)
-            box->addItem(deviceInfo.deviceName(), qVariantFromValue(deviceInfo));
-    }
-    connect(box, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
+    refreshDeviceSelection();
+
+    connect(ui->comboBoxOutputDevice, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
 
     // Initialize the default
     if (ui->comboBoxOutputDevice->count() > 0) {
@@ -79,4 +74,22 @@ void DialogSettings::on_pushButtonOutput_clicked()
 void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 {
     main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
+}
+
+void DialogSettings::on_pushButtonRefresh_clicked() {
+    qDebug() << "Refreshing devices...";
+    main->audio()->refreshDevices();
+    refreshDeviceSelection();
+    qDebug() << "Finished updating device list";
+}
+
+void DialogSettings::refreshDeviceSelection() {
+    QComboBox *box = ui->comboBoxOutputDevice;
+    const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
+
+    box->addItem(defaultDeviceInfo.deviceName(), qVariantFromValue(defaultDeviceInfo));
+    for (auto &deviceInfo: main->audio()->devices()) {
+        if (deviceInfo != defaultDeviceInfo)
+            box->addItem(deviceInfo.deviceName(), qVariantFromValue(deviceInfo));
+    }
 }

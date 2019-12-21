@@ -48,6 +48,7 @@ QString Main::DARK_THEME = "dark_theme";
 Main::Main(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainApp),
+    _audio(new AudioEngine()),
     _settings(new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat)),
     defaultPalette(qApp->palette())
 {
@@ -221,19 +222,19 @@ void Main::on_listSounds_itemActivated(QListWidgetItem *item)
     editSound(static_cast<ListItemSound*>(item));
 }
 
-void Main::onSoundMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row) {
+void Main::onSoundMoved(const QModelIndex &/*parent*/, int start, int /*end*/, const QModelIndex &/*destination*/, int row) {
     // We can ignore "end" since we know that there will always only be one item being moved
     if (row > start) row -= 1; // This is because the row variable refers to the index of the space inbetween each item index, this converts it to the item index itself
     // std::cout << "Moved from " << start << " to " << row << std::endl;
     if (start >= 0 && row >= 0) currentBoard->moveSound(static_cast<size_t>(start), static_cast<size_t>(row));
 }
 
-void Main::on_listSounds_itemClicked(QListWidgetItem *item) {
+void Main::on_listSounds_itemClicked(QListWidgetItem */*item*/) {
     ui->buttonEditSound->setEnabled(true);
     ui->buttonRemoveSound->setEnabled(true);
 }
 
-void Main::on_listBoards_itemClicked(QListWidgetItem *item) {
+void Main::on_listBoards_itemClicked(QListWidgetItem */*item*/) {
     ui->buttonEditBoard->setEnabled(true);
     ui->buttonRemoveBoard->setEnabled(true);
 }
