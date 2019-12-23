@@ -87,9 +87,9 @@ void DialogSettings::refreshDeviceSelection() {
     QComboBox *box = ui->comboBoxOutputDevice;
     const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
 
-    box->addItem(defaultDeviceInfo.deviceName(), qVariantFromValue(defaultDeviceInfo));
+    box->addItem(defaultDeviceInfo.deviceName());
     for (auto &deviceInfo: main->audio()->devices()) {
         if (deviceInfo != defaultDeviceInfo)
-            box->addItem(deviceInfo.deviceName(), qVariantFromValue(deviceInfo));
+            box->addItem(deviceInfo.deviceName());
     }
 }
