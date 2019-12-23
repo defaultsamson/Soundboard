@@ -24,5 +24,9 @@ if [ $# -ge 3 ]; then
 	export QMAKE=$3
 	echo "QMAKE export: $QMAKE"
 fi
-#wget --no-clobber https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+
+# Makes the AppImage bundle Qt's libqgtk3.so library instead of libqgtk2.so 
+# https://github.com/linuxdeploy/linuxdeploy-plugin-qt/blob/8f37917e428dd1c0734457074d211a432a09410f/src/deployers/PlatformPluginsDeployer.cpp#L41
+export DEPLOY_PLATFORM_THEMES=1
+
 $LINUX_DEPLOY --appdir AppDir -e $EXECUTABLE -i ./soundboard.png -d ./soundboard.desktop --plugin qt --output appimage

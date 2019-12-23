@@ -77,4 +77,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 QDEP_DEPENDS += Skycoder42/QHotkey
-!load(qdep):error("Failed to load qdep feature")
+!load(qdep):error("Failed to load qdep feature, try running: qdep prfgen --qmake ~/Qt/$${QT_VERSION}/gcc_64/bin/qmake")
