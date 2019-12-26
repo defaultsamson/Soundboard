@@ -2,6 +2,7 @@
 
 #include <QtMath>
 #include <qendian.h>
+#include <iostream>
 
 AudioFileStream::AudioFileStream() :
     m_input(&m_data),
@@ -163,8 +164,8 @@ qint64 AudioFileStream::readData(char* data, qint64 len)
 
 qint64 AudioFileStream::writeData(const char* data, qint64 len)
 {
-    Q_UNUSED(data);
-    Q_UNUSED(len);
+    Q_UNUSED(data)
+    Q_UNUSED(len)
 
     return 0;
 }
@@ -182,6 +183,7 @@ void AudioFileStream::play(QFile &file) {
 // Stop play audio file
 void AudioFileStream::stop()
 {
+    std::cout << "Stopping Audio" << std::endl;
     clear();
     m_state = State::Stopped;
     emit stateChanged(m_state);

@@ -2,12 +2,16 @@
 
 #include <QAudioDeviceInfo>
 
-AudioEngine::AudioEngine() {
+AudioEngine::AudioEngine() : _activeDevices() {
     refreshDevices();
 }
 
 QList<QAudioDeviceInfo> AudioEngine::devices() {
     return _devices;
+}
+
+QList<QAudioDeviceInfo> AudioEngine::activeDevices() {
+    return _activeDevices;
 }
 
 void AudioEngine::refreshDevices() {
