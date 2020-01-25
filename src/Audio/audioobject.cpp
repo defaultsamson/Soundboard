@@ -1,28 +1,30 @@
 #include "audioobject.h"
 #include "audiofilestream.h"
 
-#include <QAudioDeviceInfo>
 #include <QAudioFormat>
 #include <QAudioOutput>
 #include <QString>
 #include <QObject>
+
+#include <portaudio.h>
 
 AudioObject::AudioObject()
 {
 
 }
 
-void AudioObject::init(const QAudioDeviceInfo &info) {
+void AudioObject::init(const PaDeviceInfo* info) {
+    // TODO
     if (output) output->stop();
     _stream.stop();
-    QAudioFormat format = info.preferredFormat();
+    /*QAudioFormat format = info.preferredFormat();
     if (!_stream.init(format)) {
         qWarning() << "Failed to init audio stream";
         // TODO error message to user
         return;
     }
     output.reset(new QAudioOutput(info, format));
-    output->start(&_stream);
+    output->start(&_stream);*/
 }
 
 AudioFileStream &AudioObject::stream() {

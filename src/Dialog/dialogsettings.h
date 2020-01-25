@@ -2,12 +2,13 @@
 #define DIALOGSETTINGS_H
 
 #include <QDialog>
-#include <QAudioDeviceInfo>
 #include <QAudioOutput>
 #include <QFile>
 #include <QAudioDecoder>
 #include "../Audio/audiofilestream.h"
 #include "../Audio/audioobject.h"
+
+#include <portaudio.h>
 
 class Main;
 
@@ -38,7 +39,7 @@ private:
     AudioObject audio;
     bool pause = false;
 
-    void initializeAudio(const QAudioDeviceInfo &deviceInfo);
+    void initializeAudio(const PaDeviceInfo *deviceInfo);
     void refreshDeviceSelection();
 };
 

@@ -2,10 +2,11 @@
 #define AUDIOENGINE_H
 
 #include <QList>
-#include <QAudioDeviceInfo>
 
 #include "audioobject.h"
 #include "../Widget/listitemsound.h"
+
+#include <portaudio.h>
 
 // Hotkey-Audio Connector Object
 struct HACObj {
@@ -18,12 +19,12 @@ class AudioEngine
 public:
     AudioEngine();
 
-    QList<QAudioDeviceInfo> devices();
-    QList<QAudioDeviceInfo> activeDevices();
+    QList<const PaDeviceInfo*> devices();
+    QList<const PaDeviceInfo*> activeDevices();
     void refreshDevices();
 private:
-    QList<QAudioDeviceInfo> _devices;
-    QList<QAudioDeviceInfo> _activeDevices;
+    QList<const PaDeviceInfo*> _devices;
+    QList<const PaDeviceInfo*> _activeDevices;
 };
 
 #endif // AUDIOENGINE_H

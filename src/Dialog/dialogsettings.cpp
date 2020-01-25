@@ -3,10 +3,14 @@
 #include "../mainapp.h"
 #include "../Audio/audioobject.h"
 
-#include <QAudioDeviceInfo>
 #include <QBuffer>
 #include <QObject>
 #include <QProgressBar>
+
+#include <portaudio.h>
+
+// Allows storing the const PaDeviceInfo* as QVariants
+Q_DECLARE_METATYPE(const PaDeviceInfo*)
 
 DialogSettings::DialogSettings(Main *main) :
     QDialog(main),
@@ -23,7 +27,7 @@ DialogSettings::DialogSettings(Main *main) :
 
     // Initialize the default
     if (ui->comboBoxOutputDevice->count() > 0) {
-        initializeAudio(ui->comboBoxOutputDevice->itemData(0).value<QAudioDeviceInfo>());
+        initializeAudio(ui->comboBoxOutputDevice->itemData(0).value<const PaDeviceInfo *>());
     }
 }
 
@@ -45,10 +49,10 @@ void DialogSettings::on_buttonBox_rejected()
 
 void DialogSettings::deviceChanged(int index)
 {
-    initializeAudio(ui->comboBoxOutputDevice->itemData(index).value<QAudioDeviceInfo>());
+    initializeAudio(ui->comboBoxOutputDevice->itemData(index).value<const PaDeviceInfo *>());
 }
 
-void DialogSettings::initializeAudio(const QAudioDeviceInfo &deviceInfo)
+void DialogSettings::initializeAudio(const PaDeviceInfo *deviceInfo)
 {
     qDebug() << "Initializing audio...";
     audio.init(deviceInfo);
@@ -86,11 +90,11 @@ void DialogSettings::on_pushButtonRefresh_clicked() {
 void DialogSettings::refreshDeviceSelection() {
     // TODO get all the default info from the AudioEngine
     QComboBox *box = ui->comboBoxOutputDevice;
-    const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
+    // const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
 
-    box->addItem(defaultDeviceInfo.deviceName(), QVariant::fromValue(defaultDeviceInfo));
-    for (auto &deviceInfo: main->audio()->devices()) {
-        if (deviceInfo != defaultDeviceInfo)
-            box->addItem(deviceInfo.deviceName(), QVariant::fromValue(deviceInfo));
+    // TODO box->addItem(defaultDeviceInfo.deviceName(), QVariant::fromValue(defaultDeviceInfo));
+    for (const PaDeviceInfo *deviceInfo: main->audio()->devices()) {
+        // TODO if (deviceInfo != defaultDeviceInfo)
+        box->addItem(deviceInfo->name, QVariant::fromValue(deviceInfo));
     }
 }
