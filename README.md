@@ -10,6 +10,15 @@ A Soundboard written in C++ with Qt
 4. [Clone PortAudio](http://www.portaudio.com/usinggit.html),  then [install it](http://portaudio.com/docs/v19-doxydocs/tutorial_start.html) (compile it and install) on the system.
     - Note: Be sure to configure PortAudio with `./configure --enable-cxx`
     - On Windows: might need to [set up MSYS2 with mingw64](https://github.com/orlp/dev-on-windows/wiki/Installing-GCC--&-MSYS2) to compile PortAudio
+        - I couldn't get it to compile or install properly no matter what, so what I did is...
+        - Installed MSYS2
+        - `pacman -S mingw-w64-x86_64-portaudio`
+        - Then just copy all the files manually from the msys64 mingw64 installation to out Qt mingw64 installation
+        - Copy `C:\msys64\mingw64\lib\libportaudio.a` to my Qt install `C:\Qt\5.14.0\mingw73_64\lib\libportaudio.a`
+        - Copy `C:\msys64\mingw64\lib\libportaudio.dll.a` to my Qt install `C:\Qt\5.14.0\mingw73_64\lib\libportaudio.dll.a`
+        - Copy `C:\msys64\mingw64\bin\libportaudio-2.dll` to my Qt install `C:\Qt\5.14.0\mingw73_64\bin\libportaudio-2.dll`
+        - Copy `C:\msys64\mingw64\include\portaudio.h` to my Qt install `C:\Qt\5.14.0\mingw73_64\include\portaudio.h`
+        - Copy `C:\msys64\mingw64\pkgconfig\portaudio-2.0.pc` to my Qt install `C:\Qt\5.14.0\mingw73_64\pkgconfig\portaudio-2.0.pc`
     - On Linux: make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
         - If `JACK ... no` then (on Ubuntu) try `sudo apt install libjack-dev`
 5. Build the project! (e.g. Import the project via `Soundboard.pro` into QT Creator and hit the build button
