@@ -7,8 +7,6 @@
 #include <portaudio.h>
 #include <sndfile.hh>
 
-#include "audiofilestream.h"
-
 struct DeviceInfoContainer {
     const PaDeviceInfo *info;
     PaDeviceIndex index;
@@ -24,11 +22,9 @@ public:
     void stop();
     void pause();
     void init(const PaDeviceInfo *info);
-    AudioFileStream &stream();
 
 private:
     QScopedPointer<QAudioOutput> output;
-    AudioFileStream _stream;
     const PaDeviceInfo *info;
     SndfileHandle file;
     bool paused = false;

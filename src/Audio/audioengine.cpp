@@ -43,12 +43,13 @@ void AudioEngine::setSelectedDevice(DeviceInfoContainer device) {
     Pa_StopStream(stream);
     Pa_CloseStream(stream);
     stream = nullptr;
+    channels = CHANNELS;
 
     PaError err;
     PaStreamParameters outputParameters;
     // bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
     outputParameters.device = device.index;
-    outputParameters.channelCount = CHANNELS; // device.info->maxOutputChannels;
+    outputParameters.channelCount = channels; // device.info->maxOutputChannels;
     outputParameters.sampleFormat = paFloat32;
     outputParameters.suggestedLatency = device.info->defaultLowOutputLatency ;
     outputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
@@ -154,7 +155,7 @@ void AudioEngine::refreshDevices() {
 }
 
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
-void AudioEngine::mix(float* buffer, size_t frames) {
+void AudioEngine::mix(float* buffer, size_t framesPerBuffer) {
 
 }
 

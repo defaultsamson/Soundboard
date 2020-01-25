@@ -55,6 +55,7 @@ public:
 
 private:
     PaStream *stream = nullptr;
+    int channels = 0;
     bool _hasDefaultHost = false;
     HostInfoContainer _defaultHost;
     bool _hasDefaultDevice = false;

@@ -1,10 +1,10 @@
 #include "audioobject.h"
-#include "audiofilestream.h"
 
 #include <QAudioFormat>
 #include <QAudioOutput>
 #include <QString>
-#include <QObject>
+
+#include <iostream>
 
 #include <portaudio.h>
 #include <sndfile.hh>
@@ -26,10 +26,6 @@ void AudioObject::init(const PaDeviceInfo* info) {
     }
     output.reset(new QAudioOutput(info, format));
     output->start(&_stream);*/
-}
-
-AudioFileStream &AudioObject::stream() {
-    //return _stream;
 }
 
 void AudioObject::stop() {
@@ -56,7 +52,7 @@ void AudioObject::play() {
 void AudioObject::setFile(const QString &filename) {
     stop();
     file = SndfileHandle(filename.toStdString());
-    qDebug() << "Loading file: " << filename;
+    std::cout << "Initializing File: " << filename.toStdString();
     /*
     file.close();
     file.setFileName(filename);

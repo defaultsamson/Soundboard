@@ -37,7 +37,6 @@ SOURCES += \
     src/Widget/widgetkeybind.cpp \
     src/Widget/listitem.cpp \
     src/Dialog/dialogsound.cpp \
-    src/Audio/audiofilestream.cpp \
     src/Widget/widgetaudio.cpp \
     src/Audio/audioobject.cpp \
     src/mainapp.cpp
@@ -52,7 +51,6 @@ HEADERS += \
     src/Widget/widgetkeybind.h \
     src/Widget/listitem.h \
     src/Dialog/dialogsound.h \
-    src/Audio/audiofilestream.h \
     src/Widget/widgetaudio.h \
     src/Audio/audioobject.h \
     src/mainapp.h
