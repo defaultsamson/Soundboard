@@ -7,6 +7,7 @@
 #include <QAudioDecoder>
 #include "../Audio/audiofilestream.h"
 #include "../Audio/audioobject.h"
+#include "../Audio/audioengine.h"
 
 #include <portaudio.h>
 
@@ -28,9 +29,9 @@ private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
     void on_pushButtonOutput_clicked();
+    void hostChanged(int index);
     void deviceChanged(int index);
     void on_checkBoxDarkTheme_stateChanged(int arg1);
-
     void on_pushButtonRefresh_clicked();
 
 private:
@@ -38,6 +39,8 @@ private:
     Main *main;
     AudioObject audio;
     bool pause = false;
+    bool _hasDisplayHost = false;
+    HostInfoContainer _displayHost;
 
     void initializeAudio(DeviceInfoContainer);
     void refreshDeviceSelection();

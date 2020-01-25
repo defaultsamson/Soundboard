@@ -13,7 +13,8 @@
 #define SAMPLE_RATE (44100)
 #define FRAMES_PER_BUFFER 256
 
-// Allows storing the const PaDeviceInfo* as QVariants
+// Allows storing the following types as QVariants
+Q_DECLARE_METATYPE(HostInfoContainer)
 Q_DECLARE_METATYPE(DeviceInfoContainer)
 
 DialogSettings::DialogSettings(Main *main) :
@@ -28,6 +29,7 @@ DialogSettings::DialogSettings(Main *main) :
     refreshDeviceSelection();
 
     connect(ui->comboBoxOutputDevice, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
+    connect(ui->comboBoxDriver, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChanged);
 
     // Initialize the default
     if (ui->comboBoxOutputDevice->count() > 0) {
@@ -51,25 +53,38 @@ void DialogSettings::on_buttonBox_rejected()
     close();
 }
 
+void DialogSettings::hostChanged(int index)
+{
+    _hasDisplayHost = true;
+    _displayHost = ui->comboBoxDriver->itemData(index).value<HostInfoContainer>();
+    refreshDeviceSelection();
+}
+
 void DialogSettings::deviceChanged(int index)
 {
-    initializeAudio(ui->comboBoxOutputDevice->itemData(index).value<DeviceInfoContainer>());
+    main->audio()->setSelectedDevice(ui->comboBoxOutputDevice->itemData(index).value<DeviceInfoContainer>());
+    // If the host has been changed, update it too
+    if (_hasDisplayHost) {
+        main->audio()->setSelectedHost(_displayHost);
+        _hasDisplayHost = false;
+    }
+    refreshDeviceSelection();
+    initializeAudio(main->audio()->selectedDevice());
 }
 
 void DialogSettings::initializeAudio(DeviceInfoContainer device)
 {
-    qDebug() << "Initializing audio...";
+    qDebug() << "Initializing audio... " << main->audio()->activeHost().hostName;
     PaStream *stream;
     PaError err;
 
     PaStreamParameters outputParameters;
-    bzero( &outputParameters, sizeof( outputParameters ) ); //not necessary if you are filling in all the fields
+    bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
     outputParameters.channelCount = device.info->maxOutputChannels;
     outputParameters.device = device.index;
-    outputParameters.hostApiSpecificStreamInfo = NULL;
     outputParameters.sampleFormat = paFloat32;
     outputParameters.suggestedLatency = device.info->defaultLowOutputLatency ;
-    outputParameters.hostApiSpecificStreamInfo = NULL; //See you specific host's API docs for info on using this field
+    outputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
 
     err = Pa_OpenStream(
                     &stream,
@@ -118,12 +133,35 @@ void DialogSettings::on_pushButtonRefresh_clicked() {
 
 void DialogSettings::refreshDeviceSelection() {
     // TODO get all the default info from the AudioEngine
-    QComboBox *box = ui->comboBoxOutputDevice;
+    QComboBox *driverBox = ui->comboBoxDriver;
+    QComboBox *deviceBox = ui->comboBoxOutputDevice;
+    driverBox->clear();
+    deviceBox->clear();
     // const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
+    AudioEngine *a = main->audio();
 
-    // TODO box->addItem(defaultDeviceInfo.deviceName(), QVariant::fromValue(defaultDeviceInfo));
-    for (DeviceInfoContainer deviceInfo: main->audio()->devices()) {
-        // TODO if (deviceInfo != defaultDeviceInfo)
-        box->addItem(deviceInfo.info->name, QVariant::fromValue(deviceInfo));
+    PaHostApiIndex showingHostIndex = -1;
+    // Always prioritize the host being displayed over the active one
+    if (_hasDisplayHost) {
+        driverBox->addItem(_displayHost.hostName, QVariant::fromValue(_displayHost));
+        showingHostIndex = _displayHost.hostIndex;
+    } else if (a->hasActiveHost()) {
+        driverBox->addItem(a->activeHost().hostName, QVariant::fromValue(a->activeHost()));
+        showingHostIndex = a->activeHost().hostIndex;
+        _displayHost = a->activeHost();
+        _hasDisplayHost = true;
+    }
+    for (HostInfoContainer hostInfo : a->hosts()) {
+        if (!(_hasDisplayHost && hostInfo.hostIndex == showingHostIndex)) // If not the displaying host
+            driverBox->addItem(hostInfo.hostName, QVariant::fromValue(hostInfo));
+    }
+
+    if (_hasDisplayHost) {
+        // Only add default if it's showing the active device's tab
+        if (a->hasActiveDevice() && _displayHost.hostIndex == a->activeDevice().info->hostApi) deviceBox->addItem(a->activeDevice().info->name, QVariant::fromValue(a->activeDevice()));
+        for (DeviceInfoContainer deviceInfo : *(_displayHost.devices)) {
+            if (!(a->hasActiveDevice() && deviceInfo.index == a->activeDevice().index)) // If not the active host
+                deviceBox->addItem(deviceInfo.info->name, QVariant::fromValue(deviceInfo));
+        }
     }
 }

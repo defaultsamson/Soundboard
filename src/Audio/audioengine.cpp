@@ -3,60 +3,114 @@
 #include "audioobject.h"
 #include <portaudio.h>
 
-AudioEngine::AudioEngine() : _devices(), _activeDevices() {
+AudioEngine::AudioEngine() {
+    qDebug() << "Starting PortAudio...";
+    Pa_Initialize();
     refreshDevices();
 }
 
-QList<DeviceInfoContainer> AudioEngine::devices() {
-    return _devices;
+bool AudioEngine::hasDefaultHost() {
+    return _hasDefaultHost;
+}
+HostInfoContainer AudioEngine::defaultHost() {
+    return _defaultHost;
+}
+bool AudioEngine::hasDefaultDevice() {
+    return _hasDefaultDevice;
+}
+DeviceInfoContainer AudioEngine::defaultDevice() {
+    return _defaultDevice;
+}
+bool AudioEngine::hasSelectedHost() {
+    return _hasSelectedHost;
+}
+void AudioEngine::setSelectedHost(HostInfoContainer host) {
+    _selectedHost = host;
+    _hasSelectedHost = true;
+}
+HostInfoContainer AudioEngine::selectedHost() {
+    return _selectedHost;
+}
+bool AudioEngine::hasSelectedDevice() {
+    return _hasSelectedDevice;
+}
+void AudioEngine::setSelectedDevice(DeviceInfoContainer device) {
+    _selectedDevice = device;
+    _hasSelectedDevice = true;
+}
+DeviceInfoContainer AudioEngine::selectedDevice() {
+    return _selectedDevice;
 }
 
-QList<DeviceInfoContainer> AudioEngine::activeDevices() {
-    return _activeDevices;
+QList<HostInfoContainer> AudioEngine::hosts() {
+    return _hosts;
+}
+
+bool AudioEngine::hasActiveHost() {
+    return hasSelectedHost() || hasDefaultHost();
+}
+
+HostInfoContainer AudioEngine::activeHost() {
+    return hasSelectedHost() ? selectedHost() : defaultHost();
+}
+
+bool AudioEngine::hasActiveDevice() {
+    return hasSelectedDevice() || hasDefaultDevice();
+}
+
+DeviceInfoContainer AudioEngine::activeDevice() {
+    return hasSelectedDevice() ? selectedDevice() : defaultDevice();
 }
 
 void AudioEngine::refreshDevices() {
     // Make the default device active
     // TODO allow changing which devices are active via the settings menu
 
-    qDebug() << "Starting PA audio...";
+    int devices = Pa_GetDeviceCount();
+    qDebug() << "Refreshing devices... [" << devices << "]";
+
+    _hasDefaultHost = false;
+    _hasDefaultDevice = false;
 
     const PaDeviceInfo *device;
 
-    Pa_Initialize();
-
-    qDebug() << "Device Count: " << Pa_GetDeviceCount();
-
-    for (int i = 0; i < Pa_GetDeviceCount(); ++i ) {
+    for (int i = 0; i < devices; ++i ) {
         device = Pa_GetDeviceInfo(i);
-        qDebug() << "------------------------------------------";
-        qDebug() << "Device: [" << Pa_GetHostApiInfo(device->hostApi)->name << "] " << device->name;
-
-        if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paALSA)) {
-            qDebug() << "  (Backend) ALSA";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paJACK)) {
-            qDebug() << "  (Backend) JACK";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paOSS)) {
-            qDebug() << "  (Backend) OSS";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paWASAPI)) {
-            qDebug() << "  (Backend) WASAPI";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paWDMKS)) {
-            qDebug() << "  (Backend) WDMKS";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paCoreAudio)) {
-            qDebug() << "  (Backend) CoreAudio";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paASIO)) {
-            qDebug() << "  (Backend) ASIO";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paMME)) {
-            qDebug() << "  (Backend) MME";
-        } else if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paDirectSound)) {
-            qDebug() << "  (Backend) DirectSound";
-        }
-
         if (device->maxOutputChannels == 0) { // isInput
-            qDebug() << "  (Input) " << device->maxInputChannels << " Channels";
+            qDebug() << "Ignoring input channel... [" << i << "]";
         } else {
-            qDebug() << "  (Output) " << device->maxOutputChannels << " Channels";
-            _devices.append({device, i});
+            DeviceInfoContainer dev = {device, i};
+            if (Pa_GetDefaultOutputDevice() == i) {
+                _defaultDevice = dev;
+                _hasDefaultDevice = true;
+                qDebug() << "Default device... [" << i << "]";
+            }
+            // Try to find the container for the specific host that contains all its devices
+            bool foundCon = false;
+            for (auto hostCon : _hosts) {
+                if (hostCon.hostIndex == device->hostApi) {
+                    foundCon = true;
+                    hostCon.devices->append(dev);
+                    break;
+                }
+            }
+            // Create the container if not found
+            if (!foundCon) {
+                QList<DeviceInfoContainer> *list = new QList<DeviceInfoContainer>();
+                list->append(dev);
+                HostInfoContainer infoCon = {
+                    device->hostApi,
+                    Pa_GetHostApiInfo(device->hostApi)->name,
+                    list
+                };
+                _hosts.append(infoCon);
+                // Default stuff
+                if (device->hostApi == Pa_GetDefaultHostApi()) {
+                    _defaultHost = infoCon;
+                    _hasDefaultHost = true;
+                    qDebug() << "Default host... [" << device->hostApi << "]";
+                }
+            }
         }
     }
 }

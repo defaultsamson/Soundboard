@@ -220,7 +220,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QComboBox" name="comboBoxOutputDevice_2"/>
+           <widget class="QComboBox" name="comboBoxDriver"/>
           </item>
           <item>
            <widget class="QComboBox" name="comboBoxOutputDevice"/>
