@@ -42,4 +42,8 @@ Note: the two arguments at the end are only required if you wish to deploy a Win
 
 For example, this is what my command looks like for generating an installer `windows.bat C:\Users\my_username\Documents\GitHub\build-Soundboard-Desktop_Qt_5_12_6_MinGW_64_bit-Release\release\Soundboard.exe C:\Qt\5.12.6\mingw73_64\bin\windeployqt.exe C:\Qt\QtIFW-3.2.0\bin\binarycreator.exe C:\Qt\QtIFW-3.2.0\bin\installerbase.exe`
 
+NOTE: The 5.14.0 MingW64 `windeployqt.exe` is bugged. You just need to get an un-bugged file, which can be found in [this thread](https://forum.qt.io/topic/109779/windeployqt-exe-comes-with-qt-5-14-not-copy-the-dlls-to-the-app-directory)
+
+Also NOTE: When building, may need to initially say "no" when the script asks if the program didn't run okay, then copy `libportaudio-2.dll` into `Soundboard/lib`, then continue.
+
 
