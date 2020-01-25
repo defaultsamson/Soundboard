@@ -4,9 +4,6 @@
 #include <portaudio.h>
 
 AudioEngine::AudioEngine() {
-    qDebug() << "Starting PortAudio...";
-    Pa_Initialize();
-    refreshDevices();
 }
 
 bool AudioEngine::hasDefaultHost() {
@@ -60,6 +57,12 @@ bool AudioEngine::hasActiveDevice() {
 
 DeviceInfoContainer AudioEngine::activeDevice() {
     return hasSelectedDevice() ? selectedDevice() : defaultDevice();
+}
+
+void AudioEngine::init() {
+    qDebug() << "Starting PortAudio...";
+    Pa_Initialize();
+    refreshDevices();
 }
 
 void AudioEngine::refreshDevices() {

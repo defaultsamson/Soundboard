@@ -20,14 +20,32 @@
 #include <QModelIndex>
 #include <QObject>
 #include <QAbstractItemModel>
-
+#include <QThread>
 #include <iostream>
+
+class MyThread : public QThread
+{
+public:
+    MyThread(AudioEngine *audio) : audio(audio) {}
+protected:
+    void run();
+private:
+    AudioEngine *audio;
+};
+
+void MyThread::run()
+{
+    audio->init();
+}
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Main w;
     w.show();
+
+    MyThread t(w.audio());
+    t.start();
 
     /*
     QString dir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);

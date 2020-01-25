@@ -77,10 +77,10 @@ public slots:
 
 private:
     Ui::MainApp *ui;
+    AudioEngine *_audio;
     bool hasFile = false;
     QString fileName;
     ListItemBoard *currentBoard = nullptr;
-    AudioEngine *_audio;
     QSettings *_settings;
 
     QPalette darkPalette;
