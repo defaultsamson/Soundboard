@@ -79,9 +79,9 @@ void DialogSettings::initializeAudio(DeviceInfoContainer device)
     PaError err;
 
     PaStreamParameters outputParameters;
-    bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
-    outputParameters.channelCount = device.info->maxOutputChannels;
+    // bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
     outputParameters.device = device.index;
+    outputParameters.channelCount = device.info->maxOutputChannels;
     outputParameters.sampleFormat = paFloat32;
     outputParameters.suggestedLatency = device.info->defaultLowOutputLatency ;
     outputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
