@@ -52,6 +52,7 @@ void ListItemSound::reload() {
 void ListItemSound::setFileName(QString name) {
     _filename = name;
     _filenameChanged = true;
+    reload();
 }
 
 QString ListItemSound::filename() {
@@ -61,6 +62,7 @@ QString ListItemSound::filename() {
 void ListItemSound::setVolume(int v) {
     _volume = v;
     _volumeChanged = false;
+    reload();
 }
 
 int ListItemSound::volume() {

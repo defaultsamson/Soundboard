@@ -4,6 +4,15 @@
 #include <QList>
 #include <QAudioDeviceInfo>
 
+#include "audioobject.h"
+#include "../Widget/listitemsound.h"
+
+// Hotkey-Audio Connector Object
+struct HACObj {
+    ListItemSound* listItem;
+    AudioObject* audio;
+};
+
 class AudioEngine
 {
 public:

@@ -23,6 +23,8 @@
 
 #include <iostream>
 
+#include <portaudio.h>
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -87,6 +89,34 @@ Main::Main(QWidget *parent) :
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
 
     setDarkTheme(settings()->value(DARK_THEME, false).toBool());
+
+    std::cout << "Beginning" << std::endl;
+
+    const PaDeviceInfo *device;
+
+    Pa_Initialize();
+
+    for(int i = 0; i < Pa_GetDeviceCount(); ++i ) {
+        device = Pa_GetDeviceInfo(i);
+        std::cout << "Device: " << Pa_GetDeviceInfo(i)->hostApi << std::endl;
+        if( Pa_GetDeviceInfo(i)->hostApi == Pa_HostApiTypeIdToHostApiIndex(paALSA) )
+        {
+            std::cout << "------------------------------------------" << std::endl;
+            std::cout << "ALSA Device: " << device->name << std::endl;
+            if(device->maxOutputChannels == 0) // isInput
+                std::cout << "  (Input) " << device->maxInputChannels << " Channels" << std::endl;
+            else
+                std::cout << "  (Output) " << device->maxOutputChannels << " Channels" << std::endl;
+        } else if( Pa_GetDeviceInfo(i)->hostApi == Pa_HostApiTypeIdToHostApiIndex(paJACK) )
+        {
+            std::cout << "------------------------------------------" << std::endl;
+            std::cout << "JACK Device: " << device->name << std::endl;
+            if(device->maxOutputChannels == 0) // isInput
+                std::cout << "  (Input) " << device->maxInputChannels << " Channels" << std::endl;
+            else
+                std::cout << "  (Output) " << device->maxOutputChannels << " Channels" << std::endl;
+        }
+    }
 }
 
 Main::~Main()

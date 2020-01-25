@@ -84,6 +84,7 @@ void DialogSettings::on_pushButtonRefresh_clicked() {
 }
 
 void DialogSettings::refreshDeviceSelection() {
+    // TODO get all the default info from the AudioEngine
     QComboBox *box = ui->comboBoxOutputDevice;
     const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
 

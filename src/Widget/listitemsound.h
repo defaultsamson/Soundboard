@@ -17,7 +17,6 @@ public:
     static QString NEW_SOUND;
     ListItemSound(Main *main, ListItemBoard *board);
     ~ListItemSound() override;
-    void reload();
     void setFileName(QString name);
     QString filename();
     void setVolume(int v);
@@ -35,6 +34,7 @@ private:
     QFile *file;
     bool _filenameChanged;
     bool _volumeChanged;
+    void reload();
 };
 
 #endif // SOUND_H

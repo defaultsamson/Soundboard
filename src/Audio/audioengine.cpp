@@ -16,4 +16,6 @@ QList<QAudioDeviceInfo> AudioEngine::activeDevices() {
 
 void AudioEngine::refreshDevices() {
     _devices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
+    _activeDevices.append(QAudioDeviceInfo::defaultOutputDevice()); // Make the default device active
+    // TODO allow changing which devices are active via the settings menu
 }
