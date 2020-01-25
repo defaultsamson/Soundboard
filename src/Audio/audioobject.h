@@ -5,6 +5,7 @@
 #include <QFile>
 
 #include <portaudio.h>
+#include <sndfile.hh>
 
 #include "audiofilestream.h"
 
@@ -29,7 +30,7 @@ private:
     QScopedPointer<QAudioOutput> output;
     AudioFileStream _stream;
     const PaDeviceInfo *info;
-    QFile file;
+    SndfileHandle file;
     bool paused = false;
 };
 

@@ -9,10 +9,6 @@
 
 #include <portaudio.h>
 
-// TODO allow the user to change these
-#define SAMPLE_RATE (44100)
-#define FRAMES_PER_BUFFER 256
-
 // Allows storing the following types as QVariants
 Q_DECLARE_METATYPE(HostInfoContainer)
 Q_DECLARE_METATYPE(DeviceInfoContainer)
@@ -80,33 +76,11 @@ void DialogSettings::deviceChanged(int index)
 void DialogSettings::initializeAudio(DeviceInfoContainer device)
 {
     qDebug() << "Initializing audio... " << main->audio()->activeHost().hostName;
-    PaStream *stream;
-    PaError err;
 
-    PaStreamParameters outputParameters;
-    // bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
-    outputParameters.device = device.index;
-    outputParameters.channelCount = device.info->maxOutputChannels;
-    outputParameters.sampleFormat = paFloat32;
-    outputParameters.suggestedLatency = device.info->defaultLowOutputLatency ;
-    outputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
-
-    err = Pa_OpenStream(
-                    &stream,
-                    nullptr,
-                    &outputParameters,
-                    device.info->defaultSampleRate,
-                    FRAMES_PER_BUFFER,
-                    paNoFlag, //flags that can be used to define dither, clip settings and more
-                    nullptr, //your callback function
-                    (void *) this); //data to be passed to callback. In C++, it is frequently (void *)this
-    //don't forget to check errors!
-    if (err != paNoError) qDebug() << "Error opening stream";
-
-    /*
-    audio.init(deviceInfo);
+    audio.init(device.info);
     audio.setFile("/home/samson/Desktop/succ.flac");
     // Sets up audio bar
+    /*
     connect(&audio.stream(), &AudioFileStream::update, this, [&](qreal level) {
         ui->outputBar->setLevel(level);
     });*/
@@ -114,13 +88,14 @@ void DialogSettings::initializeAudio(DeviceInfoContainer device)
 
 void DialogSettings::on_pushButtonOutput_clicked()
 {
-    qDebug() << "Testing audio";
     if (pause) {
         pause = false;
         audio.pause();
+        qDebug() << "Pausing audio";
     } else {
         pause = true;
         audio.play();
+        qDebug() << "Playing audio";
     }
 }
 

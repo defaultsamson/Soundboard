@@ -6,6 +6,8 @@
 #include "audioobject.h"
 #include "../Widget/listitemsound.h"
 
+#include <portaudio.h>
+
 // Hotkey-Audio Connector Object
 struct HACObj {
     ListItemSound* listItem;
@@ -42,7 +44,17 @@ public:
     DeviceInfoContainer activeDevice();
 
     void init();
+
+    static int readCallback(const void *inputBuffer, void *outputBuffer,
+                            unsigned long framesPerBuffer,
+                            const PaStreamCallbackTimeInfo* timeInfo,
+                            PaStreamCallbackFlags statusFlags,
+                            void *userData);
+
+    void mix(float* buffer, size_t frames);
+
 private:
+    PaStream *stream = nullptr;
     bool _hasDefaultHost = false;
     HostInfoContainer _defaultHost;
     bool _hasDefaultDevice = false;
