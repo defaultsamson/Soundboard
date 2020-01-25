@@ -9,6 +9,9 @@ A Soundboard written in C++ with Qt
     - Note: Really, all you have to do is install qdep and prepare your Qt's qmake version for it (as described in their README). The Soundboard.pro file is already set up properly here, so all you'll have to do is compile the program, and it'll isntall the QHotkey library for you.
 4. Install [libsndfile](https://github.com/erikd/libsndfile)
     - On Linux `sudo apt install libsndfile-dev`
+    - On Windows
+        - Download the windows installer from [here](http://www.mega-nerd.com/libsndfile/)
+        - Add the `bin` folder to your `PATH` variable (This will make sure it can run from Qt Creator)
 5. Install [PortAudio](http://www.portaudio.com/usinggit.html)
     - On Linux `sudo apt install libportaudio2`
         - On Linux: make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
@@ -49,6 +52,6 @@ For example, this is what my command looks like for generating an installer `win
 
 NOTE: The 5.14.0 MingW64 `windeployqt.exe` is bugged. You just need to get an un-bugged file, which can be found in [this thread](https://forum.qt.io/topic/109779/windeployqt-exe-comes-with-qt-5-14-not-copy-the-dlls-to-the-app-directory)
 
-Also NOTE: When building, may need to initially say "no" when the script asks if the program didn't run okay, then copy `libportaudio-2.dll` into `Soundboard/lib`, then continue.
+Also NOTE: When building, may need to initially say "no" when the script asks if the program didn't run okay, then copy `libportaudio-2.dll` and `libsndfile-1.dll` into `Soundboard/lib`, then continue.
 
 
