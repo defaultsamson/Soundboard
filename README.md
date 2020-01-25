@@ -9,8 +9,9 @@ A Soundboard written in C++ with Qt
     - Note: Really, all you have to do is install qdep and prepare your Qt's qmake version for it (as described in their README). The Soundboard.pro file is already set up properly here, so all you'll have to do is compile the program, and it'll isntall the QHotkey library for you.
 4. [Clone PortAudio](http://www.portaudio.com/usinggit.html),  then [install it](http://portaudio.com/docs/v19-doxydocs/tutorial_start.html) (compile it and install) on the system.
     - Note: Be sure to configure PortAudio with `./configure --enable-cxx`
-    - Make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
-    - If `JACK ... no` then (on Ubuntu) try `sudo apt install libjack-dev`
+    - On Windows: might need to [set up MSYS2 with mingw64](https://github.com/orlp/dev-on-windows/wiki/Installing-GCC--&-MSYS2) to compile PortAudio
+    - On Linux: make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
+        - If `JACK ... no` then (on Ubuntu) try `sudo apt install libjack-dev`
 5. Build the project! (e.g. Import the project via `Soundboard.pro` into QT Creator and hit the build button
 
 ### Linux (AppImage) deployment

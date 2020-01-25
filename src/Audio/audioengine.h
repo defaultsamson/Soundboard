@@ -40,6 +40,8 @@ public:
     HostInfoContainer activeHost();
     bool hasActiveDevice();
     DeviceInfoContainer activeDevice();
+
+    void init();
 private:
     bool _hasDefaultHost = false;
     HostInfoContainer _defaultHost;

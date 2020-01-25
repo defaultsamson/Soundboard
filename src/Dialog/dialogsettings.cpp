@@ -55,14 +55,19 @@ void DialogSettings::on_buttonBox_rejected()
 
 void DialogSettings::hostChanged(int index)
 {
+    QVariant qvar = ui->comboBoxDriver->itemData(index);
+    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select backend..."
+
+    _displayHost = qvar.value<HostInfoContainer>();
     _hasDisplayHost = true;
-    _displayHost = ui->comboBoxDriver->itemData(index).value<HostInfoContainer>();
     refreshDeviceSelection();
 }
 
 void DialogSettings::deviceChanged(int index)
 {
-    main->audio()->setSelectedDevice(ui->comboBoxOutputDevice->itemData(index).value<DeviceInfoContainer>());
+    QVariant qvar = ui->comboBoxOutputDevice->itemData(index);
+    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
+    main->audio()->setSelectedDevice(qvar.value<DeviceInfoContainer>());
     // If the host has been changed, update it too
     if (_hasDisplayHost) {
         main->audio()->setSelectedHost(_displayHost);
@@ -125,10 +130,8 @@ void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 }
 
 void DialogSettings::on_pushButtonRefresh_clicked() {
-    qDebug() << "Refreshing devices...";
     main->audio()->refreshDevices();
     refreshDeviceSelection();
-    qDebug() << "Finished updating device list";
 }
 
 void DialogSettings::refreshDeviceSelection() {
@@ -137,7 +140,6 @@ void DialogSettings::refreshDeviceSelection() {
     QComboBox *deviceBox = ui->comboBoxOutputDevice;
     driverBox->clear();
     deviceBox->clear();
-    // const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
     AudioEngine *a = main->audio();
 
     PaHostApiIndex showingHostIndex = -1;
@@ -150,6 +152,8 @@ void DialogSettings::refreshDeviceSelection() {
         showingHostIndex = a->activeHost().hostIndex;
         _displayHost = a->activeHost();
         _hasDisplayHost = true;
+    } else {
+        driverBox->addItem("Select backend...", QVariant(QVariant::Invalid));
     }
     for (HostInfoContainer hostInfo : a->hosts()) {
         if (!(_hasDisplayHost && hostInfo.hostIndex == showingHostIndex)) // If not the displaying host
@@ -158,7 +162,11 @@ void DialogSettings::refreshDeviceSelection() {
 
     if (_hasDisplayHost) {
         // Only add default if it's showing the active device's tab
-        if (a->hasActiveDevice() && _displayHost.hostIndex == a->activeDevice().info->hostApi) deviceBox->addItem(a->activeDevice().info->name, QVariant::fromValue(a->activeDevice()));
+        if (a->hasActiveDevice() && _displayHost.hostIndex == a->activeDevice().info->hostApi) {
+            deviceBox->addItem(a->activeDevice().info->name, QVariant::fromValue(a->activeDevice()));
+        } else {
+            deviceBox->addItem("Select device...", QVariant(QVariant::Invalid));
+        }
         for (DeviceInfoContainer deviceInfo : *(_displayHost.devices)) {
             if (!(a->hasActiveDevice() && deviceInfo.index == a->activeDevice().index)) // If not the active host
                 deviceBox->addItem(deviceInfo.info->name, QVariant::fromValue(deviceInfo));
