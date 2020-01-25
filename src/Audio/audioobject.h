@@ -8,6 +8,12 @@
 
 #include "audiofilestream.h"
 
+typedef struct DeviceInfoContainer {
+    const PaDeviceInfo *info;
+    PaDeviceIndex index;
+
+} DeviceInfoContainer;
+
 class AudioObject
 {
 public:

@@ -1,16 +1,17 @@
 #include "audioengine.h"
 
+#include "audioobject.h"
 #include <portaudio.h>
 
 AudioEngine::AudioEngine() : _devices(), _activeDevices() {
     refreshDevices();
 }
 
-QList<const PaDeviceInfo*> AudioEngine::devices() {
+QList<DeviceInfoContainer> AudioEngine::devices() {
     return _devices;
 }
 
-QList<const PaDeviceInfo*> AudioEngine::activeDevices() {
+QList<DeviceInfoContainer> AudioEngine::activeDevices() {
     return _activeDevices;
 }
 
@@ -29,7 +30,7 @@ void AudioEngine::refreshDevices() {
     for (int i = 0; i < Pa_GetDeviceCount(); ++i ) {
         device = Pa_GetDeviceInfo(i);
         qDebug() << "------------------------------------------";
-        qDebug() << "Device: " << device->hostApi << ", " << device->name;
+        qDebug() << "Device: [" << Pa_GetHostApiInfo(device->hostApi)->name << "] " << device->name;
 
         if (device->hostApi == Pa_HostApiTypeIdToHostApiIndex(paALSA)) {
             qDebug() << "  (Backend) ALSA";
@@ -55,7 +56,7 @@ void AudioEngine::refreshDevices() {
             qDebug() << "  (Input) " << device->maxInputChannels << " Channels";
         } else {
             qDebug() << "  (Output) " << device->maxOutputChannels << " Channels";
-            _devices.append(device);
+            _devices.append({device, i});
         }
     }
 }

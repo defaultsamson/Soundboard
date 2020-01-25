@@ -6,8 +6,6 @@
 #include "audioobject.h"
 #include "../Widget/listitemsound.h"
 
-#include <portaudio.h>
-
 // Hotkey-Audio Connector Object
 struct HACObj {
     ListItemSound* listItem;
@@ -19,12 +17,12 @@ class AudioEngine
 public:
     AudioEngine();
 
-    QList<const PaDeviceInfo*> devices();
-    QList<const PaDeviceInfo*> activeDevices();
+    QList<DeviceInfoContainer> devices();
+    QList<DeviceInfoContainer> activeDevices();
     void refreshDevices();
 private:
-    QList<const PaDeviceInfo*> _devices;
-    QList<const PaDeviceInfo*> _activeDevices;
+    QList<DeviceInfoContainer> _devices;
+    QList<DeviceInfoContainer> _activeDevices;
 };
 
 #endif // AUDIOENGINE_H

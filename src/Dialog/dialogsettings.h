@@ -39,7 +39,7 @@ private:
     AudioObject audio;
     bool pause = false;
 
-    void initializeAudio(const PaDeviceInfo *deviceInfo);
+    void initializeAudio(DeviceInfoContainer);
     void refreshDeviceSelection();
 };
 
