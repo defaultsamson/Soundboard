@@ -90,31 +90,34 @@ Main::Main(QWidget *parent) :
 
     setDarkTheme(settings()->value(DARK_THEME, false).toBool());
 
-    std::cout << "Beginning" << std::endl;
+
+    qDebug() << "Starting PA audio...";
 
     const PaDeviceInfo *device;
 
     Pa_Initialize();
 
+    qDebug() << "Device Count: " << Pa_GetDeviceCount();
+
     for(int i = 0; i < Pa_GetDeviceCount(); ++i ) {
         device = Pa_GetDeviceInfo(i);
-        std::cout << "Device: " << Pa_GetDeviceInfo(i)->hostApi << std::endl;
+        qDebug() << "Device: " << Pa_GetDeviceInfo(i)->hostApi;
         if( Pa_GetDeviceInfo(i)->hostApi == Pa_HostApiTypeIdToHostApiIndex(paALSA) )
         {
-            std::cout << "------------------------------------------" << std::endl;
-            std::cout << "ALSA Device: " << device->name << std::endl;
+            qDebug() << "------------------------------------------";
+            qDebug() << "ALSA Device: " << device->name;
             if(device->maxOutputChannels == 0) // isInput
-                std::cout << "  (Input) " << device->maxInputChannels << " Channels" << std::endl;
+                qDebug() << "  (Input) " << device->maxInputChannels << " Channels";
             else
-                std::cout << "  (Output) " << device->maxOutputChannels << " Channels" << std::endl;
+                qDebug() << "  (Output) " << device->maxOutputChannels << " Channels";
         } else if( Pa_GetDeviceInfo(i)->hostApi == Pa_HostApiTypeIdToHostApiIndex(paJACK) )
         {
-            std::cout << "------------------------------------------" << std::endl;
-            std::cout << "JACK Device: " << device->name << std::endl;
+            qDebug() << "------------------------------------------";
+            qDebug() << "JACK Device: " << device->name;
             if(device->maxOutputChannels == 0) // isInput
-                std::cout << "  (Input) " << device->maxInputChannels << " Channels" << std::endl;
+                qDebug() << "  (Input) " << device->maxInputChannels << " Channels";
             else
-                std::cout << "  (Output) " << device->maxOutputChannels << " Channels" << std::endl;
+                qDebug() << "  (Output) " << device->maxOutputChannels << " Channels";
         }
     }
 }

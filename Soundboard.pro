@@ -80,5 +80,4 @@ QDEP_DEPENDS += Skycoder42/QHotkey
 !load(qdep):error("Failed to load qdep feature, try running: qdep prfgen --qmake ~/Qt/$${QT_VERSION}/gcc_64/bin/qmake")
 
 # Portaudio
-unix:!macx: LIBS += -L$$PWD/lib/ -lportaudio
-unix:!macx: LIBS += -lrt -lm -lasound -ljack
+unix:!macx: LIBS += -lportaudio -lrt -lm -lasound -ljack
