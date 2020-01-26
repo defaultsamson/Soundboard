@@ -31,6 +31,8 @@ DialogSettings::DialogSettings(Main *main) :
     if (ui->comboBoxOutputDevice->count() > 0) {
         initializeAudio(ui->comboBoxOutputDevice->itemData(0).value<DeviceInfoContainer>());
     }
+
+    main->audio()->registerAudio(&audio);
 }
 
 DialogSettings::~DialogSettings()

@@ -154,9 +154,29 @@ void AudioEngine::refreshDevices() {
     }
 }
 
+void AudioEngine::registerAudio(AudioObject *obj) {
+    _audioObjectRegistry.append(obj);
+}
+void AudioEngine::unregisterAudio(AudioObject *) {
+
+}
+
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
 void AudioEngine::mix(float* buffer, size_t framesPerBuffer) {
 
+    // Fills the buffer with zeros (I think? might overflow, have to check)
+    memset(buffer, 0, framesPerBuffer * channels * sizeof(float));
+    //qDebug() << framesPerBuffer << " * " << channels << " = " << (framesPerBuffer * channels);
+
+    // Fills the buffer with zeros
+    /*
+    for (int i = 0; i < framesPerBuffer * channels; i += channels) {
+        buffer[i] = 0; // Left
+        buffer[i + 1] = 0; // Right
+    }*/
+    for (AudioObject *audio : _audioObjectRegistry) {
+        audio->mix(buffer, framesPerBuffer);
+    }
 }
 
 int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
@@ -169,8 +189,7 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
     AudioEngine *audio = static_cast<AudioEngine*>(userData);
     audio->mix(out, framesPerBuffer);
 
-    /*
-    for (size_t i = 0; i < framesPerBuffer; ++i) {
+    /*for (size_t i = 0; i < framesPerBuffer; ++i) {
         *out++ = 0; // Left
         *out++ = 0; // Right
     }*/

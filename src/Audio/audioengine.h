@@ -53,9 +53,13 @@ public:
 
     void mix(float* buffer, size_t frames);
 
+    void registerAudio(AudioObject *);
+    void unregisterAudio(AudioObject *);
+
 private:
     PaStream *stream = nullptr;
     int channels = 0;
+
     bool _hasDefaultHost = false;
     HostInfoContainer _defaultHost;
     bool _hasDefaultDevice = false;
@@ -65,6 +69,8 @@ private:
     bool _hasSelectedDevice = false;
     DeviceInfoContainer _selectedDevice;
     QList<HostInfoContainer> _hosts;
+
+    QList<AudioObject *> _audioObjectRegistry;
 };
 
 #endif // AUDIOENGINE_H

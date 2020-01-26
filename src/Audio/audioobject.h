@@ -23,10 +23,11 @@ public:
     void pause();
     void init(const PaDeviceInfo *info);
 
+    void mix(float* buffer, size_t framesPerBuffer);
+
 private:
-    QScopedPointer<QAudioOutput> output;
-    const PaDeviceInfo *info;
-    SndfileHandle file;
+    const PaDeviceInfo *info = nullptr;
+    SndfileHandle *file = nullptr;
     bool paused = false;
 };
 
