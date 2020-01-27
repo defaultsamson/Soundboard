@@ -27,7 +27,11 @@ DialogSettings::DialogSettings(Main *main) :
     connect(ui->comboBoxOutputDevice, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
     connect(ui->comboBoxDriver, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChanged);
 
-    audio.setFile("/home/samson/Desktop/succ.ogg");
+#ifdef Q_OS_WIN
+    audio.setFile("C:\\Users\\test\\Desktop\\test.ogg");
+#else
+    audio.setFile("/home/samson/Desktop/test.ogg");
+#endif
     main->audio()->registerAudio(&audio);
 
     connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
