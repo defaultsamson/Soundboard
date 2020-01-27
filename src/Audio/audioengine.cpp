@@ -123,6 +123,9 @@ void AudioEngine::refreshDevices() {
                 _defaultDevice = dev;
                 _hasDefaultDevice = true;
                 qDebug() << "Default device... [" << i << "]";
+
+                // TODO TEMPORARY, in the future, load the selected from a file (or default if not specified)
+                setSelectedDevice(_defaultDevice);
             }
             // Try to find the container for the specific host that contains all its devices
             bool foundCon = false;
@@ -148,6 +151,9 @@ void AudioEngine::refreshDevices() {
                     _defaultHost = infoCon;
                     _hasDefaultHost = true;
                     qDebug() << "Default host... [" << device->hostApi << "]";
+
+                    // TODO TEMPORARY, in the future, load the selected from a file (or default if not specified)
+                    setSelectedHost(_defaultHost);
                 }
             }
         }
@@ -155,25 +161,18 @@ void AudioEngine::refreshDevices() {
 }
 
 void AudioEngine::registerAudio(AudioObject *obj) {
-    _audioObjectRegistry.append(obj);
+    if (!_audioObjectRegistry.contains(obj)) _audioObjectRegistry.append(obj);
 }
-void AudioEngine::unregisterAudio(AudioObject *) {
-
+void AudioEngine::unregisterAudio(AudioObject *obj) {
+    if (_audioObjectRegistry.contains(obj)) _audioObjectRegistry.removeOne(obj);
 }
 
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
 void AudioEngine::mix(float* buffer, size_t framesPerBuffer) {
 
-    // Fills the buffer with zeros (I think? might overflow, have to check)
-    memset(buffer, 0, framesPerBuffer * channels * sizeof(float));
-    //qDebug() << framesPerBuffer << " * " << channels << " = " << (framesPerBuffer * channels);
-
     // Fills the buffer with zeros
-    /*
-    for (int i = 0; i < framesPerBuffer * channels; i += channels) {
-        buffer[i] = 0; // Left
-        buffer[i + 1] = 0; // Right
-    }*/
+    memset(buffer, 0, framesPerBuffer * channels * sizeof(float));
+
     for (AudioObject *audio : _audioObjectRegistry) {
         audio->mix(buffer, framesPerBuffer);
     }

@@ -37,11 +37,9 @@ private:
     Ui::DialogSettings *ui;
     Main *main;
     AudioObject audio;
-    bool pause = false;
     bool _hasDisplayHost = false;
     HostInfoContainer _displayHost;
 
-    void initializeAudio(DeviceInfoContainer);
     void refreshDeviceSelection();
 };
 

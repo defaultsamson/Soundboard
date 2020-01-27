@@ -14,73 +14,65 @@ AudioObject::AudioObject()
 
 }
 
-void AudioObject::init(const PaDeviceInfo* info) {
-    // TODO
-    //if (output) output->stop();
-    //_stream.stop();
-    /*QAudioFormat format = info.preferredFormat();
-    if (!_stream.init(format)) {
-        qWarning() << "Failed to init audio stream";
-        // TODO error message to user
-        return;
-    }
-    output.reset(new QAudioOutput(info, format));
-    output->start(&_stream);*/
-}
+bool AudioObject::isPlaying() { return !isPaused() && !isStopped(); }
+bool AudioObject::isPaused() { return paused; }
+bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
-    //_stream.stop();
+    if (!file) return;
+    std::cout << "Stopping" << std::endl;
     paused = false;
+    stopped = true;
 }
 
 void AudioObject::pause() {
-    //output->suspend();
+    if (!file || stopped) return;
+    std::cout << "Pausing" << std::endl;
     paused = true;
+    stopped = false;
 }
 
 void AudioObject::play() {
+    if (!file) return;
+    std::cout << "Playing" << std::endl;
     if (paused) {
-        //output->resume();
+        // Resume
         paused = false;
-    } else {
-        // plays from beginning of file
-        //_stream.stop();
-        //_stream.play(file);
+    } else if (stopped) {
+        // Play from beginning of file
+        stopped = false;
+        file->seek(0, SEEK_SET);
     }
 }
 
 void AudioObject::mix(float* buffer, size_t framesPerBuffer) {
-    if (!file) return;
+    if (!file || paused || stopped) return;
     size_t channels = 2; // TODO
 
-    float mixBuffer[framesPerBuffer * channels];
-    file->read(mixBuffer, framesPerBuffer * channels);
+    sf_count_t frames = framesPerBuffer * channels;
 
-    std::cout << "2" << std::endl;
+    float mixBuffer[frames];
+    sf_count_t read = file->read(mixBuffer, frames);
 
-    for (int i = 0; i < framesPerBuffer * channels; i += channels) {
+    for (int i = 0; i < read; i += channels) {
         buffer[i] += mixBuffer[i]; // Left
         buffer[i + 1] += mixBuffer[i + 1]; // Right
-        /*
-        buffer[i] = 0; // Left
-        buffer[i + 1] = 0; // Right
-        */
+    }
+
+    // Ran out of things to read, the file stream is over
+    if (read == 0 || read < frames) {
+        stop();
+        return;
     }
 }
 
 void AudioObject::setFile(const QString &filename) {
     stop();
+    if (file) delete file;
+    paused = false;
+    stopped = true;
     file = new SndfileHandle(filename.toStdString());
     std::cout << "Initializing File: " << filename.toStdString() << std::endl;
-
     std::cout << "Sample rate:       " << file->samplerate() << std::endl;
     std::cout << "Channels:          " << file->channels() << std::endl;
-    /*
-    file.close();
-    file.setFileName(filename);
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        // TODO error message for could not open file
-        return;
-    }*/
 }

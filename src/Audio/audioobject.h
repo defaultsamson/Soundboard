@@ -21,14 +21,17 @@ public:
     void play();
     void stop();
     void pause();
-    void init(const PaDeviceInfo *info);
 
     void mix(float* buffer, size_t framesPerBuffer);
 
+    bool isPlaying();
+    bool isPaused();
+    bool isStopped();
+
 private:
-    const PaDeviceInfo *info = nullptr;
     SndfileHandle *file = nullptr;
     bool paused = false;
+    bool stopped = true;
 };
 
 #endif // AUDIOOBJECT_H

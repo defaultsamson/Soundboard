@@ -27,11 +27,7 @@ DialogSettings::DialogSettings(Main *main) :
     connect(ui->comboBoxOutputDevice, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
     connect(ui->comboBoxDriver, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChanged);
 
-    // Initialize the default
-    if (ui->comboBoxOutputDevice->count() > 0) {
-        initializeAudio(ui->comboBoxOutputDevice->itemData(0).value<DeviceInfoContainer>());
-    }
-
+    audio.setFile("/home/samson/Desktop/succ.ogg");
     main->audio()->registerAudio(&audio);
 }
 
@@ -43,11 +39,13 @@ DialogSettings::~DialogSettings()
 void DialogSettings::on_buttonBox_accepted()
 {
     // TODO save
+    main->audio()->unregisterAudio(&audio);
     close();
 }
 
 void DialogSettings::on_buttonBox_rejected()
 {
+    main->audio()->unregisterAudio(&audio);
     close();
 }
 
@@ -72,32 +70,14 @@ void DialogSettings::deviceChanged(int index)
         _hasDisplayHost = false;
     }
     refreshDeviceSelection();
-    initializeAudio(main->audio()->selectedDevice());
-}
-
-void DialogSettings::initializeAudio(DeviceInfoContainer device)
-{
-    qDebug() << "Initializing audio... " << main->audio()->activeHost().hostName;
-
-    audio.init(device.info);
-    audio.setFile("/home/samson/Desktop/succ.flac");
-    // Sets up audio bar
-    /*
-    connect(&audio.stream(), &AudioFileStream::update, this, [&](qreal level) {
-        ui->outputBar->setLevel(level);
-    });*/
 }
 
 void DialogSettings::on_pushButtonOutput_clicked()
 {
-    if (pause) {
-        pause = false;
+    if (audio.isPlaying()) {
         audio.pause();
-        qDebug() << "Pausing audio";
     } else {
-        pause = true;
         audio.play();
-        qDebug() << "Playing audio";
     }
 }
 
