@@ -49,9 +49,9 @@ void AudioObject::mix(float* buffer, size_t framesPerBuffer) {
     if (!file || paused || stopped) return;
     size_t channels = 2; // TODO
 
-    sf_count_t frames = framesPerBuffer * channels;
+    size_t frames = framesPerBuffer * channels;
 
-    float mixBuffer[frames];
+    float *mixBuffer = static_cast<float*>(malloc(frames * sizeof(float)));
     sf_count_t read = file->read(mixBuffer, frames);
 
     for (int i = 0; i < read; i += channels) {
@@ -59,10 +59,11 @@ void AudioObject::mix(float* buffer, size_t framesPerBuffer) {
         buffer[i + 1] += mixBuffer[i + 1]; // Right
     }
 
+    free(mixBuffer);
+
     // Ran out of things to read, the file stream is over
     if (read == 0 || read < frames) {
         stop();
-        return;
     }
 }
 
