@@ -29,6 +29,10 @@ DialogSettings::DialogSettings(Main *main) :
 
     audio.setFile("/home/samson/Desktop/succ.ogg");
     main->audio()->registerAudio(&audio);
+
+    connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
+        ui->outputBar->setLevel(level);
+    });
 }
 
 DialogSettings::~DialogSettings()

@@ -1,6 +1,7 @@
 #ifndef AUDIOENGINE_H
 #define AUDIOENGINE_H
 
+#include <QObject>
 #include <QList>
 
 #include "audioobject.h"
@@ -20,8 +21,10 @@ struct HostInfoContainer {
     QList <DeviceInfoContainer> *devices;
 };
 
-class AudioEngine
+class AudioEngine : public QObject
 {
+    Q_OBJECT
+
 public:
     AudioEngine();
 
@@ -71,6 +74,9 @@ private:
     QList<HostInfoContainer> _hosts;
 
     QList<AudioObject *> _audioObjectRegistry;
+
+signals:
+    void update(qreal m_level);
 };
 
 #endif // AUDIOENGINE_H

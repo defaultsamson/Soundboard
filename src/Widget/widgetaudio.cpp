@@ -1,7 +1,6 @@
 #include "widgetaudio.h"
 
 #include <QPainter>
-#include <QAudio>
 
 WidgetAudio::WidgetAudio(QWidget *parent)
     : QWidget(parent)

@@ -1,8 +1,7 @@
 #ifndef AUDIOOBJECT_H
 #define AUDIOOBJECT_H
 
-#include <QAudioOutput>
-#include <QFile>
+#include <QString>
 
 #include <portaudio.h>
 #include <sndfile.hh>

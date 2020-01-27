@@ -1,7 +1,5 @@
 #include "audioobject.h"
 
-#include <QAudioFormat>
-#include <QAudioOutput>
 #include <QString>
 
 #include <iostream>

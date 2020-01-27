@@ -170,12 +170,23 @@ void AudioEngine::unregisterAudio(AudioObject *obj) {
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
 void AudioEngine::mix(float* buffer, size_t framesPerBuffer) {
 
+    size_t frames = framesPerBuffer * channels;
+
     // Fills the buffer with zeros
-    memset(buffer, 0, framesPerBuffer * channels * sizeof(float));
+    memset(buffer, 0, frames * sizeof(float));
 
     for (AudioObject *audio : _audioObjectRegistry) {
         audio->mix(buffer, framesPerBuffer);
     }
+
+    // Update with the greatest level
+    qreal level = 0;
+    for (size_t i = 0; i < frames; ++i) {
+        float b = buffer[i];
+        if (b < 0) b *= -1;
+        if (b  > level) level = b;
+    }
+    emit update(level);
 }
 
 int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,

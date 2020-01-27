@@ -2,9 +2,7 @@
 #define DIALOGSETTINGS_H
 
 #include <QDialog>
-#include <QAudioOutput>
 #include <QFile>
-#include <QAudioDecoder>
 #include "../Audio/audioobject.h"
 #include "../Audio/audioengine.h"
 

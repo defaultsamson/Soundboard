@@ -5,10 +5,7 @@
 #include <QJsonObject>
 #include <QString>
 #include <QHotkey>
-#include <QSoundEffect>
 #include <QUrl>
-#include <QAudio>
-#include <QAudioOutput>
 #include <iostream>
 
 QString ListItemSound::NEW_SOUND = "New Sound";
