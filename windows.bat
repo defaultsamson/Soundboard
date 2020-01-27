@@ -12,7 +12,10 @@ set PACK=installer\packaged\pack
 set DATA=%PACK%\data
 mkdir %PACK%\data
 mkdir %PACK%\meta
+copy installer\auto_uninstall.qs %PACK%\meta
+copy installer\installscript.qs %PACK%\meta
 copy installer\package.xml %PACK%\meta
+copy installer\targetwidget.ui %PACK%\meta
 
 :: Copies all the libs using the windowsdeployqt tool
 %2 %EXEC% --no-quick-import --no-translations --no-system-d3d-compiler --no-webkit2 --no-angle --no-opengl-sw --dir %DATA%
