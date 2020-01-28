@@ -26,6 +26,7 @@ private slots:
     void on_spinBoxVolume_valueChanged(int arg1);
     void on_pushButtonFile_clicked();
     void onClose();
+    void on_pushButton_2_clicked();
 
 private:
     Ui::DialogSound *ui;
@@ -33,6 +34,9 @@ private:
     ListItemSound *sound;
     bool creatingNew;
     bool soundUpdated;
+
+    QString originalFileName;
+    int originalVolume;
 };
 
 #endif // DIALOGSOUND_H

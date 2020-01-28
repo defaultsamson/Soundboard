@@ -53,8 +53,8 @@ void AudioObject::mix(float* buffer, size_t framesPerBuffer) {
     sf_count_t read = file->read(mixBuffer, frames);
 
     for (int i = 0; i < read; i += channels) {
-        buffer[i] += mixBuffer[i]; // Left
-        buffer[i + 1] += mixBuffer[i + 1]; // Right
+        buffer[i] += mixBuffer[i] * _volume; // Left
+        buffer[i + 1] += mixBuffer[i + 1] * _volume; // Right
     }
 
     free(mixBuffer);
@@ -74,4 +74,8 @@ void AudioObject::setFile(const QString &filename) {
     std::cout << "Initializing File: " << filename.toStdString() << std::endl;
     std::cout << "Sample rate:       " << file->samplerate() << std::endl;
     std::cout << "Channels:          " << file->channels() << std::endl;
+}
+
+void AudioObject::setVolume(const float volume) {
+    _volume = volume;
 }

@@ -22,9 +22,16 @@ DialogSound::DialogSound(Main *main, ListItemSound *sound, bool creatingNew) :
     ui->sliderVolume->setValue(sound->volume());
     ui->spinBoxVolume->setValue(sound->volume());
 
+    originalFileName = sound->filename();
+    originalVolume = sound->volume();
+
     // Disable the keybinds temporarily while the dialog is up
     main->disableKeybinds();
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
+
+    connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
+        ui->outputBar->setLevel(level);
+    });
 }
 
 DialogSound::~DialogSound()
@@ -51,16 +58,18 @@ void DialogSound::on_buttonBox_rejected()
 void DialogSound::on_sliderVolume_valueChanged(int value)
 {
     ui->spinBoxVolume->setValue(value);
+    sound->setVolume(value);
 }
 
 void DialogSound::on_spinBoxVolume_valueChanged(int value)
 {
     ui->sliderVolume->setValue(value);
+    sound->setVolume(value);
 }
 
 void DialogSound::on_pushButtonFile_clicked()
 {
-    QString fn = QFileDialog::getOpenFileName(this, tr("Load Audio File"), QString(), tr("(*.wav *.mp3)"));
+    QString fn = QFileDialog::getOpenFileName(this, tr("Load Audio File"), QString(), tr("(*.wav *.ogg *.flac)"));
 
     QFile file(fn);
 
@@ -70,13 +79,23 @@ void DialogSound::on_pushButtonFile_clicked()
     }
 
     ui->lineEditFile->setText(fn);
+    sound->setFileName(fn);
 }
 
 void DialogSound::onClose() {
     // Remove the board if it's being created new and wasn't saved (e.g. hit "OK: on)
     if (creatingNew && !soundUpdated) {
        main->removeSound(sound);
+    } else if (!creatingNew && !soundUpdated) {
+        sound->setFileName(originalFileName);
+        sound->setVolume(originalVolume);
     }
+    sound->audio()->stop();
     // Re-enable the keybinds
     main->enableKeybinds();
+}
+
+void DialogSound::on_pushButton_2_clicked()
+{
+    sound->audio()->play();
 }

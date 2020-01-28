@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Board Edit</string>
+   <string>Sound Edit</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -187,7 +187,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="WidgetAudio" name="widget_3" native="true">
+      <widget class="WidgetAudio" name="outputBar" native="true">
        <property name="maximumSize">
         <size>
          <width>16777215</width>

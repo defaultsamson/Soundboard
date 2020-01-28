@@ -13,34 +13,27 @@ QString ListItemSound::NEW_SOUND = "New Sound";
 ListItemSound::ListItemSound(Main *main, ListItemBoard *board) :
     ListItem(main),
     board(board),
+    _audio(new AudioObject()),
     _filename(""),
     _volume(100),
-    file(nullptr),
     _filenameChanged(false),
     _volumeChanged(false)
 {
     setText(NEW_SOUND);
+    main->audio()->registerAudio(_audio);
 }
 
 ListItemSound::~ListItemSound() {
     board->removeSound(this, false);
+    main->audio()->unregisterAudio(_audio);
 }
 
 void ListItemSound::reload() {
     if (_filenameChanged) {
-        //QAudioOutput *audio;
-        //QFile f(filename());
-
-
-
-        //audio.setSource(QUrl::fromUserInput(filename()));
+        _audio->setFile(filename()); // QUrl::fromUserInput(filename())
     }
     if (_volumeChanged) {
-
-        //qreal linearVolume = QAudio::convertVolume(_volume / qreal(100), QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
-        //m_audioOutput->setVolume(linearVolume);
-
-        //audio.setVolume(static_cast<double>(volume()) / static_cast<double>(100));
+        _audio->setVolume(_volume / static_cast<float>(100)); //qreal linearVolume = QAudio::convertVolume(_volume / qreal(100), QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
     }
     _filenameChanged = false;
     _volumeChanged = false;
@@ -58,7 +51,7 @@ QString ListItemSound::filename() {
 
 void ListItemSound::setVolume(int v) {
     _volume = v;
-    _volumeChanged = false;
+    _volumeChanged = true;
     reload();
 }
 
@@ -87,9 +80,13 @@ void ListItemSound::save(QJsonObject &json) {
     json["volume"] = volume();
 }
 
+AudioObject *ListItemSound::audio() {
+    return _audio;
+}
+
 void ListItemSound::trigger() {
     ListItem::trigger();
-    //audio.play();
+    _audio->play();
     main->setCurrentSound(this);
     // TODO give this an AudioObject
 }

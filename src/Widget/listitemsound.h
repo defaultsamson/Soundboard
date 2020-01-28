@@ -8,6 +8,8 @@
 #include <QHotkey>
 #include <QFile>
 
+#include "../Audio/audioobject.h"
+
 class Main;
 class ListItemBoard;
 
@@ -26,12 +28,13 @@ public:
     void reg();
     void unreg() ;
     void trigger() override;
+    AudioObject *audio();
 
 private:
     ListItemBoard *board;
+    AudioObject *_audio;
     QString _filename;
     int _volume;
-    QFile *file;
     bool _filenameChanged;
     bool _volumeChanged;
     void reload();
