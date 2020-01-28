@@ -22,6 +22,8 @@ public:
     explicit DialogSettings(Main *main = nullptr);
     ~DialogSettings();
 
+    void refreshDeviceSelection();
+
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
@@ -37,8 +39,6 @@ private:
     AudioObject audio;
     bool _hasDisplayHost = false;
     HostInfoContainer _displayHost;
-
-    void refreshDeviceSelection();
 };
 
 #endif // DIALOGSETTINGS_H

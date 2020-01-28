@@ -47,6 +47,7 @@ public:
     DeviceInfoContainer activeDevice();
 
     void init();
+    bool isInitialized();
 
     static int readCallback(const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,
@@ -62,6 +63,9 @@ public:
 private:
     PaStream *stream = nullptr;
     int channels = 0;
+    PaHostApiIndex selectedDeviceIndex = -1;
+
+    bool _isInitialized = false;
 
     bool _hasDefaultHost = false;
     HostInfoContainer _defaultHost;

@@ -9,6 +9,7 @@
 #include <QModelIndex>
 
 #include "Audio/audioengine.h"
+#include "Dialog/dialogsettings.h"
 #include "Widget/listitem.h"
 #include "Widget/listitemboard.h"
 #include "Widget/listitemsound.h"
@@ -41,8 +42,12 @@ public:
     void setDarkTheme(bool set = true);
     QSettings *settings();
     AudioEngine *audio();
-private slots:
 
+    // This is only used while initializing the AudioEngine
+    void setSettingsDialog(DialogSettings *);
+    DialogSettings *getSettingsDialog();
+
+private slots:
     void on_actionNew_triggered();
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
@@ -82,6 +87,8 @@ private:
     QString fileName;
     ListItemBoard *currentBoard = nullptr;
     QSettings *_settings;
+
+    DialogSettings *_settingsDialog = nullptr;
 
     QPalette darkPalette;
     QPalette defaultPalette;

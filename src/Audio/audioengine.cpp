@@ -39,8 +39,8 @@ bool AudioEngine::hasSelectedDevice() {
 void AudioEngine::setSelectedDevice(DeviceInfoContainer device) {
     _selectedDevice = device;
     _hasSelectedDevice = true;
+    selectedDeviceIndex = device.index;
 
-    Pa_StopStream(stream);
     Pa_CloseStream(stream);
     stream = nullptr;
     channels = CHANNELS;
@@ -99,6 +99,11 @@ void AudioEngine::init() {
     qDebug() << "Starting PortAudio...";
     Pa_Initialize();
     refreshDevices();
+    _isInitialized = true;
+}
+
+bool AudioEngine::isInitialized() {
+    return _isInitialized;
 }
 
 void AudioEngine::refreshDevices() {
@@ -110,6 +115,7 @@ void AudioEngine::refreshDevices() {
 
     _hasDefaultHost = false;
     _hasDefaultDevice = false;
+    _hosts.clear();
 
     const PaDeviceInfo *device;
 
@@ -124,15 +130,19 @@ void AudioEngine::refreshDevices() {
                 _hasDefaultDevice = true;
                 qDebug() << "Default device... [" << i << "]";
 
-                // TODO TEMPORARY, in the future, load the selected from a file (or default if not specified)
-                setSelectedDevice(_defaultDevice);
+                // unspecified selected device, select default device
+                if (selectedDeviceIndex < 0) selectedDeviceIndex = i;
             }
+            // If it's the device to select
+            if (i == selectedDeviceIndex) setSelectedDevice(dev);
             // Try to find the container for the specific host that contains all its devices
             bool foundCon = false;
             for (auto hostCon : _hosts) {
                 if (hostCon.hostIndex == device->hostApi) {
                     foundCon = true;
                     hostCon.devices->append(dev);
+                    // If it's the device to select, set the selected host to the one it belongs to
+                    if (i == selectedDeviceIndex) setSelectedHost(hostCon);
                     break;
                 }
             }
@@ -140,20 +150,20 @@ void AudioEngine::refreshDevices() {
             if (!foundCon) {
                 QList<DeviceInfoContainer> *list = new QList<DeviceInfoContainer>();
                 list->append(dev);
-                HostInfoContainer infoCon = {
+                HostInfoContainer hostCon = {
                     device->hostApi,
                     Pa_GetHostApiInfo(device->hostApi)->name,
                     list
                 };
-                _hosts.append(infoCon);
+                _hosts.append(hostCon);
                 // Default stuff
                 if (device->hostApi == Pa_GetDefaultHostApi()) {
-                    _defaultHost = infoCon;
+                    _defaultHost = hostCon;
                     _hasDefaultHost = true;
                     qDebug() << "Default host... [" << device->hostApi << "]";
 
-                    // TODO TEMPORARY, in the future, load the selected from a file (or default if not specified)
-                    setSelectedHost(_defaultHost);
+                    // If it's the device to select, set the selected host to the one it belongs to
+                    if (i == selectedDeviceIndex) setSelectedHost(hostCon);
                 }
             }
         }

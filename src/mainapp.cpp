@@ -26,16 +26,24 @@
 class MyThread : public QThread
 {
 public:
-    MyThread(AudioEngine *audio) : audio(audio) {}
+    MyThread(Main &main) : main(main) {}
 protected:
     void run();
 private:
-    AudioEngine *audio;
+    Main &main;
 };
 
 void MyThread::run()
 {
-    audio->init();
+    main.audio()->init();
+    if (main.getSettingsDialog()) main.getSettingsDialog()->refreshDeviceSelection();
+}
+
+void Main::setSettingsDialog(DialogSettings *s) {
+    _settingsDialog = s;
+}
+DialogSettings *Main::getSettingsDialog() {
+    return _settingsDialog;
 }
 
 int main(int argc, char *argv[])
@@ -44,7 +52,7 @@ int main(int argc, char *argv[])
     Main w;
     w.show();
 
-    MyThread t(w.audio());
+    MyThread t(w);
     t.start();
 
     /*

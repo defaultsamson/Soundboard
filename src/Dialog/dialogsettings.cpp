@@ -37,6 +37,8 @@ DialogSettings::DialogSettings(Main *main) :
     connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
         ui->outputBar->setLevel(level);
     });
+
+    main->setSettingsDialog(this);
 }
 
 DialogSettings::~DialogSettings()
@@ -48,12 +50,14 @@ void DialogSettings::on_buttonBox_accepted()
 {
     // TODO save
     main->audio()->unregisterAudio(&audio);
+    main->setSettingsDialog(nullptr);
     close();
 }
 
 void DialogSettings::on_buttonBox_rejected()
 {
     main->audio()->unregisterAudio(&audio);
+    main->setSettingsDialog(nullptr);
     close();
 }
 
@@ -96,6 +100,7 @@ void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 
 void DialogSettings::on_pushButtonRefresh_clicked() {
     main->audio()->refreshDevices();
+    _hasDisplayHost = false; // Forces a refresh of the list of hosts and devices
     refreshDeviceSelection();
 }
 
@@ -106,6 +111,14 @@ void DialogSettings::refreshDeviceSelection() {
     driverBox->clear();
     deviceBox->clear();
     AudioEngine *a = main->audio();
+
+    bool inited = a->isInitialized();
+    driverBox->setEnabled(inited);
+    deviceBox->setEnabled(inited);
+    ui->pushButtonOutput->setEnabled(inited);
+    ui->pushButtonRefresh->setEnabled(inited);
+    ui->groupBox_2->setTitle(inited ? "Audio" : "Audio (INITIALIZING...)");
+    if (!inited) return;
 
     PaHostApiIndex showingHostIndex = -1;
     // Always prioritize the host being displayed over the active one
@@ -119,6 +132,7 @@ void DialogSettings::refreshDeviceSelection() {
         _hasDisplayHost = true;
     } else {
         driverBox->addItem("Select backend...", QVariant(QVariant::Invalid));
+        deviceBox->setEnabled(false);
     }
     for (HostInfoContainer hostInfo : a->hosts()) {
         if (!(_hasDisplayHost && hostInfo.hostIndex == showingHostIndex)) // If not the displaying host
@@ -137,4 +151,11 @@ void DialogSettings::refreshDeviceSelection() {
                 deviceBox->addItem(deviceInfo.info->name, QVariant::fromValue(deviceInfo));
         }
     }
+
+    ui->pushButtonOutput->setEnabled(a->hasActiveDevice());
+
+    // A hack to forcefully update the visuals when updated from another thread
+    // e.g. When the audio thread finished initializing the audio engine
+    if (driverBox->count() > 0) driverBox->setCurrentIndex(0);
+    if (deviceBox->count() > 0) deviceBox->setCurrentIndex(0);
 }
