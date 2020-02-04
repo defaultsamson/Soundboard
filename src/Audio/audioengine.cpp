@@ -65,11 +65,11 @@ void AudioEngine::setSelectedDevice(DeviceInfoContainer device) {
                     (void *) this); //data to be passed to callback. In C++, it is frequently (void *)this
     //don't forget to check errors!
     if (err != paNoError) qDebug() << "Error opening stream";
-    else qDebug() << "Stream opened successfully!";
+    // else qDebug() << "Stream opened successfully!";
 
     err = Pa_StartStream(stream);
     if (err != paNoError) qDebug() << "Error starting stream";
-    else qDebug() << "Stream started successfully!";
+    // else qDebug() << "Stream started successfully!";
 }
 DeviceInfoContainer AudioEngine::selectedDevice() {
     return _selectedDevice;
@@ -208,11 +208,6 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
     float *out = static_cast<float*>(outputBuffer);
     AudioEngine *audio = static_cast<AudioEngine*>(userData);
     audio->mix(out, framesPerBuffer);
-
-    /*for (size_t i = 0; i < framesPerBuffer; ++i) {
-        *out++ = 0; // Left
-        *out++ = 0; // Right
-    }*/
     return paContinue;
 
     /*
@@ -228,35 +223,4 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
  be used to stop the stream. The callback must always fill the entire output
  buffer irrespective of its return value.
  */
-
-    /*
-    const void *data;
-    assert(s);
-    assert(length > 0);
-
-    if (stdio_event)
-        mainloop_api->io_enable(stdio_event, PA_IO_EVENT_OUTPUT);
-
-    if (pa_stream_peek(s, &data, &length) < 0) {
-        fprintf(stderr, "pa_stream_peek() failed: %s\n", pa_strerror(pa_context_errno(context)));
-        quit(1);
-        return;
-    }
-
-    assert(data);
-    assert(length > 0);
-
-    if (buffer) {
-        buffer = pa_xrealloc(buffer, buffer_length + length);
-        memcpy((uint8_t*) buffer + buffer_length, data, length);
-        buffer_length += length;
-    } else {
-        buffer = pa_xmalloc(length);
-        memcpy(buffer, data, length);
-        buffer_length = length;
-        buffer_index = 0;
-    }
-
-    pa_stream_drop(s);
-    */
 }

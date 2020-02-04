@@ -26,8 +26,15 @@ public:
     static QString DEFAULT_DIR;
     static QString SETTINGS_FILE;
     static QString DEFAULT_SOUNDBOARD;
+
     static QString DARK_THEME;
     static bool DARK_THEME_DEFAULT;
+    static QString ACTIVE_BOARD;
+    static QString ACTIVE_BOARD_DEFAULT;
+    static QString HAS_ACTIVE_BOARD;
+    static bool HAS_ACTIVE_BOARD_DEFAULT;
+
+
     explicit Main(QWidget *parent = nullptr);
     ~Main();
     void load();
@@ -35,11 +42,15 @@ public:
     void save(bool saveAs = false);
     void clear();
     void setCurrentBoard(ListItemBoard *board);
+    void setCurrentBoard(int row);
     void removeBoard(ListItemBoard *board);
     void removeBoard(int row);
+    ListItemBoard *getBoard(int row);
     void setCurrentSound(ListItemSound *sound);
+    void setCurrentSound(int row);
     void removeSound(ListItemSound *sound);
     void removeSound(int row);
+    ListItemSound *getSound(int row);
     void setDarkTheme(bool set = true);
     QSettings *settings();
     AudioEngine *audio();
@@ -47,6 +58,8 @@ public:
     // This is only used while initializing the AudioEngine
     void setSettingsDialog(DialogSettings *);
     DialogSettings *getSettingsDialog();
+
+    void setChanged(bool changed = true);
 
 private slots:
     void on_actionNew_triggered();
@@ -88,6 +101,7 @@ private:
     QString fileName;
     ListItemBoard *currentBoard = nullptr;
     QSettings *_settings;
+    bool _changed = false;
 
     DialogSettings *_settingsDialog = nullptr;
 
@@ -102,6 +116,9 @@ private:
     void addBoard();
     void addSound();
     ListItemSound *currentSound();
+    void updateTitle();
+
+    void closeEvent(QCloseEvent *bar);
 };
 
 #endif // MAINWINDOW_H
