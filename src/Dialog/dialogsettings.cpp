@@ -140,14 +140,24 @@ void DialogSettings::refreshDeviceSelection() {
     }
 
     if (_hasDisplayHost) {
-        // Only add default if it's showing the active device's tab
+        // Only add active device if it's showing the active device's tab
+        bool addedActive = false;
         if (a->hasActiveDevice() && _displayHost.hostIndex == a->activeDevice().info->hostApi) {
             deviceBox->addItem(a->activeDevice().info->name, QVariant::fromValue(a->activeDevice()));
+            addedActive = true;
         } else {
             deviceBox->addItem("Select device...", QVariant(QVariant::Invalid));
         }
+        // Only add default device if it's showing the default device's tab and there is a default, and the active is not the default
+        bool addedDefault = false;
+        if (a->hasDefaultDevice() && _displayHost.hostIndex == a->defaultDevice().info->hostApi && !(a->hasActiveDevice() && a->defaultDevice().index == a->activeDevice().index)) {
+            deviceBox->addItem(a->defaultDevice().info->name, QVariant::fromValue(a->defaultDevice()));
+            addedDefault = true;
+        }
+
         for (DeviceInfoContainer deviceInfo : *(_displayHost.devices)) {
-            if (!(a->hasActiveDevice() && deviceInfo.index == a->activeDevice().index)) // If not the active host
+            // If not the active host and not the default host, add the device to the list
+            if (!(addedActive && deviceInfo.index == a->activeDevice().index) && !(addedDefault && deviceInfo.index == a->defaultDevice().index))
                 deviceBox->addItem(deviceInfo.info->name, QVariant::fromValue(deviceInfo));
         }
     }

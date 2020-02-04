@@ -2,7 +2,6 @@
 
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
-#include <iostream>
 
 // Function to create a keyboard event
 XKeyEvent createKeyEvent(Display *display, Window &win, Window &winRoot, bool press, KeySym keycode, int modifiers) {
@@ -44,7 +43,7 @@ void HotkeyPass::triggerPassthrough() {
     XGetInputFocus(display, &winFocus, &revert);
 
     KeySym nativKeyCode = XkbKeycodeToKeysym(display, KeyCode(currentNativeShortcut().key), 0, 0);
-    std::cout << "Native Key Code: " << nativKeyCode << std::endl;
+    // std::cout << "Native Key Code: " << nativKeyCode << std::endl;
 
     // Send a fake key press event to the window.
     XKeyEvent event = createKeyEvent(display, winFocus, winRoot, true, nativKeyCode, 0);

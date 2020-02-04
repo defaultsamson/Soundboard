@@ -27,6 +27,7 @@ public:
     static QString SETTINGS_FILE;
     static QString DEFAULT_SOUNDBOARD;
     static QString DARK_THEME;
+    static bool DARK_THEME_DEFAULT;
     explicit Main(QWidget *parent = nullptr);
     ~Main();
     void load();

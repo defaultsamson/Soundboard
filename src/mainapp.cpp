@@ -21,7 +21,6 @@
 #include <QObject>
 #include <QAbstractItemModel>
 #include <QThread>
-#include <iostream>
 
 class MyThread : public QThread
 {
@@ -70,6 +69,7 @@ QString Main::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::Con
 QString Main::SETTINGS_FILE = "settings.ini";
 QString Main::DEFAULT_SOUNDBOARD = "default.json";
 QString Main::DARK_THEME = "dark_theme";
+bool Main::DARK_THEME_DEFAULT = false;
 
 Main::Main(QWidget *parent) :
     QMainWindow(parent),
@@ -112,7 +112,7 @@ Main::Main(QWidget *parent) :
     darkPalette.setColor(QPalette::HighlightedText, Qt::white);
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
 
-    setDarkTheme(settings()->value(DARK_THEME, false).toBool());
+    setDarkTheme(settings()->value(DARK_THEME, DARK_THEME_DEFAULT).toBool());
 }
 
 Main::~Main()
