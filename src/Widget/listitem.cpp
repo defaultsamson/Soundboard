@@ -2,6 +2,7 @@
 
 #include "../mainapp.h"
 #include "../Hotkey/hotkeypass.h"
+#include "../Hotkey/hotkeyutil.h"
 #include <QObject>
 #include <QHotkey>
 
@@ -32,7 +33,7 @@ void ListItem::unSetKey() {
 void ListItem::setKey(quint32 k) {
     _key = k;
     _hasKey = true;
-    hotkey->setNativeShortcut(QHotkey::NativeShortcut(_key));
+    hotkey->setNativeShortcut(HotkeyUtil::scancodeToNative(k));
 }
 
 bool ListItem::hasKey() {

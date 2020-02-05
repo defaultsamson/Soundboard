@@ -2,6 +2,7 @@
 
 #include <X11/XKBlib.h>
 #include <QString>
+#include <QHotkey>
 
 QString HotkeyUtil::keycodeToString(quint32 keycode) {
     // Obtain the X11 display.
@@ -11,3 +12,8 @@ QString HotkeyUtil::keycodeToString(quint32 keycode) {
 
     return XKeysymToString( XkbKeycodeToKeysym(display, KeyCode(keycode), 0, 0)); // QString::number(keycode);
 }
+
+QHotkey::NativeShortcut HotkeyUtil::scancodeToNative(quint32 k) {
+    return QHotkey::NativeShortcut(k);
+}
+
