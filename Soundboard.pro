@@ -88,3 +88,6 @@ unix:!macx: LIBS += -lsndfile #-lmpg123 -lmp3lame
 win32: LIBS += -L$$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/lib/' -llibsndfile-1
 win32: INCLUDEPATH += $$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/include'
 win32: DEPENDPATH += $$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/include'
+
+RESOURCES += \
+    res.qrc

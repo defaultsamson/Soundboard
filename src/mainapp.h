@@ -90,6 +90,12 @@ private slots:
     void on_listSounds_itemClicked(QListWidgetItem *item);
     void on_listBoards_itemClicked(QListWidgetItem *item);
 
+    void on_buttonPlay_clicked();
+    void on_buttonPause_clicked();
+    void on_buttonStop_clicked();
+
+    void rowChanged(int row);
+
 public slots:
     void enableKeybinds();
     void disableKeybinds();

@@ -120,6 +120,8 @@ Main::Main(QWidget *parent) :
     if (settings()->value(HAS_ACTIVE_BOARD, HAS_ACTIVE_BOARD_DEFAULT).toBool()) {
         load(settings()->value(ACTIVE_BOARD, ACTIVE_BOARD_DEFAULT).toString());
     }
+
+    connect(ui->listSounds, &QListWidget::currentRowChanged, this, &Main::rowChanged);
 }
 
 Main::~Main()
@@ -265,6 +267,9 @@ void Main::onSoundMoved(const QModelIndex &/*parent*/, int start, int /*end*/, c
 void Main::on_listSounds_itemClicked(QListWidgetItem */*item*/) {
     ui->buttonEditSound->setEnabled(true);
     ui->buttonRemoveSound->setEnabled(true);
+    ui->buttonPlay->setEnabled(true);
+    ui->buttonPause->setEnabled(true);
+    ui->buttonStop->setEnabled(true);
 }
 
 void Main::on_listBoards_itemClicked(QListWidgetItem */*item*/) {
@@ -327,6 +332,9 @@ void Main::addSound() {
     setCurrentSound(sound);
     ui->buttonEditSound->setEnabled(true);
     ui->buttonRemoveSound->setEnabled(true);
+    ui->buttonPlay->setEnabled(true);
+    ui->buttonPause->setEnabled(true);
+    ui->buttonStop->setEnabled(true);
     editSound(sound, true);
 }
 
@@ -360,9 +368,13 @@ void Main::displayBoard(ListItemBoard *board) {
         ui->listBoards->setCurrentItem(board);
     }
     board->populateList(ui->listSounds);
+    bool isSoundSelected = ui->listSounds->currentRow() >= 0;
     ui->buttonAddSound->setEnabled(true);
-    ui->buttonEditSound->setEnabled(ui->listSounds->currentRow() >= 0); // highlight if a sound is selected
-    ui->buttonRemoveSound->setEnabled(ui->listSounds->currentRow() >= 0); // highlight if a sound is selected
+    ui->buttonEditSound->setEnabled(isSoundSelected);
+    ui->buttonRemoveSound->setEnabled(isSoundSelected);
+    ui->buttonPlay->setEnabled(isSoundSelected);
+    ui->buttonPause->setEnabled(isSoundSelected);
+    ui->buttonStop->setEnabled(isSoundSelected);
 }
 
 void Main::setCurrentBoard(int row) {
@@ -390,6 +402,9 @@ void Main::setCurrentBoard(ListItemBoard *board) {
         ui->buttonAddSound->setEnabled(false);
         ui->buttonEditSound->setEnabled(false);
         ui->buttonRemoveSound->setEnabled(false);
+        ui->buttonPlay->setEnabled(false);
+        ui->buttonPause->setEnabled(false);
+        ui->buttonStop->setEnabled(false);
     }
 }
 
@@ -595,4 +610,28 @@ void Main::updateTitle() {
     }
     if (_changed) title += "*";
     setWindowTitle(title);
+}
+
+void Main::on_buttonPlay_clicked()
+{
+    if (currentSound()) currentSound()->audio()->play();
+}
+
+void Main::on_buttonPause_clicked()
+{
+    if (currentSound()) currentSound()->audio()->pause();
+}
+
+void Main::on_buttonStop_clicked()
+{
+    if (currentSound()) currentSound()->audio()->stop();
+}
+
+void Main::rowChanged(int row) {
+    bool soundSelected = row >= 0;
+    ui->buttonEditSound->setEnabled(soundSelected);
+    ui->buttonRemoveSound->setEnabled(soundSelected);
+    ui->buttonPlay->setEnabled(soundSelected);
+    ui->buttonPause->setEnabled(soundSelected);
+    ui->buttonStop->setEnabled(soundSelected);
 }
