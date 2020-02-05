@@ -21,6 +21,9 @@ DialogSettings::DialogSettings(Main *main) :
 {
     ui->setupUi(this);
 
+#ifdef Q_OS_WIN
+    ui->checkBoxDarkTheme->hide();
+#endif
     ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
     ui->tabWidget->setCurrentIndex(main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
 
@@ -44,18 +47,21 @@ DialogSettings::~DialogSettings()
     delete ui;
 }
 
+void DialogSettings::handleClose() {
+    main->audio()->unregisterAudio(&audio);
+    main->setSettingsDialog(nullptr);
+}
+
 void DialogSettings::on_buttonBox_accepted()
 {
     // TODO save
-    main->audio()->unregisterAudio(&audio);
-    main->setSettingsDialog(nullptr);
+    handleClose();
     close();
 }
 
 void DialogSettings::on_buttonBox_rejected()
 {
-    main->audio()->unregisterAudio(&audio);
-    main->setSettingsDialog(nullptr);
+    handleClose();
     close();
 }
 
@@ -171,4 +177,9 @@ void DialogSettings::refreshDeviceSelection() {
 void DialogSettings::on_tabWidget_currentChanged(int index)
 {
     main->settings()->setValue(Main::SETTINGS_TAB, index);
+}
+
+void DialogSettings::closeEvent(QCloseEvent *bar) {
+    handleClose();
+    bar->accept();
 }

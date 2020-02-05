@@ -41,6 +41,8 @@ private:
     AudioObject audio;
     bool _hasDisplayHost = false;
     HostInfoContainer _displayHost;
+    void closeEvent(QCloseEvent *bar);
+    void handleClose();
 };
 
 #endif // DIALOGSETTINGS_H
