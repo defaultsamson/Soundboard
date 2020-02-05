@@ -21,7 +21,8 @@
 #include <QObject>
 #include <QAbstractItemModel>
 #include <QThread>
-#include <iostream>
+#include <QCloseEvent>
+#include <QMessageBox>
 
 class MyThread : public QThread
 {
@@ -35,6 +36,12 @@ private:
 
 void MyThread::run()
 {
+    // Set up testing audio
+    QFile testFile(Main::TEST_AUDIO);
+    if (!testFile.exists()) {
+        QFile::copy(":/audio/res/test.ogg", Main::TEST_AUDIO);
+    }
+
     main.audio()->init();
     if (main.getSettingsDialog()) main.getSettingsDialog()->refreshDeviceSelection();
 }
@@ -52,16 +59,9 @@ int main(int argc, char *argv[])
     Main w;
     w.show();
 
+    // Initializes audio engine on separate thread so that the UI starts super fast
     MyThread t(w);
     t.start();
-
-    /*
-    QString dir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
-    if (!dir.isEmpty()) {
-        // TODO w.loadSettings(dir + "settings.json");
-        // TODO w.saveSettings(dir + "settings.json");
-        w.load(dir + "default.json");
-    }*/
 
     return a.exec();
 }
@@ -69,7 +69,14 @@ int main(int argc, char *argv[])
 QString Main::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/Soundboard/";
 QString Main::SETTINGS_FILE = "settings.ini";
 QString Main::DEFAULT_SOUNDBOARD = "default.json";
+QString Main::TEST_AUDIO = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/test.ogg";
+
 QString Main::DARK_THEME = "dark_theme";
+bool Main::DARK_THEME_DEFAULT = false;
+QString Main::ACTIVE_BOARD = "active_board";
+QString Main::ACTIVE_BOARD_DEFAULT = "";
+QString Main::HAS_ACTIVE_BOARD = "has_active_board";
+bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
 
 Main::Main(QWidget *parent) :
     QMainWindow(parent),
@@ -112,7 +119,16 @@ Main::Main(QWidget *parent) :
     darkPalette.setColor(QPalette::HighlightedText, Qt::white);
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
 
-    setDarkTheme(settings()->value(DARK_THEME, false).toBool());
+    // Light, Midlight, Mid, NoRole, PlaceholderText
+
+    setDarkTheme(settings()->value(DARK_THEME, DARK_THEME_DEFAULT).toBool());
+
+    // Load the previously active board
+    if (settings()->value(HAS_ACTIVE_BOARD, HAS_ACTIVE_BOARD_DEFAULT).toBool()) {
+        load(settings()->value(ACTIVE_BOARD, ACTIVE_BOARD_DEFAULT).toString());
+    }
+
+    connect(ui->listSounds, &QListWidget::currentRowChanged, this, &Main::rowChanged);
 }
 
 Main::~Main()
@@ -128,7 +144,7 @@ void Main::contextMenuBoard(const QPoint &pos) {
     // If the mouse is hovering over something
     if (row >= 0) {
         // Select the current board (have to do this or else Qt is too slow when switching items really fast)
-        setCurrentBoard(static_cast<ListItemBoard*>(ui->listBoards->item(row)));
+        setCurrentBoard(row);
         myMenu.addAction("Edit", this, [&]() { editBoard(); });
         myMenu.addAction("Delete",  this, [&]() { removeBoard(currentBoard); });
     } else {
@@ -258,6 +274,9 @@ void Main::onSoundMoved(const QModelIndex &/*parent*/, int start, int /*end*/, c
 void Main::on_listSounds_itemClicked(QListWidgetItem */*item*/) {
     ui->buttonEditSound->setEnabled(true);
     ui->buttonRemoveSound->setEnabled(true);
+    ui->buttonPlay->setEnabled(true);
+    ui->buttonPause->setEnabled(true);
+    ui->buttonStop->setEnabled(true);
 }
 
 void Main::on_listBoards_itemClicked(QListWidgetItem */*item*/) {
@@ -320,6 +339,9 @@ void Main::addSound() {
     setCurrentSound(sound);
     ui->buttonEditSound->setEnabled(true);
     ui->buttonRemoveSound->setEnabled(true);
+    ui->buttonPlay->setEnabled(true);
+    ui->buttonPause->setEnabled(true);
+    ui->buttonStop->setEnabled(true);
     editSound(sound, true);
 }
 
@@ -330,6 +352,11 @@ void Main::removeBoard(ListItemBoard *board) {
 void Main::removeBoard(int row) {
     if (row < 0 || row >= ui->listBoards->count()) return;
     delete ui->listBoards->takeItem(row);
+    setChanged();
+}
+
+ListItemBoard *Main::getBoard(int row) {
+    return row >= 0 ? static_cast<ListItemBoard*>(ui->listBoards->item(row)) : nullptr;
 }
 
 void Main::editBoard(bool createNew) {
@@ -348,9 +375,18 @@ void Main::displayBoard(ListItemBoard *board) {
         ui->listBoards->setCurrentItem(board);
     }
     board->populateList(ui->listSounds);
+    bool isSoundSelected = ui->listSounds->currentRow() >= 0;
     ui->buttonAddSound->setEnabled(true);
-    ui->buttonEditSound->setEnabled(ui->listSounds->currentRow() >= 0); // highlight if a sound is selected
-    ui->buttonRemoveSound->setEnabled(ui->listSounds->currentRow() >= 0); // highlight if a sound is selected
+    ui->buttonEditSound->setEnabled(isSoundSelected);
+    ui->buttonRemoveSound->setEnabled(isSoundSelected);
+    ui->buttonPlay->setEnabled(isSoundSelected);
+    ui->buttonPause->setEnabled(isSoundSelected);
+    ui->buttonStop->setEnabled(isSoundSelected);
+}
+
+void Main::setCurrentBoard(int row) {
+    if (row < 0 || row >= ui->listBoards->count()) return;
+    setCurrentBoard(getBoard(row));
 }
 
 void Main::setCurrentBoard(ListItemBoard *board) {
@@ -373,7 +409,15 @@ void Main::setCurrentBoard(ListItemBoard *board) {
         ui->buttonAddSound->setEnabled(false);
         ui->buttonEditSound->setEnabled(false);
         ui->buttonRemoveSound->setEnabled(false);
+        ui->buttonPlay->setEnabled(false);
+        ui->buttonPause->setEnabled(false);
+        ui->buttonStop->setEnabled(false);
     }
+}
+
+void Main::setCurrentSound(int row) {
+    if (row < 0 || row >= ui->listSounds->count()) return;
+    setCurrentSound(getSound(row));
 }
 
 void Main::setCurrentSound(ListItemSound *sound) {
@@ -390,6 +434,11 @@ void Main::removeSound(int row) {
     if (row < 0 || row >= ui->listSounds->count()) return;
     delete ui->listSounds->takeItem(row);
     displayBoard(currentBoard);
+    setChanged();
+}
+
+ListItemSound *Main::getSound(int row) {
+    return row >= 0 ? static_cast<ListItemSound*>(ui->listSounds->item(row)) : nullptr;
 }
 
 void Main::editSound(bool createNew) {
@@ -408,7 +457,7 @@ void Main::clear() {
 }
 
 ListItemSound* Main::currentSound() {
-    return static_cast<ListItemSound*>(ui->listSounds->item(ui->listSounds->currentRow()));
+    return getSound(ui->listSounds->currentRow());
 }
 
 // ******************* END BOARD FUNCTIONS *******************
@@ -421,17 +470,17 @@ void Main::load() {
 void Main::load(const QString fn) {
     QFile file(fn);
 
+    qDebug() << "Loading File: " << fn;
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open save file.");
+        // TODO inform user the file failed to load
+        settings()->setValue(HAS_ACTIVE_BOARD, false);
         return;
     }
 
     QJsonDocument loadDoc(QJsonDocument::fromJson(file.readAll()));
     QJsonObject obj = loadDoc.object();
     QJsonArray arr = obj["boards"].toArray();
-
-    hasFile = true;
-    fileName = fn;
 
     clear();
 
@@ -440,24 +489,39 @@ void Main::load(const QString fn) {
         ListItemBoard *board = new ListItemBoard(this);
         board->load(arr[i].toObject());
         ui->listBoards->addItem(board);
-        // Set the first board as the active board
+        // Set the first board as the current board
         if (i == 0) {
             setCurrentBoard(board);
         }
     }
     enableKeybinds();
+
+    // setCurrentBoard(obj["currentboard"].toInt());
+    // setCurrentSound(obj["currentsound"].toInt());
+
+    hasFile = true;
+    fileName = fn;
+    settings()->setValue(HAS_ACTIVE_BOARD, true);
+    settings()->setValue(ACTIVE_BOARD, fileName);
+    updateTitle();
 }
 
 void Main::save(bool saveAs) {
-    if (!hasFile || saveAs) {
-        // Let the user choose a save file
-        fileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
+    QString tempFileName;
+    if (saveAs) { // Let the user choose a save file
+        tempFileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
+    } else if (!hasFile) { // Use default
+        tempFileName = DEFAULT_DIR + DEFAULT_SOUNDBOARD;
+    } else {
+        tempFileName = fileName;
     }
 
-    QFile file(fileName);
+    QFile file(tempFileName);
 
     if (!file.open(QIODevice::WriteOnly)) {
-        qWarning("Couldn't open save file.");
+        qWarning("Couldn't write to save file.");
+        // TODO inform user the file failed to save
+        settings()->setValue(HAS_ACTIVE_BOARD, false);
         return;
     }
 
@@ -467,31 +531,38 @@ void Main::save(bool saveAs) {
     QJsonArray boards;
     for (int i = 0; i < ui->listBoards->count(); ++i) {
         QJsonObject b;
-        static_cast<ListItemBoard*>(ui->listBoards->item(i))->save(b);
+        getBoard(i)->save(b);
         boards.append(b);
     }
 
     json["boards"] = boards;
+    // json["currentboard"] = currentBoard ? ui->listBoards->currentRow() : -1;
+    // json["currentsound"] = currentSound() ? ui->listSounds->currentRow() : -1;
 
     // Turns the object into text and saves it
     QJsonDocument saveDoc(json);
     file.write(saveDoc.toJson());
 
     hasFile = true;
+    fileName = tempFileName;
+    setChanged(false);
+    updateTitle();
+    settings()->setValue(HAS_ACTIVE_BOARD, true);
+    settings()->setValue(ACTIVE_BOARD, fileName);
 }
 
 // ******************* END FILE FUNCTIONS *******************
 
 void Main::enableKeybinds() {
     for (int i = 0; i < ui->listBoards->count(); ++i) {
-        static_cast<ListItemBoard*>(ui->listBoards->item(i))->reg(true, false);
+        getBoard(i)->reg(true, false);
     }
     if (currentBoard) currentBoard->reg(false, true);
 }
 
 void Main::disableKeybinds() {
     for (int i = 0; i < ui->listBoards->count(); ++i) {
-        static_cast<ListItemBoard*>(ui->listBoards->item(i))->unreg(true);
+        getBoard(i)->unreg(true);
     }
 }
 
@@ -506,4 +577,68 @@ AudioEngine *Main::audio() {
 
 QSettings *Main::settings() {
     return _settings;
+}
+
+void Main::closeEvent (QCloseEvent *event)
+{
+    if (_changed) {
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Soundboard",
+                                                                    tr("Handle unsaved changes?"),
+                                                                    QMessageBox::Cancel | QMessageBox::Discard | QMessageBox::Save,
+                                                                    QMessageBox::Save);
+        switch (resBtn) {
+        case QMessageBox::Save:
+            save();
+        case QMessageBox::Discard:
+            event->accept();
+            break;
+        default:
+            event->ignore();
+        }
+    } else {
+        event->accept();
+    }
+}
+
+void Main::setChanged(bool changed) {
+    _changed = changed;
+    updateTitle();
+}
+
+void Main::updateTitle() {
+    QString title = "Soundboard";
+    if (hasFile) {
+        QStringList splitted;
+        // This is to differentiate by each platform's file system
+        if (fileName.contains("\\")) splitted = fileName.split("\\");
+        else splitted = fileName.split("/");
+
+        title += " (" + splitted.last() + ")";
+    }
+    if (_changed) title += "*";
+    setWindowTitle(title);
+}
+
+void Main::on_buttonPlay_clicked()
+{
+    if (currentSound()) currentSound()->audio()->play();
+}
+
+void Main::on_buttonPause_clicked()
+{
+    if (currentSound()) currentSound()->audio()->pause();
+}
+
+void Main::on_buttonStop_clicked()
+{
+    if (currentSound()) currentSound()->audio()->stop();
+}
+
+void Main::rowChanged(int row) {
+    bool soundSelected = row >= 0;
+    ui->buttonEditSound->setEnabled(soundSelected);
+    ui->buttonRemoveSound->setEnabled(soundSelected);
+    ui->buttonPlay->setEnabled(soundSelected);
+    ui->buttonPause->setEnabled(soundSelected);
+    ui->buttonStop->setEnabled(soundSelected);
 }

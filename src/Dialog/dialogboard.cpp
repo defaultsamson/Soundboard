@@ -29,8 +29,19 @@ DialogBoard::~DialogBoard()
 
 void DialogBoard::on_buttonBox_accepted()
 {
+    QString originalName = board->text();
+    int originalKey = board->key();
+
     board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
     board->setKey(ui->lineEdiKeybind->key());
+
+    // If anything's ACTUALLY changed, then tell the program
+    if (creatingNew
+            || board->text() != originalName
+            || board->key() != originalKey) {
+        main->setChanged();
+    }
+
     boardUpdated = true;
     close();
 }

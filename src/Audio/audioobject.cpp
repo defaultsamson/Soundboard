@@ -2,8 +2,6 @@
 
 #include <QString>
 
-#include <iostream>
-
 #include <portaudio.h>
 #include <sndfile.hh>
 
@@ -18,21 +16,21 @@ bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
     if (!file) return;
-    std::cout << "Stopping" << std::endl;
+    // std::cout << "Stopping" << std::endl;
     paused = false;
     stopped = true;
 }
 
 void AudioObject::pause() {
     if (!file || stopped) return;
-    std::cout << "Pausing" << std::endl;
+    // std::cout << "Pausing" << std::endl;
     paused = true;
     stopped = false;
 }
 
 void AudioObject::play() {
     if (!file) return;
-    std::cout << "Playing" << std::endl;
+    // std::cout << "Playing" << std::endl;
     if (paused) {
         // Resume
         paused = false;
@@ -71,9 +69,11 @@ void AudioObject::setFile(const QString &filename) {
     paused = false;
     stopped = true;
     file = new SndfileHandle(filename.toStdString());
+    /*
     std::cout << "Initializing File: " << filename.toStdString() << std::endl;
     std::cout << "Sample rate:       " << file->samplerate() << std::endl;
     std::cout << "Channels:          " << file->channels() << std::endl;
+    */
 }
 
 void AudioObject::setVolume(const float volume) {

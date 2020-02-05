@@ -6,7 +6,6 @@
 #include <QString>
 #include <QHotkey>
 #include <QUrl>
-#include <iostream>
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 

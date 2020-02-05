@@ -41,11 +41,26 @@ DialogSound::~DialogSound()
 
 void DialogSound::on_buttonBox_accepted()
 {
+    QString originalName = sound->text();
+    int originalKey = sound->key();
+    // QString originalFilename = sound->filename();
+    // int originalVolume = sound->volume();
+
     // Updates the values to the board
     sound->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemSound::NEW_SOUND);
     sound->setKey(ui->lineEdiKeybind->key());
     sound->setFileName(ui->lineEditFile->text());
     sound->setVolume(ui->sliderVolume->value());
+
+    // If anything's ACTUALLY changed, then tell the program
+    if (creatingNew
+            || sound->text() != originalName
+            || sound->key() != originalKey
+            || sound->filename() != originalFileName
+            || sound->volume() != originalVolume) {
+        main->setChanged();
+    }
+
     soundUpdated = true;
     close();
 }
