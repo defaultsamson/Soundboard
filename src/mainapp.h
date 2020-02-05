@@ -26,6 +26,7 @@ public:
     static QString DEFAULT_DIR;
     static QString SETTINGS_FILE;
     static QString DEFAULT_SOUNDBOARD;
+    static QString TEST_AUDIO;
 
     static QString DARK_THEME;
     static bool DARK_THEME_DEFAULT;

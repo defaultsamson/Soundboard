@@ -36,6 +36,12 @@ private:
 
 void MyThread::run()
 {
+    // Set up testing audio
+    QFile testFile(Main::TEST_AUDIO);
+    if (!testFile.exists()) {
+        QFile::copy(":/audio/res/test.ogg", Main::TEST_AUDIO);
+    }
+
     main.audio()->init();
     if (main.getSettingsDialog()) main.getSettingsDialog()->refreshDeviceSelection();
 }
@@ -63,6 +69,7 @@ int main(int argc, char *argv[])
 QString Main::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/Soundboard/";
 QString Main::SETTINGS_FILE = "settings.ini";
 QString Main::DEFAULT_SOUNDBOARD = "default.json";
+QString Main::TEST_AUDIO = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/test.ogg";
 
 QString Main::DARK_THEME = "dark_theme";
 bool Main::DARK_THEME_DEFAULT = false;

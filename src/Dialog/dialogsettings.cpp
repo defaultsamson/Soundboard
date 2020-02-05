@@ -8,6 +8,7 @@
 #include <QProgressBar>
 
 #include <portaudio.h>
+#include <QStandardPaths>
 
 // Allows storing the following types as QVariants
 Q_DECLARE_METATYPE(HostInfoContainer)
@@ -27,11 +28,8 @@ DialogSettings::DialogSettings(Main *main) :
     connect(ui->comboBoxOutputDevice, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
     connect(ui->comboBoxDriver, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChanged);
 
-#ifdef Q_OS_WIN
-    audio.setFile("C:\\Users\\test\\Desktop\\test.ogg");
-#else
-    audio.setFile("/home/samson/Desktop/test.ogg");
-#endif
+
+    audio.setFile(Main::TEST_AUDIO);
     main->audio()->registerAudio(&audio);
 
     connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
