@@ -601,11 +601,11 @@ void Main::setChanged(bool changed) {
 void Main::updateTitle() {
     QString title = "Soundboard";
     if (hasFile) {
-#ifdef Q_OS_WIN
-        QStringList splitted = fileName.split("\\");
-#else
-        QStringList splitted = fileName.split("/");
-#endif
+        QStringList splitted;
+        // This is to differentiate by each platform's file system
+        if (fileName.contains("\\")) splitted = fileName.split("\\");
+        else splitted = fileName.split("/");
+
         title += " (" + splitted.last() + ")";
     }
     if (_changed) title += "*";
