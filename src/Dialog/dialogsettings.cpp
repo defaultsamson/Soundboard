@@ -29,8 +29,10 @@ DialogSettings::DialogSettings(Main *main) :
 
     refreshDeviceSelection();
 
-    connect(ui->comboBoxOutputDevice, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
-    connect(ui->comboBoxDriver, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChanged);
+    connect(ui->comboBoxOutputDevice1, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device1Changed);
+    connect(ui->comboBoxDriver1, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host1Changed);
+    connect(ui->comboBoxOutputDevice2, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device2Changed);
+    connect(ui->comboBoxDriver2, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host2Changed);
 
     audio.setFile(Main::TEST_AUDIO);
     main->audio()->registerAudio(&audio);
@@ -65,27 +67,52 @@ void DialogSettings::on_buttonBox_rejected()
     close();
 }
 
-void DialogSettings::hostChanged(int index)
+void DialogSettings::host1Changed(int index)
 {
-    QVariant qvar = ui->comboBoxDriver->itemData(index);
+    QVariant qvar = ui->comboBoxDriver1->itemData(index);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select backend..."
 
     _displayHost = qvar.value<HostInfoContainer*>();
-    _hasDisplayHost = true;
     refreshDeviceSelection();
 }
 
-void DialogSettings::deviceChanged(int index)
+void DialogSettings::device1Changed(int index)
 {
-    QVariant qvar = ui->comboBoxOutputDevice->itemData(index);
+    QVariant qvar = ui->comboBoxOutputDevice1->itemData(index);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
     main->audio()->setSelectedDevice(qvar.value<DeviceInfoContainer*>());
     // If the host has been changed, update it too
-    if (_hasDisplayHost) {
+    if (_displayHost) {
         main->audio()->setSelectedHost(_displayHost);
-        _hasDisplayHost = false;
+        _displayHost = nullptr;
     }
     refreshDeviceSelection();
+}
+
+void DialogSettings::host2Changed(int index)
+{
+    /*
+    QVariant qvar = ui->comboBoxDriver1->itemData(index);
+    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select backend..."
+
+    _displayHost = qvar.value<HostInfoContainer*>();
+    refreshDeviceSelection();
+    */
+}
+
+void DialogSettings::device2Changed(int index)
+{
+    /*
+    QVariant qvar = ui->comboBoxOutputDevice1->itemData(index);
+    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
+    main->audio()->setSelectedDevice(qvar.value<DeviceInfoContainer*>());
+    // If the host has been changed, update it too
+    if (_displayHost) {
+        main->audio()->setSelectedHost(_displayHost);
+        _displayHost = nullptr;
+    }
+    refreshDeviceSelection();
+    */
 }
 
 void DialogSettings::on_pushButtonOutput_clicked()
@@ -104,14 +131,14 @@ void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 
 void DialogSettings::on_pushButtonRefresh_clicked() {
     main->audio()->refreshDevices();
-    _hasDisplayHost = false; // Forces a refresh of the list of hosts and devices
+    _displayHost = nullptr; // Forces a refresh of the list of hosts and devices
     refreshDeviceSelection();
 }
 
 void DialogSettings::refreshDeviceSelection() {
     // TODO get all the default info from the AudioEngine
-    QComboBox *driverBox = ui->comboBoxDriver;
-    QComboBox *deviceBox = ui->comboBoxOutputDevice;
+    QComboBox *driverBox = ui->comboBoxDriver1;
+    QComboBox *deviceBox = ui->comboBoxOutputDevice1;
     driverBox->clear();
     deviceBox->clear();
     AudioEngine *a = main->audio();
@@ -121,29 +148,28 @@ void DialogSettings::refreshDeviceSelection() {
     deviceBox->setEnabled(inited);
     ui->pushButtonOutput->setEnabled(inited);
     ui->pushButtonRefresh->setEnabled(inited);
-    ui->labelOutputDevice->setText(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
+    ui->groupBoxDevice1->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
     if (!inited) return;
 
     PaHostApiIndex showingHostIndex = -1;
     // Always prioritize the host being displayed over the active one
-    if (_hasDisplayHost) {
+    if (_displayHost) {
         driverBox->addItem(_displayHost->hostName, QVariant::fromValue(_displayHost));
         showingHostIndex = _displayHost->hostIndex;
     } else if (a->activeHost()) {
         driverBox->addItem(a->activeHost()->hostName, QVariant::fromValue(a->activeHost()));
         showingHostIndex = a->activeHost()->hostIndex;
         _displayHost = a->activeHost();
-        _hasDisplayHost = true;
     } else {
         driverBox->addItem("Select backend...", QVariant(QVariant::Invalid));
         deviceBox->setEnabled(false);
     }
     for (HostInfoContainer *hostInfo : a->hosts()) {
-        if (!(_hasDisplayHost && hostInfo->hostIndex == showingHostIndex)) // If not the displaying host
+        if (!(_displayHost && hostInfo->hostIndex == showingHostIndex)) // If not the displaying host
             driverBox->addItem(hostInfo->hostName, QVariant::fromValue(hostInfo));
     }
 
-    if (_hasDisplayHost) {
+    if (_displayHost) {
         // Only add active device if it's showing the active device's tab
         bool addedActive = false;
         if (a->activeDevice() && _displayHost->hostIndex == a->activeDevice()->info->hostApi) {

@@ -28,8 +28,10 @@ private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
     void on_pushButtonOutput_clicked();
-    void hostChanged(int index);
-    void deviceChanged(int index);
+    void host1Changed(int index);
+    void device1Changed(int index);
+    void host2Changed(int index);
+    void device2Changed(int index);
     void on_checkBoxDarkTheme_stateChanged(int arg1);
     void on_pushButtonRefresh_clicked();
 
@@ -39,7 +41,6 @@ private:
     Ui::DialogSettings *ui;
     Main *main;
     AudioObject audio;
-    bool _hasDisplayHost = false;
     HostInfoContainer *_displayHost = nullptr;
     void closeEvent(QCloseEvent *bar);
     void handleClose();

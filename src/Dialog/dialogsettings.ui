@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>536</height>
+    <height>334</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -78,54 +78,74 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
-        <widget class="QLabel" name="labelOutputDevice">
-         <property name="text">
-          <string>Output Devices</string>
+        <widget class="QGroupBox" name="groupBoxDevice1">
+         <property name="title">
+          <string>Output Device 1</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="QComboBox" name="comboBoxDriver1"/>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBoxOutputDevice1"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBoxDevice2">
+         <property name="title">
+          <string>Output Device 2</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QComboBox" name="comboBoxDriver2"/>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBoxOutputDevice2"/>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <item>
-            <widget class="QComboBox" name="comboBoxDriver"/>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBoxOutputDevice"/>
-           </item>
-          </layout>
+          <widget class="WidgetAudio" name="outputBar" native="true">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonOutput">
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Test</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="pushButtonRefresh">
            <property name="maximumSize">
             <size>
-             <width>100</width>
+             <width>130</width>
              <height>20</height>
             </size>
            </property>
            <property name="text">
-            <string>Refresh</string>
+            <string>Refresh Devices</string>
            </property>
           </widget>
          </item>
         </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>4</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item>
         <widget class="QWidget" name="widget_4" native="true">
@@ -143,43 +163,20 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="WidgetAudio" name="outputBar" native="true">
-            <property name="maximumSize">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
              <size>
-              <width>16777215</width>
-              <height>20</height>
+              <width>20</width>
+              <height>40</height>
              </size>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonOutput">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Test</string>
-            </property>
-           </widget>
+           </spacer>
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
