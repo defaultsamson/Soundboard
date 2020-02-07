@@ -7,18 +7,24 @@
 
 WidgetKeybind::WidgetKeybind(QWidget *parent) :
     QLineEdit(parent),
-    _key(-1)
+    _key(-1),
+    _native(-1)
 {
     setPlaceholderText("Click here to set key");
 }
 
-void WidgetKeybind::setKey(int key) {
+void WidgetKeybind::setKey(int key, int native) {
     _key = key;
+    _native = native;
     setText(key == -1 ? "" : QKeySequence(key).toString());
 }
 
 int WidgetKeybind::key() {
     return _key;
+}
+
+int WidgetKeybind::nativeKey() {
+    return _native;
 }
 
 void WidgetKeybind::focusInEvent(QFocusEvent *e) {

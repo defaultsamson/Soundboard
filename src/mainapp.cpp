@@ -77,6 +77,7 @@ QString Main::ACTIVE_BOARD = "active_board";
 QString Main::ACTIVE_BOARD_DEFAULT = "";
 QString Main::HAS_ACTIVE_BOARD = "has_active_board";
 bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
+QString Main::SETTINGS_TAB = "settings_tab";
 
 Main::Main(QWidget *parent) :
     QMainWindow(parent),

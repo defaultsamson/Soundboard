@@ -34,7 +34,7 @@ public:
     static QString ACTIVE_BOARD_DEFAULT;
     static QString HAS_ACTIVE_BOARD;
     static bool HAS_ACTIVE_BOARD_DEFAULT;
-
+    static QString SETTINGS_TAB;
 
     explicit Main(QWidget *parent = nullptr);
     ~Main();

@@ -33,6 +33,8 @@ private slots:
     void on_checkBoxDarkTheme_stateChanged(int arg1);
     void on_pushButtonRefresh_clicked();
 
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::DialogSettings *ui;
     Main *main;

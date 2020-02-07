@@ -13,7 +13,9 @@ public:
     ListItem(Main *main);
     ~ListItem();
     int key();
+    int nativeKey();
     void setKey(int key);
+    void setNativeKey(int key);
     virtual void load(const QJsonObject &json);
     virtual void save(QJsonObject &json);
     virtual void trigger() = 0;
@@ -21,6 +23,7 @@ public:
 protected:
     Main *main;
     int _key;
+    int _native;
     QHotkey *hotkey;
 };
 

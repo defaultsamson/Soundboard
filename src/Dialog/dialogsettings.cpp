@@ -22,12 +22,12 @@ DialogSettings::DialogSettings(Main *main) :
     ui->setupUi(this);
 
     ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
+    ui->tabWidget->setCurrentIndex(main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
 
     refreshDeviceSelection();
 
     connect(ui->comboBoxOutputDevice, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChanged);
     connect(ui->comboBoxDriver, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChanged);
-
 
     audio.setFile(Main::TEST_AUDIO);
     main->audio()->registerAudio(&audio);
@@ -115,7 +115,7 @@ void DialogSettings::refreshDeviceSelection() {
     deviceBox->setEnabled(inited);
     ui->pushButtonOutput->setEnabled(inited);
     ui->pushButtonRefresh->setEnabled(inited);
-    ui->groupBox_2->setTitle(inited ? "Audio" : "Audio (INITIALIZING...)");
+    ui->labelOutputDevice->setText(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
     if (!inited) return;
 
     PaHostApiIndex showingHostIndex = -1;
@@ -166,4 +166,9 @@ void DialogSettings::refreshDeviceSelection() {
     // e.g. When the audio thread finished initializing the audio engine
     if (driverBox->count() > 0) driverBox->setCurrentIndex(0);
     if (deviceBox->count() > 0) deviceBox->setCurrentIndex(0);
+}
+
+void DialogSettings::on_tabWidget_currentChanged(int index)
+{
+    main->settings()->setValue(Main::SETTINGS_TAB, index);
 }
