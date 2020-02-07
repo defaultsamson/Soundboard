@@ -12,18 +12,18 @@ class ListItem : public QListWidgetItem, public QObject
 public:
     ListItem(Main *main);
     ~ListItem();
-    int key();
-    int nativeKey();
-    void setKey(int key);
-    void setNativeKey(int key);
+    bool hasKey();
+    quint32 key();
+    void unSetKey();
+    void setKey(quint32 key);
     virtual void load(const QJsonObject &json);
     virtual void save(QJsonObject &json);
     virtual void trigger() = 0;
 
 protected:
     Main *main;
-    int _key;
-    int _native;
+    bool _hasKey;
+    quint32 _key;
     QHotkey *hotkey;
 };
 

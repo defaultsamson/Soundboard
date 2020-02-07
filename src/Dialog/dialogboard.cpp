@@ -15,7 +15,7 @@ DialogBoard::DialogBoard(Main *main, ListItemBoard *board, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : board->text());
-    ui->lineEdiKeybind->setKey(board->key(), board->nativeKey());
+    if (board->hasKey()) ui->lineEdiKeybind->setKey(board->key());
 
     // Disable the keybinds temporarily while the dialog is up
     main->disableKeybinds();
@@ -30,11 +30,11 @@ DialogBoard::~DialogBoard()
 void DialogBoard::on_buttonBox_accepted()
 {
     QString originalName = board->text();
-    int originalKey = board->key();
+    quint32 originalKey = board->key();
 
     board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
-    // TOD check if still needed board->setKey(ui->lineEdiKeybind->key());
-    board->setNativeKey(ui->lineEdiKeybind->nativeKey());
+    if (ui->lineEdiKeybind->hasKey()) board->setKey(ui->lineEdiKeybind->key());
+    else board->unSetKey();
 
     // If anything's ACTUALLY changed, then tell the program
     if (creatingNew

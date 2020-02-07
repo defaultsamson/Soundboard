@@ -17,7 +17,7 @@ DialogSound::DialogSound(Main *main, ListItemSound *sound, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : sound->text());
-    ui->lineEdiKeybind->setKey(sound->key(), sound->nativeKey());
+    if (sound->hasKey()) ui->lineEdiKeybind->setKey(sound->key());
     ui->lineEditFile->setText(sound->filename());
     ui->sliderVolume->setValue(sound->volume());
     ui->spinBoxVolume->setValue(sound->volume());
@@ -42,14 +42,14 @@ DialogSound::~DialogSound()
 void DialogSound::on_buttonBox_accepted()
 {
     QString originalName = sound->text();
-    int originalKey = sound->key();
+    quint32 originalKey = sound->key();
     // QString originalFilename = sound->filename();
     // int originalVolume = sound->volume();
 
     // Updates the values to the board
     sound->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemSound::NEW_SOUND);
-    // TODO check if this is still needed sound->setKey(ui->lineEdiKeybind->key());
-    sound->setNativeKey(ui->lineEdiKeybind->nativeKey());
+    if (ui->lineEdiKeybind->hasKey()) sound->setKey(ui->lineEdiKeybind->key());
+    else sound->unSetKey();
     sound->setFileName(ui->lineEditFile->text());
     sound->setVolume(ui->sliderVolume->value());
 

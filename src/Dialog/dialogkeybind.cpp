@@ -19,6 +19,11 @@ DialogKeybind::~DialogKeybind()
 
 void DialogKeybind::keyPressEvent(QKeyEvent *e) {
     // When a key is presed, update the widget value and close the dialog
-    widget->setKey(e->key()==Qt::Key_Escape ? -1 : e->key(), e->nativeScanCode());
+    if (e->key()==Qt::Key_Escape) {
+        widget->unSetKey();
+    } else {
+        widget->setKey(e->nativeScanCode());
+    }
+
     close();
 }

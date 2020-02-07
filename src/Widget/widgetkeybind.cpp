@@ -4,27 +4,35 @@
 #include <QKeySequence>
 #include <QLineEdit>
 #include <QWidget>
+#include <QString>
 
 WidgetKeybind::WidgetKeybind(QWidget *parent) :
     QLineEdit(parent),
-    _key(-1),
-    _native(-1)
+    _key(0),
+    _hasKey(false)
 {
     setPlaceholderText("Click here to set key");
 }
 
-void WidgetKeybind::setKey(int key, int native) {
+void WidgetKeybind::setKey(quint32 key) {
     _key = key;
-    _native = native;
-    setText(key == -1 ? "" : QKeySequence(key).toString());
+    _hasKey = true;
+    // TODO get key names
+    setText(QString::number(_key)); // QKeySequence(key).toString());
 }
 
-int WidgetKeybind::key() {
+void WidgetKeybind::unSetKey() {
+    _key = 0;
+    _hasKey = false;
+    setText("");
+}
+
+quint32 WidgetKeybind::key() {
     return _key;
 }
 
-int WidgetKeybind::nativeKey() {
-    return _native;
+bool WidgetKeybind::hasKey() {
+    return _hasKey;
 }
 
 void WidgetKeybind::focusInEvent(QFocusEvent *e) {
