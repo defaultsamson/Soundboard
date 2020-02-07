@@ -11,8 +11,8 @@
 #include <QStandardPaths>
 
 // Allows storing the following types as QVariants
-Q_DECLARE_METATYPE(HostInfoContainer)
-Q_DECLARE_METATYPE(DeviceInfoContainer)
+Q_DECLARE_METATYPE(HostInfoContainer*)
+Q_DECLARE_METATYPE(DeviceInfoContainer*)
 
 DialogSettings::DialogSettings(Main *main) :
     QDialog(main),
@@ -70,7 +70,7 @@ void DialogSettings::hostChanged(int index)
     QVariant qvar = ui->comboBoxDriver->itemData(index);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select backend..."
 
-    _displayHost = qvar.value<HostInfoContainer>();
+    _displayHost = qvar.value<HostInfoContainer*>();
     _hasDisplayHost = true;
     refreshDeviceSelection();
 }
@@ -79,7 +79,7 @@ void DialogSettings::deviceChanged(int index)
 {
     QVariant qvar = ui->comboBoxOutputDevice->itemData(index);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
-    main->audio()->setSelectedDevice(qvar.value<DeviceInfoContainer>());
+    main->audio()->setSelectedDevice(qvar.value<DeviceInfoContainer*>());
     // If the host has been changed, update it too
     if (_hasDisplayHost) {
         main->audio()->setSelectedHost(_displayHost);
@@ -127,46 +127,46 @@ void DialogSettings::refreshDeviceSelection() {
     PaHostApiIndex showingHostIndex = -1;
     // Always prioritize the host being displayed over the active one
     if (_hasDisplayHost) {
-        driverBox->addItem(_displayHost.hostName, QVariant::fromValue(_displayHost));
-        showingHostIndex = _displayHost.hostIndex;
-    } else if (a->hasActiveHost()) {
-        driverBox->addItem(a->activeHost().hostName, QVariant::fromValue(a->activeHost()));
-        showingHostIndex = a->activeHost().hostIndex;
+        driverBox->addItem(_displayHost->hostName, QVariant::fromValue(_displayHost));
+        showingHostIndex = _displayHost->hostIndex;
+    } else if (a->activeHost()) {
+        driverBox->addItem(a->activeHost()->hostName, QVariant::fromValue(a->activeHost()));
+        showingHostIndex = a->activeHost()->hostIndex;
         _displayHost = a->activeHost();
         _hasDisplayHost = true;
     } else {
         driverBox->addItem("Select backend...", QVariant(QVariant::Invalid));
         deviceBox->setEnabled(false);
     }
-    for (HostInfoContainer hostInfo : a->hosts()) {
-        if (!(_hasDisplayHost && hostInfo.hostIndex == showingHostIndex)) // If not the displaying host
-            driverBox->addItem(hostInfo.hostName, QVariant::fromValue(hostInfo));
+    for (HostInfoContainer *hostInfo : a->hosts()) {
+        if (!(_hasDisplayHost && hostInfo->hostIndex == showingHostIndex)) // If not the displaying host
+            driverBox->addItem(hostInfo->hostName, QVariant::fromValue(hostInfo));
     }
 
     if (_hasDisplayHost) {
         // Only add active device if it's showing the active device's tab
         bool addedActive = false;
-        if (a->hasActiveDevice() && _displayHost.hostIndex == a->activeDevice().info->hostApi) {
-            deviceBox->addItem(a->activeDevice().info->name, QVariant::fromValue(a->activeDevice()));
+        if (a->activeDevice() && _displayHost->hostIndex == a->activeDevice()->info->hostApi) {
+            deviceBox->addItem(a->activeDevice()->info->name, QVariant::fromValue(a->activeDevice()));
             addedActive = true;
         } else {
             deviceBox->addItem("Select device...", QVariant(QVariant::Invalid));
         }
         // Only add default device if it's showing the default device's tab and there is a default, and the active is not the default
         bool addedDefault = false;
-        if (a->hasDefaultDevice() && _displayHost.hostIndex == a->defaultDevice().info->hostApi && !(a->hasActiveDevice() && a->defaultDevice().index == a->activeDevice().index)) {
-            deviceBox->addItem(a->defaultDevice().info->name, QVariant::fromValue(a->defaultDevice()));
+        if (a->defaultDevice() && _displayHost->hostIndex == a->defaultDevice()->info->hostApi && !(a->activeDevice() && a->defaultDevice()->index == a->activeDevice()->index)) {
+            deviceBox->addItem(a->defaultDevice()->info->name, QVariant::fromValue(a->defaultDevice()));
             addedDefault = true;
         }
 
-        for (DeviceInfoContainer deviceInfo : *(_displayHost.devices)) {
+        for (DeviceInfoContainer *deviceInfo : *(_displayHost->devices)) {
             // If not the active host and not the default host, add the device to the list
-            if (!(addedActive && deviceInfo.index == a->activeDevice().index) && !(addedDefault && deviceInfo.index == a->defaultDevice().index))
-                deviceBox->addItem(deviceInfo.info->name, QVariant::fromValue(deviceInfo));
+            if (!(addedActive && deviceInfo->index == a->activeDevice()->index) && !(addedDefault && deviceInfo->index == a->defaultDevice()->index))
+                deviceBox->addItem(deviceInfo->info->name, QVariant::fromValue(deviceInfo));
         }
     }
 
-    ui->pushButtonOutput->setEnabled(a->hasActiveDevice());
+    ui->pushButtonOutput->setEnabled(a->activeDevice());
 
     // A hack to forcefully update the visuals when updated from another thread
     // e.g. When the audio thread finished initializing the audio engine

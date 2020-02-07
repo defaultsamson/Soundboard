@@ -9,16 +9,17 @@
 
 #include <portaudio.h>
 
-// Hotkey-Audio Connector Object
-struct HACObj {
-    ListItemSound* listItem;
-    AudioObject* audio;
-};
-
 struct HostInfoContainer {
     PaHostApiIndex hostIndex;
     const char* hostName;
-    QList <DeviceInfoContainer> *devices;
+    QList <DeviceInfoContainer*> *devices;
+
+    ~HostInfoContainer() {
+        if (devices) {
+            for (int i = 0; i < devices->size(); i++) delete devices->at(i);
+            delete devices;
+        }
+    }
 };
 
 class AudioEngine : public QObject
@@ -28,23 +29,17 @@ class AudioEngine : public QObject
 public:
     AudioEngine();
 
-    bool hasDefaultHost();
-    HostInfoContainer defaultHost();
-    bool hasDefaultDevice();
-    DeviceInfoContainer defaultDevice();
-    bool hasSelectedHost();
-    void setSelectedHost(HostInfoContainer);
-    HostInfoContainer selectedHost();
-    bool hasSelectedDevice();
-    void setSelectedDevice(DeviceInfoContainer);
-    DeviceInfoContainer selectedDevice();
-    QList<HostInfoContainer> hosts();
+    HostInfoContainer *defaultHost();
+    DeviceInfoContainer *defaultDevice();
+    void setSelectedHost(HostInfoContainer*);
+    HostInfoContainer *selectedHost();
+    void setSelectedDevice(DeviceInfoContainer*);
+    DeviceInfoContainer *selectedDevice();
+    QList<HostInfoContainer*> hosts();
     void refreshDevices();
 
-    bool hasActiveHost();
-    HostInfoContainer activeHost();
-    bool hasActiveDevice();
-    DeviceInfoContainer activeDevice();
+    HostInfoContainer *activeHost();
+    DeviceInfoContainer *activeDevice();
 
     void init();
     bool isInitialized();
@@ -60,6 +55,8 @@ public:
     void registerAudio(AudioObject *);
     void unregisterAudio(AudioObject *);
 
+    ~AudioEngine();
+
 private:
     PaStream *stream = nullptr;
     int channels = 0;
@@ -67,15 +64,11 @@ private:
 
     bool _isInitialized = false;
 
-    bool _hasDefaultHost = false;
-    HostInfoContainer _defaultHost;
-    bool _hasDefaultDevice = false;
-    DeviceInfoContainer _defaultDevice;
-    bool _hasSelectedHost = false;
-    HostInfoContainer _selectedHost;
-    bool _hasSelectedDevice = false;
-    DeviceInfoContainer _selectedDevice;
-    QList<HostInfoContainer> _hosts;
+    HostInfoContainer *_defaultHost = nullptr;
+    DeviceInfoContainer *_defaultDevice = nullptr;
+    HostInfoContainer *_selectedHost = nullptr;
+    DeviceInfoContainer *_selectedDevice = nullptr;
+    QList<HostInfoContainer*> _hosts;
 
     QList<AudioObject *> _audioObjectRegistry;
 

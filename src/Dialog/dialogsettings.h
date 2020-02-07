@@ -40,7 +40,7 @@ private:
     Main *main;
     AudioObject audio;
     bool _hasDisplayHost = false;
-    HostInfoContainer _displayHost;
+    HostInfoContainer *_displayHost = nullptr;
     void closeEvent(QCloseEvent *bar);
     void handleClose();
 };
