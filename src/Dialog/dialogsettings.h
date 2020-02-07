@@ -2,7 +2,7 @@
 #define DIALOGSETTINGS_H
 
 #include <QDialog>
-#include <QFile>
+#include <QComboBox>
 #include "../Audio/audioobject.h"
 #include "../Audio/audioengine.h"
 
@@ -13,6 +13,11 @@ class Main;
 namespace Ui {
 class DialogSettings;
 }
+
+struct AudioDisplayContainer {
+    QComboBox *drivers;
+    QComboBox *devices;
+};
 
 class DialogSettings : public QDialog
 {

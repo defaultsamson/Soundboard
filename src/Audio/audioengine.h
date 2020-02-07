@@ -9,9 +9,19 @@
 
 #include <portaudio.h>
 
+struct HostInfoContainer;
+
+struct DeviceInfoContainer {
+    HostInfoContainer *host;
+    const PaDeviceInfo *info;
+    PaDeviceIndex index;
+    PaStream *stream;
+    int channels;
+};
+
 struct HostInfoContainer {
-    PaHostApiIndex hostIndex;
-    const char* hostName;
+    PaHostApiIndex index;
+    const char* name;
     QList <DeviceInfoContainer*> *devices;
 
     ~HostInfoContainer() {
@@ -22,6 +32,7 @@ struct HostInfoContainer {
     }
 };
 
+
 class AudioEngine : public QObject
 {
     Q_OBJECT
@@ -31,15 +42,19 @@ public:
 
     HostInfoContainer *defaultHost();
     DeviceInfoContainer *defaultDevice();
-    void setSelectedHost(HostInfoContainer*);
-    HostInfoContainer *selectedHost();
-    void setSelectedDevice(DeviceInfoContainer*);
-    DeviceInfoContainer *selectedDevice();
-    QList<HostInfoContainer*> hosts();
-    void refreshDevices();
 
-    HostInfoContainer *activeHost();
-    DeviceInfoContainer *activeDevice();
+    void addActiveHost(HostInfoContainer*);
+    void removeActiveHost(HostInfoContainer*);
+    const QList<HostInfoContainer*> activeHosts();
+
+    void addActiveDevice(DeviceInfoContainer*);
+    void removeActiveDevice(DeviceInfoContainer*);
+    const QList<DeviceInfoContainer*> activeDevices();
+
+    const QList<HostInfoContainer*> hosts();
+    const QList<DeviceInfoContainer*> devices();
+
+    void refreshDevices();
 
     void init();
     bool isInitialized();
@@ -58,17 +73,16 @@ public:
     ~AudioEngine();
 
 private:
-    PaStream *stream = nullptr;
-    int channels = 0;
     PaHostApiIndex selectedDeviceIndex = -1;
 
     bool _isInitialized = false;
 
     HostInfoContainer *_defaultHost = nullptr;
     DeviceInfoContainer *_defaultDevice = nullptr;
-    HostInfoContainer *_selectedHost = nullptr;
-    DeviceInfoContainer *_selectedDevice = nullptr;
     QList<HostInfoContainer*> _hosts;
+    QList<DeviceInfoContainer*> _devices;
+    QList<HostInfoContainer*> _activeHosts;
+    QList<DeviceInfoContainer*> _activeDevices;
 
     QList<AudioObject *> _audioObjectRegistry;
 

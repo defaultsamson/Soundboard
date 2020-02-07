@@ -6,12 +6,6 @@
 #include <portaudio.h>
 #include <sndfile.hh>
 
-struct DeviceInfoContainer {
-    const PaDeviceInfo *info;
-    PaDeviceIndex index;
-
-};
-
 class AudioObject
 {
 public:
