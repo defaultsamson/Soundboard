@@ -192,6 +192,7 @@ void Main::on_actionNew_triggered()
     clear();
     hasFile = false;
     fileName = "";
+    updateTitle();
 }
 
 // Open
