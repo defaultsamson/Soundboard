@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QWidget>
 #include <QString>
+#include "../Hotkey/hotkeyutil.h"
 
 WidgetKeybind::WidgetKeybind(QWidget *parent) :
     QLineEdit(parent),
@@ -17,8 +18,7 @@ WidgetKeybind::WidgetKeybind(QWidget *parent) :
 void WidgetKeybind::setKey(quint32 key) {
     _key = key;
     _hasKey = true;
-    // TODO get key names
-    setText(QString::number(_key)); // QKeySequence(key).toString());
+    setText(HotkeyUtil::keycodeToString(_key));
 }
 
 void WidgetKeybind::unSetKey() {

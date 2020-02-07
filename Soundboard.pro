@@ -69,6 +69,12 @@ mac: SOURCES += src/Hotkey/hotkeypass_mac.cpp
 else:win32: SOURCES += src/Hotkey/hotkeypass_win.cpp
 else:unix: SOURCES += src/Hotkey/hotkeypass_x11.cpp
 
+# Sources for HotkeyUtil
+HEADERS += src/Hotkey/hotkeyutil.h
+mac: SOURCES += src/Hotkey/hotkeyutil_mac.cpp
+else:win32: SOURCES += src/Hotkey/hotkeyutil_win.cpp
+else:unix: SOURCES += src/Hotkey/hotkeyutil_x11.cpp
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
