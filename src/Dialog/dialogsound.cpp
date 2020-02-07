@@ -100,7 +100,7 @@ void DialogSound::on_pushButtonFile_clicked()
 void DialogSound::onClose() {
     // Remove the board if it's being created new and wasn't saved (e.g. hit "OK: on)
     if (creatingNew && !soundUpdated) {
-       main->removeSound(sound);
+       main->removeSound(sound, true);
     } else if (!creatingNew && !soundUpdated) {
         sound->setFileName(originalFileName);
         sound->setVolume(originalVolume);

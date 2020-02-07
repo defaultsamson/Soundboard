@@ -54,7 +54,7 @@ void DialogBoard::on_buttonBox_rejected()
 void DialogBoard::onClose() {
     // Remove the board if it's being created new and wasn't saved (e.g. hit "OK: on)
     if (creatingNew && !boardUpdated) {
-       main->removeBoard(board);
+       main->removeBoard(board, true);
     }
     // Re-enable the keybinds
     main->enableKeybinds();

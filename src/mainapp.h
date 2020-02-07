@@ -44,13 +44,13 @@ public:
     void clear();
     void setCurrentBoard(ListItemBoard *board);
     void setCurrentBoard(int row);
-    void removeBoard(ListItemBoard *board);
-    void removeBoard(int row);
+    void removeBoard(ListItemBoard *board, bool wasNew = false);
+    void removeBoard(int row, bool wasNew = false);
     ListItemBoard *getBoard(int row);
     void setCurrentSound(ListItemSound *sound);
     void setCurrentSound(int row);
-    void removeSound(ListItemSound *sound);
-    void removeSound(int row);
+    void removeSound(ListItemSound *sound, bool wasNew = false);
+    void removeSound(int row, bool wasNew = false);
     ListItemSound *getSound(int row);
     void setDarkTheme(bool set = true);
     QSettings *settings();

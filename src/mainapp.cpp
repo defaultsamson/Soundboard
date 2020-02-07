@@ -345,14 +345,14 @@ void Main::addSound() {
     editSound(sound, true);
 }
 
-void Main::removeBoard(ListItemBoard *board) {
-    removeBoard(ui->listBoards->row(board));
+void Main::removeBoard(ListItemBoard *board, bool wasNew) {
+    removeBoard(ui->listBoards->row(board), wasNew);
 }
 
-void Main::removeBoard(int row) {
+void Main::removeBoard(int row, bool wasNew) {
     if (row < 0 || row >= ui->listBoards->count()) return;
     delete ui->listBoards->takeItem(row);
-    setChanged();
+    if (!wasNew) setChanged();
 }
 
 ListItemBoard *Main::getBoard(int row) {
@@ -426,15 +426,15 @@ void Main::setCurrentSound(ListItemSound *sound) {
     // TODO play audio
 }
 
-void Main::removeSound(ListItemSound *sound) {
-    removeSound(ui->listSounds->row(sound));
+void Main::removeSound(ListItemSound *sound, bool wasNew) {
+    removeSound(ui->listSounds->row(sound), wasNew);
 }
 
-void Main::removeSound(int row) {
+void Main::removeSound(int row, bool wasNew) {
     if (row < 0 || row >= ui->listSounds->count()) return;
     delete ui->listSounds->takeItem(row);
     displayBoard(currentBoard);
-    setChanged();
+    if (!wasNew) setChanged();
 }
 
 ListItemSound *Main::getSound(int row) {
