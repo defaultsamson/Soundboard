@@ -189,6 +189,18 @@ void Main::contextMenuSound(const QPoint &pos) {
 // New
 void Main::on_actionNew_triggered()
 {
+    if (_changed) {
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
+        switch (resBtn) {
+        case QMessageBox::Save:
+            save();
+        case QMessageBox::Discard:
+            break;
+        default:
+            return;
+        }
+    }
+
     clear();
     hasFile = false;
     fileName = "";
@@ -198,6 +210,17 @@ void Main::on_actionNew_triggered()
 // Open
 void Main::on_actionOpen_triggered()
 {
+    if (_changed) {
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
+        switch (resBtn) {
+        case QMessageBox::Save:
+            save();
+        case QMessageBox::Discard:
+            break;
+        default:
+            return;
+        }
+    }
     load();
 }
 
@@ -216,6 +239,17 @@ void Main::on_actionSaveAs_triggered()
 // Exit program
 void Main::on_actionExit_triggered()
 {
+    if (_changed) {
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
+        switch (resBtn) {
+        case QMessageBox::Save:
+            save();
+        case QMessageBox::Discard:
+            break;
+        default:
+            return;
+        }
+    }
     QApplication::quit();
 }
 
@@ -581,13 +615,17 @@ QSettings *Main::settings() {
     return _settings;
 }
 
+QMessageBox::StandardButton Main::unsavedChangedDialogue() {
+    return QMessageBox::question( this, "Soundboard",
+                                  tr("Handle unsaved changes?"),
+                                  QMessageBox::Cancel | QMessageBox::Discard | QMessageBox::Save,
+                                  QMessageBox::Save);
+}
+
 void Main::closeEvent (QCloseEvent *event)
 {
     if (_changed) {
-        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Soundboard",
-                                                                    tr("Handle unsaved changes?"),
-                                                                    QMessageBox::Cancel | QMessageBox::Discard | QMessageBox::Save,
-                                                                    QMessageBox::Save);
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
         switch (resBtn) {
         case QMessageBox::Save:
             save();

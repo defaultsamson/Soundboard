@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QSettings>
 #include <QModelIndex>
+#include <QMessageBox>
 
 #include "Audio/audioengine.h"
 #include "Dialog/dialogsettings.h"
@@ -124,7 +125,7 @@ private:
     void addSound();
     ListItemSound *currentSound();
     void updateTitle();
-
+    QMessageBox::StandardButton unsavedChangedDialogue();
     void closeEvent(QCloseEvent *bar);
 };
 
