@@ -73,53 +73,27 @@ void DialogSettings::host1Changed(int index)
     QVariant qvar = ui->comboBoxDriver1->itemData(index);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select backend..."
 
-    _displayHost = qvar.value<HostInfoContainer*>();
+    _displayHost1 = qvar.value<HostInfoContainer*>();
     refreshDeviceSelection();
 }
 
 void DialogSettings::device1Changed(int index)
 {
-    
-    
-    QVariant qvar = ui->comboBoxOutputDevice1->itemData(index);
-    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
-    DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
-    if (main->audio()->activeDevices().contains(dev)) return; // If it's already active, ignore
-    DeviceInfoContainer* prev = ui->comboBoxOutputDevice1->itemData(0).value<DeviceInfoContainer*>();
-    main->audio()->removeActiveDevice(prev);
-    main->audio()->addActiveDevice(dev);
-    // If the host has been changed, update it too
-    if (_displayHost) {
-        main->audio()->addActiveHost(_displayHost);
-        _displayHost = nullptr;
-    }
-    refreshDeviceSelection();
+    deviceChanged(ui->comboBoxOutputDevice1, index, 0, _displayHost1);
 }
 
 void DialogSettings::host2Changed(int index)
 {
-    /*
     QVariant qvar = ui->comboBoxDriver1->itemData(index);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select backend..."
 
-    _displayHost = qvar.value<HostInfoContainer*>();
+    _displayHost2 = qvar.value<HostInfoContainer*>();
     refreshDeviceSelection();
-    */
 }
 
 void DialogSettings::device2Changed(int index)
 {
-    /*
-    QVariant qvar = ui->comboBoxOutputDevice1->itemData(index);
-    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
-    main->audio()->addActiveDevice(qvar.value<DeviceInfoContainer*>());
-    // If the host has been changed, update it too
-    if (_displayHost) {
-        main->audio()->addActiveHost(_displayHost);
-        _displayHost = nullptr;
-    }
-    refreshDeviceSelection();
-    */
+    deviceChanged(ui->comboBoxOutputDevice2, index, 1, _displayHost2);
 }
 
 void DialogSettings::on_pushButtonOutput_clicked()
@@ -131,6 +105,22 @@ void DialogSettings::on_pushButtonOutput_clicked()
     }
 }
 
+void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer *displayHost)
+{
+    QVariant qvar = selector->itemData(selectorIndex);
+    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
+
+    DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
+    if (main->audio()->activeDevices().contains(dev)) return; // If it's already active, ignore
+    dev->deviceDisplayIndex = deviceDisplayIndex;
+
+    main->audio()->removeActiveDevice(deviceDisplayIndex);
+    main->audio()->addActiveDevice(dev);
+
+    displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
+    refreshDeviceSelection();
+}
+
 void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 {
     main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
@@ -138,7 +128,7 @@ void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 
 void DialogSettings::on_pushButtonRefresh_clicked() {
     main->audio()->refreshDevices();
-    _displayHost = nullptr; // Forces a refresh of the list of hosts and devices
+    _displayHost1 = nullptr; // Forces a refresh of the list of hosts and devices
     refreshDeviceSelection();
 }
 
@@ -160,11 +150,12 @@ void DialogSettings::refreshDeviceSelection() {
     if (!inited) return;
 
     QList<AudioDisplayContainer> deviceDisplays;
-    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxOutputDevice1});
-    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver2, ui->comboBoxOutputDevice2});
+    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxOutputDevice1, _displayHost1, 0});
+    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver2, ui->comboBoxOutputDevice2, _displayHost2, 1});
     QList<DeviceInfoContainer*> displayedDevices;
 
     for (AudioDisplayContainer display : deviceDisplays) {
+        qDebug() << "Displaying...";
         QComboBox *drivers = display.drivers;
         QComboBox *devices = display.devices;
         drivers->clear();
@@ -177,14 +168,22 @@ void DialogSettings::refreshDeviceSelection() {
 
         // First add a single active device
         for (DeviceInfoContainer* dev : a->activeDevices()) {
-            // If the active device is part of the displayed host (and if there is infact a display host)
-            if (!displayedDevices.contains(dev) && !(_displayHost && _displayHost != dev->host)) {
+            // If the device hasn't already been added somewhere, and the display indexes match
+            if (!displayedDevices.contains(dev) && display.deviceDisplayIndex == dev->deviceDisplayIndex) {
                 displayedDevices.append(dev);
 
-                drivers->addItem(dev->host->name, QVariant::fromValue(dev->host));
-                devices->addItem(dev->info->name, QVariant::fromValue(dev));
+                // If the active device is run by the displayed host (and if there is infact a display host)
+                if (display.displayHost && display.displayHost != dev->host) {
+                    // Act as though it's being displayed, even though the displayHost will be displayed.
+                    // This is to prevent the next device display from showing this device when it's active
+                    // in another device selector that's displaying a different host than the active one
+                } else {
+                    drivers->addItem(dev->host->name, QVariant::fromValue(dev->host));
+                    devices->addItem(dev->info->name, QVariant::fromValue(dev));
 
-                displayHost = dev->host;
+                    qDebug() << "Setting: From active device";
+                    displayHost = dev->host;
+                }
 
                 break; // Break so it only adds 1 as the active
             }
@@ -193,13 +192,15 @@ void DialogSettings::refreshDeviceSelection() {
         // If there were no active devices in the current display host,
         // and there is infact a current display host, then add it, it
         // wasn't added by the active device loop
-        if (!displayHost && _displayHost) {
-            displayHost = _displayHost;
+        if (!displayHost && display.displayHost) {
+            displayHost = display.displayHost;
             notActiveDriver = true;
             drivers->addItem(displayHost->name, QVariant::fromValue(displayHost));
+            qDebug() << "Setting: From display host";
         }
 
         if (!displayHost) {
+            qDebug() << "Display Host: None";
             drivers->addItem("Select driver...", QVariant(QVariant::Invalid));
             devices->setEnabled(false);
             // Display the available drivers
@@ -207,6 +208,7 @@ void DialogSettings::refreshDeviceSelection() {
                 drivers->addItem(host->name, QVariant::fromValue(host));
             }
         } else {
+            qDebug() << "Display Host: " << displayHost->name;
             // Then add the other hosts
             for (HostInfoContainer* host : a->hosts()) {
                 if (host != displayHost) drivers->addItem(host->name, QVariant::fromValue(host));
@@ -221,11 +223,17 @@ void DialogSettings::refreshDeviceSelection() {
 
             // Then add other devices
             for (DeviceInfoContainer* dev : a->devices()) {
-                if (!displayedDevices.contains(dev) && displayHost == dev->host) {
+                // If it's not already being displayed, it's not the default (because we just added it), and it's under this host
+                if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != a->defaultDevice()) {
                     devices->addItem(dev->info->name, QVariant::fromValue(dev));
                 }
             }
         }
+
+        // A hack to forcefully update the visuals when updated from another thread
+        // e.g. When the audio thread finished initializing the audio engine
+        if (drivers->count() > 0) drivers->setCurrentIndex(0);
+        if (devices->count() > 0) devices->setCurrentIndex(0);
     }
 
     /*
@@ -278,8 +286,8 @@ void DialogSettings::refreshDeviceSelection() {
 
     // A hack to forcefully update the visuals when updated from another thread
     // e.g. When the audio thread finished initializing the audio engine
-    if (driverBox->count() > 0) driverBox->setCurrentIndex(0);
-    if (deviceBox->count() > 0) deviceBox->setCurrentIndex(0);
+    // if (driverBox->count() > 0) driverBox->setCurrentIndex(0);
+    // if (deviceBox->count() > 0) deviceBox->setCurrentIndex(0);
 }
 
 void DialogSettings::on_tabWidget_currentChanged(int index)

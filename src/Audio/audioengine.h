@@ -17,6 +17,7 @@ struct DeviceInfoContainer {
     PaDeviceIndex index;
     PaStream *stream;
     int channels;
+    int deviceDisplayIndex;
 };
 
 struct HostInfoContainer {
@@ -43,12 +44,9 @@ public:
     HostInfoContainer *defaultHost();
     DeviceInfoContainer *defaultDevice();
 
-    void addActiveHost(HostInfoContainer*);
-    void removeActiveHost(HostInfoContainer*);
-    const QList<HostInfoContainer*> activeHosts();
-
     void addActiveDevice(DeviceInfoContainer*);
     void removeActiveDevice(DeviceInfoContainer*);
+    void removeActiveDevice(int deviceDisplayIndex);
     const QList<DeviceInfoContainer*> activeDevices();
 
     const QList<HostInfoContainer*> hosts();
@@ -81,7 +79,6 @@ private:
     DeviceInfoContainer *_defaultDevice = nullptr;
     QList<HostInfoContainer*> _hosts;
     QList<DeviceInfoContainer*> _devices;
-    QList<HostInfoContainer*> _activeHosts;
     QList<DeviceInfoContainer*> _activeDevices;
 
     QList<AudioObject *> _audioObjectRegistry;

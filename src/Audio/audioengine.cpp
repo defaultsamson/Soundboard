@@ -21,20 +21,12 @@ DeviceInfoContainer *AudioEngine::defaultDevice() {
     return _defaultDevice;
 }
 
-void AudioEngine::addActiveHost(HostInfoContainer *host) {
-     _activeHosts.append(host);
-}
-void AudioEngine::removeActiveHost(HostInfoContainer* host) {
-     _activeHosts.removeOne(host);
-}
-const QList<HostInfoContainer*> AudioEngine::activeHosts() {
-    return _activeHosts;
-}
-
 void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
     if (_activeDevices.contains(device)) return;
     _activeDevices.append(device);
     selectedDeviceIndex = device->index;
+
+    qDebug() << "adding device: " << device->info->name;
 
     Pa_CloseStream(device->stream);
     device->stream = nullptr;
@@ -66,8 +58,14 @@ void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
     if (err != paNoError) qDebug() << "Error starting stream";
     // else qDebug() << "Stream started successfully!";
 }
-void AudioEngine::removeActiveDevice(DeviceInfoContainer* dev) {
-    _activeDevices.removeOne(dev);
+void AudioEngine::removeActiveDevice(DeviceInfoContainer* device) {
+    Pa_CloseStream(device->stream);
+    device->deviceDisplayIndex = -1;
+    qDebug() << "removing device: " << device->info->name;
+    _activeDevices.removeOne(device);
+}
+void AudioEngine::removeActiveDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+    for (auto dev : _activeDevices) if (dev->deviceDisplayIndex == deviceDisplayIndex) removeActiveDevice(dev);
 }
 const QList<DeviceInfoContainer*> AudioEngine::activeDevices() {
     return _activeDevices;
@@ -76,7 +74,6 @@ const QList<DeviceInfoContainer*> AudioEngine::activeDevices() {
 const QList<HostInfoContainer*> AudioEngine::hosts() {
     return _hosts;
 }
-
 const QList<DeviceInfoContainer*> AudioEngine::devices() {
     return _devices;
 }
@@ -103,7 +100,6 @@ void AudioEngine::refreshDevices() {
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
     _hosts.clear();
     _devices.clear();
-    _activeHosts.clear();
     _activeDevices.clear();
 
     const PaDeviceInfo *device;
@@ -113,7 +109,7 @@ void AudioEngine::refreshDevices() {
         if (device->maxOutputChannels == 0) { // isInput
             qDebug() << "Ignoring input channel... [" << i << "]";
         } else {
-            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, i, nullptr, CHANNELS};
+            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, i, nullptr, CHANNELS, -1};
             _devices.append(dev);
             if (Pa_GetDefaultOutputDevice() == i) {
                 _defaultDevice = dev;
@@ -151,6 +147,7 @@ void AudioEngine::refreshDevices() {
 
     // Devices are loaded, now determine which are supposed to be active
     if (activeDevices().size() == 0 && _defaultDevice) {
+        _defaultDevice->deviceDisplayIndex = 0;
         addActiveDevice(_defaultDevice);
     }
 }

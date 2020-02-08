@@ -17,6 +17,8 @@ class DialogSettings;
 struct AudioDisplayContainer {
     QComboBox *drivers;
     QComboBox *devices;
+    HostInfoContainer* displayHost;
+    int deviceDisplayIndex;
 };
 
 class DialogSettings : public QDialog
@@ -47,9 +49,11 @@ private:
     Ui::DialogSettings *ui;
     Main *main;
     AudioObject audio;
-    HostInfoContainer *_displayHost = nullptr;
+    HostInfoContainer *_displayHost1 = nullptr;
+    HostInfoContainer *_displayHost2 = nullptr;
     void closeEvent(QCloseEvent *bar);
     void handleClose();
+    void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer *displayHost);
 };
 
 #endif // DIALOGSETTINGS_H
