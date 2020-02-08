@@ -11,13 +11,17 @@
 
 struct HostInfoContainer;
 
+struct DeviceIndexInfo {
+    PaDeviceIndex deviceIndex;
+    int displayIndex;
+};
+
 struct DeviceInfoContainer {
     HostInfoContainer *host;
     const PaDeviceInfo *info;
-    PaDeviceIndex index;
     PaStream *stream;
     int channels;
-    int deviceDisplayIndex;
+    DeviceIndexInfo indexes;
 };
 
 struct HostInfoContainer {
@@ -39,7 +43,7 @@ class AudioEngine : public QObject
     Q_OBJECT
 
 public:
-    AudioEngine();
+    AudioEngine(Main *main);
 
     HostInfoContainer *defaultHost();
     DeviceInfoContainer *defaultDevice();
@@ -71,8 +75,7 @@ public:
     ~AudioEngine();
 
 private:
-    PaHostApiIndex selectedDeviceIndex = -1;
-
+    Main *main;
     bool _isInitialized = false;
 
     HostInfoContainer *_defaultHost = nullptr;
@@ -80,8 +83,10 @@ private:
     QList<HostInfoContainer*> _hosts;
     QList<DeviceInfoContainer*> _devices;
     QList<DeviceInfoContainer*> _activeDevices;
-
+    QList<DeviceIndexInfo> _selectedDeviceIndexes;
     QList<AudioObject *> _audioObjectRegistry;
+
+    DeviceInfoContainer *getDevice(int deviceIndex);
 
 signals:
     void update(qreal m_level);

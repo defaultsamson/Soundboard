@@ -79,10 +79,14 @@ QString Main::HAS_ACTIVE_BOARD = "has_active_board";
 bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
 QString Main::SETTINGS_TAB = "settings_tab";
 
+QString Main::EXPLICIT_NO_DEVICES = "explicit_no_devices";
+QString Main::DEVICE_INDEX0 = "device_index0";
+QString Main::DEVICE_INDEX1 = "device_index1";
+
 Main::Main(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainApp),
-    _audio(new AudioEngine()),
+    _audio(new AudioEngine(this)),
     _settings(new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat)),
     defaultPalette(qApp->palette())
 {

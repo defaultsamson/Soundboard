@@ -26,7 +26,7 @@ class DialogSettings : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogSettings(Main *main = nullptr);
+    explicit DialogSettings(Main *main);
     ~DialogSettings();
 
     void refreshDeviceSelection();
@@ -37,10 +37,10 @@ private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
     void on_pushButtonOutput_clicked();
+    void host0Changed(int index);
+    void device0Changed(int index);
     void host1Changed(int index);
     void device1Changed(int index);
-    void host2Changed(int index);
-    void device2Changed(int index);
     void on_checkBoxDarkTheme_stateChanged(int arg1);
     void on_pushButtonRefresh_clicked();
     void on_tabWidget_currentChanged(int index);
@@ -49,8 +49,8 @@ private:
     Ui::DialogSettings *ui;
     Main *main;
     AudioObject audio;
+    HostInfoContainer *_displayHost0 = nullptr;
     HostInfoContainer *_displayHost1 = nullptr;
-    HostInfoContainer *_displayHost2 = nullptr;
     void closeEvent(QCloseEvent *bar);
     void handleClose();
     void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer *displayHost);

@@ -37,6 +37,10 @@ public:
     static bool HAS_ACTIVE_BOARD_DEFAULT;
     static QString SETTINGS_TAB;
 
+    static QString EXPLICIT_NO_DEVICES;
+    static QString DEVICE_INDEX0;
+    static QString DEVICE_INDEX1;
+
     explicit Main(QWidget *parent = nullptr);
     ~Main();
     void load();

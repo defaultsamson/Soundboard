@@ -2,13 +2,14 @@
 
 #include "audioobject.h"
 #include <portaudio.h>
+#include "../mainapp.h"
 
 // TODO allow the user to change these
 #define SAMPLE_RATE (44100)
 #define FRAMES_PER_BUFFER 256
 #define CHANNELS 2
 
-AudioEngine::AudioEngine() {
+AudioEngine::AudioEngine(Main *main) : main(main) {
 }
 AudioEngine::~AudioEngine() {
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
@@ -22,11 +23,9 @@ DeviceInfoContainer *AudioEngine::defaultDevice() {
 }
 
 void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
-    if (_activeDevices.contains(device)) return;
+    if (_activeDevices.contains(device) || !device) return;
     _activeDevices.append(device);
-    selectedDeviceIndex = device->index;
-
-    qDebug() << "adding device: " << device->info->name;
+    _selectedDeviceIndexes.append(device->indexes);
 
     Pa_CloseStream(device->stream);
     device->stream = nullptr;
@@ -35,7 +34,7 @@ void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
     PaError err;
     PaStreamParameters outputParameters;
     // bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
-    outputParameters.device = device->index;
+    outputParameters.device = device->indexes.deviceIndex;
     outputParameters.channelCount = channels; // device.info->maxOutputChannels;
     outputParameters.sampleFormat = paFloat32;
     outputParameters.suggestedLatency = device->info->defaultLowOutputLatency ;
@@ -60,12 +59,15 @@ void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
 }
 void AudioEngine::removeActiveDevice(DeviceInfoContainer* device) {
     Pa_CloseStream(device->stream);
-    device->deviceDisplayIndex = -1;
-    qDebug() << "removing device: " << device->info->name;
+    device->indexes.displayIndex = -1;
+    // Remove its info so upon reaload or refresh it doesn't select it again
+    for (int i = 0; i < _selectedDeviceIndexes.size(); i++)
+        if (_selectedDeviceIndexes.at(i).deviceIndex == device->indexes.deviceIndex)
+            _selectedDeviceIndexes.removeAt(i);
     _activeDevices.removeOne(device);
 }
 void AudioEngine::removeActiveDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
-    for (auto dev : _activeDevices) if (dev->deviceDisplayIndex == deviceDisplayIndex) removeActiveDevice(dev);
+    for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) removeActiveDevice(dev);
 }
 const QList<DeviceInfoContainer*> AudioEngine::activeDevices() {
     return _activeDevices;
@@ -109,7 +111,7 @@ void AudioEngine::refreshDevices() {
         if (device->maxOutputChannels == 0) { // isInput
             qDebug() << "Ignoring input channel... [" << i << "]";
         } else {
-            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, i, nullptr, CHANNELS, -1};
+            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1}};
             _devices.append(dev);
             if (Pa_GetDefaultOutputDevice() == i) {
                 _defaultDevice = dev;
@@ -146,10 +148,33 @@ void AudioEngine::refreshDevices() {
     }
 
     // Devices are loaded, now determine which are supposed to be active
-    if (activeDevices().size() == 0 && _defaultDevice) {
-        _defaultDevice->deviceDisplayIndex = 0;
+    DeviceInfoContainer* dev0 = getDevice(main->settings()->value(Main::DEVICE_INDEX0, -1).toInt());
+    DeviceInfoContainer* dev1 = getDevice(main->settings()->value(Main::DEVICE_INDEX1, -1).toInt());
+
+    // There's a saved device, load it
+    if (dev0) {
+        dev0->indexes.displayIndex = 0;
+        addActiveDevice(dev0);
+    }
+    if (dev1) {
+        dev1->indexes.displayIndex = 1;
+        addActiveDevice(dev1);
+    }
+
+    // If no device was found, load the defaults
+    if (_activeDevices.size() == 0 && _defaultDevice && !main->settings()->value(Main::EXPLICIT_NO_DEVICES, false).toBool()) {
+        main->settings()->setValue(Main::DEVICE_INDEX0, _defaultDevice ? _defaultDevice->indexes.deviceIndex : -1);
+        _defaultDevice->indexes.displayIndex = 0;
         addActiveDevice(_defaultDevice);
     }
+}
+
+DeviceInfoContainer* AudioEngine::getDevice(int deviceIndex) {
+    for (auto dev : _devices)
+        if (dev->indexes.deviceIndex == deviceIndex)
+            return dev;
+
+    return nullptr;
 }
 
 void AudioEngine::registerAudio(AudioObject *obj) {

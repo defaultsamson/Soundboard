@@ -78,31 +78,31 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
-        <widget class="QGroupBox" name="groupBoxDevice1">
+        <widget class="QGroupBox" name="groupBoxDevice0">
          <property name="title">
           <string>Output Device 1</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
-           <widget class="QComboBox" name="comboBoxDriver1"/>
+           <widget class="QComboBox" name="comboBoxDriver0"/>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBoxOutputDevice1"/>
+           <widget class="QComboBox" name="comboBoxOutputDevice0"/>
           </item>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBoxDevice2">
+        <widget class="QGroupBox" name="groupBoxDevice1">
          <property name="title">
           <string>Output Device 2</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QComboBox" name="comboBoxDriver2"/>
+           <widget class="QComboBox" name="comboBoxDriver1"/>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBoxOutputDevice2"/>
+           <widget class="QComboBox" name="comboBoxOutputDevice1"/>
           </item>
          </layout>
         </widget>
