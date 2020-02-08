@@ -24,7 +24,7 @@ DeviceInfoContainer *AudioEngine::defaultDevice() {
 void AudioEngine::addActiveHost(HostInfoContainer *host) {
      _activeHosts.append(host);
 }
-void AudioEngine::removeActiveHost(HostInfoContainer *host) {
+void AudioEngine::removeActiveHost(HostInfoContainer* host) {
      _activeHosts.removeOne(host);
 }
 const QList<HostInfoContainer*> AudioEngine::activeHosts() {
@@ -65,6 +65,9 @@ void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
     err = Pa_StartStream(device->stream);
     if (err != paNoError) qDebug() << "Error starting stream";
     // else qDebug() << "Stream started successfully!";
+}
+void AudioEngine::removeActiveDevice(DeviceInfoContainer* dev) {
+    _activeDevices.removeOne(dev);
 }
 const QList<DeviceInfoContainer*> AudioEngine::activeDevices() {
     return _activeDevices;

@@ -79,9 +79,15 @@ void DialogSettings::host1Changed(int index)
 
 void DialogSettings::device1Changed(int index)
 {
+    
+    
     QVariant qvar = ui->comboBoxOutputDevice1->itemData(index);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
-    main->audio()->addActiveDevice(qvar.value<DeviceInfoContainer*>());
+    DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
+    if (main->audio()->activeDevices().contains(dev)) return; // If it's already active, ignore
+    DeviceInfoContainer* prev = ui->comboBoxOutputDevice1->itemData(0).value<DeviceInfoContainer*>();
+    main->audio()->removeActiveDevice(prev);
+    main->audio()->addActiveDevice(dev);
     // If the host has been changed, update it too
     if (_displayHost) {
         main->audio()->addActiveHost(_displayHost);
@@ -167,10 +173,12 @@ void DialogSettings::refreshDeviceSelection() {
         devices->setEnabled(true);
 
         HostInfoContainer *displayHost = nullptr;
+        bool notActiveDriver = false;
 
         // First add a single active device
         for (DeviceInfoContainer* dev : a->activeDevices()) {
-            if (!displayedDevices.contains(dev)) {
+            // If the active device is part of the displayed host (and if there is infact a display host)
+            if (!displayedDevices.contains(dev) && !(_displayHost && _displayHost != dev->host)) {
                 displayedDevices.append(dev);
 
                 drivers->addItem(dev->host->name, QVariant::fromValue(dev->host));
@@ -180,6 +188,15 @@ void DialogSettings::refreshDeviceSelection() {
 
                 break; // Break so it only adds 1 as the active
             }
+        }
+
+        // If there were no active devices in the current display host,
+        // and there is infact a current display host, then add it, it
+        // wasn't added by the active device loop
+        if (!displayHost && _displayHost) {
+            displayHost = _displayHost;
+            notActiveDriver = true;
+            drivers->addItem(displayHost->name, QVariant::fromValue(displayHost));
         }
 
         if (!displayHost) {
@@ -194,6 +211,14 @@ void DialogSettings::refreshDeviceSelection() {
             for (HostInfoContainer* host : a->hosts()) {
                 if (host != displayHost) drivers->addItem(host->name, QVariant::fromValue(host));
             }
+
+            if (notActiveDriver)
+                devices->addItem("Select device...", QVariant(QVariant::Invalid));
+
+            // Then add the default device
+            if (a->defaultDevice() && !displayedDevices.contains(a->defaultDevice()) && displayHost == a->defaultDevice()->host)
+                devices->addItem(a->defaultDevice()->info->name, QVariant::fromValue(a->defaultDevice()));
+
             // Then add other devices
             for (DeviceInfoContainer* dev : a->devices()) {
                 if (!displayedDevices.contains(dev) && displayHost == dev->host) {
