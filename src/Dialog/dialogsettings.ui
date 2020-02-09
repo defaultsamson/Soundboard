@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -113,7 +113,7 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>0</y>
+               <y>-354</y>
                <width>462</width>
                <height>672</height>
               </rect>
@@ -657,6 +657,9 @@
                           <property name="placeholderText">
                            <string>Please choose a file...</string>
                           </property>
+                          <property name="clearButtonEnabled">
+                           <bool>true</bool>
+                          </property>
                          </widget>
                         </item>
                         <item>
@@ -713,15 +716,71 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="pushButtonOutput">
+                    <widget class="QPushButton" name="pushButtonPlay">
                      <property name="maximumSize">
                       <size>
-                       <width>60</width>
+                       <width>40</width>
                        <height>20</height>
                       </size>
                      </property>
                      <property name="text">
-                      <string>Test</string>
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="../../res.qrc">
+                       <normaloff>:/icons/res/play.png</normaloff>:/icons/res/play.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButtonPause">
+                     <property name="maximumSize">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="../../res.qrc">
+                       <normaloff>:/icons/res/pause.png</normaloff>:/icons/res/pause.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButtonStop">
+                     <property name="maximumSize">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="../../res.qrc">
+                       <normaloff>:/icons/res/stop.png</normaloff>:/icons/res/stop.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -990,6 +1049,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../res.qrc"/>
+ </resources>
  <connections/>
 </ui>

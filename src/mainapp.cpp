@@ -7,6 +7,7 @@
 #include "Dialog/dialogboard.h"
 #include "Dialog/dialogsound.h"
 #include "Dialog/dialogsettings.h"
+#include "Dialog/dialogtestaudio.h"
 
 #include <QApplication>
 #include <QDesktopServices>
@@ -43,14 +44,14 @@ void MyThread::run()
     }
 
     main.audio()->init();
-    if (main.getSettingsDialog()) main.getSettingsDialog()->refreshDeviceSelection();
+    if (main.getAudioTestDialog()) main.getAudioTestDialog()->audioEngineInit();
 }
 
-void Main::setSettingsDialog(DialogSettings *s) {
-    _settingsDialog = s;
+void Main::setAudioTestDialog(DialogTestAudio *s) {
+    _audioTestDialog = s;
 }
-DialogSettings *Main::getSettingsDialog() {
-    return _settingsDialog;
+DialogTestAudio *Main::getAudioTestDialog() {
+    return _audioTestDialog;
 }
 
 int main(int argc, char *argv[])

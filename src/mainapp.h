@@ -11,6 +11,7 @@
 
 #include "Audio/audioengine.h"
 #include "Dialog/dialogsettings.h"
+#include "Dialog/dialogtestaudio.h"
 #include "Widget/listitem.h"
 #include "Widget/listitemboard.h"
 #include "Widget/listitemsound.h"
@@ -61,9 +62,9 @@ public:
     QSettings *settings();
     AudioEngine *audio();
 
-    // This is only used while initializing the AudioEngine
-    void setSettingsDialog(DialogSettings *);
-    DialogSettings *getSettingsDialog();
+    // This is only used while initializing the AudioEngine, makes the audio player work better
+    void setAudioTestDialog(DialogTestAudio *);
+    DialogTestAudio *getAudioTestDialog();
 
     void setChanged(bool changed = true);
 
@@ -115,7 +116,7 @@ private:
     QSettings *_settings;
     bool _changed = false;
 
-    DialogSettings *_settingsDialog = nullptr;
+    DialogTestAudio *_audioTestDialog = nullptr;
 
     QPalette darkPalette;
     QPalette defaultPalette;

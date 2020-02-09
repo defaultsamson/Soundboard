@@ -25,6 +25,8 @@ public:
     bool isPaused();
     bool isStopped();
 
+    bool hasFile();
+
 private:
     SndfileHandle *file = nullptr;
     bool paused = false;

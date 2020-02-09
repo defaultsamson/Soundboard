@@ -3,6 +3,7 @@
 #include "../mainapp.h"
 #include "../Audio/audioengine.h"
 #include "../Audio/audioobject.h"
+#include "dialogtestaudio.h"
 
 #include <QBuffer>
 #include <QObject>
@@ -16,7 +17,7 @@ Q_DECLARE_METATYPE(HostInfoContainer*)
 Q_DECLARE_METATYPE(DeviceInfoContainer*)
 
 DialogSettings::DialogSettings(Main *main) :
-    QDialog(main),
+    DialogTestAudio(main),
     ui(new Ui::DialogSettings),
     main(main)
 {
@@ -42,7 +43,7 @@ DialogSettings::DialogSettings(Main *main) :
         ui->outputBar->setLevel(level);
     });
 
-    main->setSettingsDialog(this);
+    main->setAudioTestDialog(this);
 }
 
 DialogSettings::~DialogSettings()
@@ -52,7 +53,7 @@ DialogSettings::~DialogSettings()
 
 void DialogSettings::handleClose() {
     main->audio()->unregisterAudio(&audio);
-    main->setSettingsDialog(nullptr);
+    main->setAudioTestDialog(nullptr);
 }
 
 void DialogSettings::on_buttonBox_accepted()
@@ -100,12 +101,6 @@ void DialogSettings::device1Changed(int index)
     deviceChanged(ui->comboBoxOutputDevice1, index, 1, &_displayHost1);
 }
 
-void DialogSettings::on_pushButtonOutput_clicked()
-{
-    audio.stop();
-    audio.play();
-}
-
 void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost)
 {
     QVariant qvar = selector->itemData(selectorIndex);
@@ -147,6 +142,10 @@ void DialogSettings::on_pushButtonRefresh_clicked() {
     refreshDeviceSelection();
 }
 
+void DialogSettings::audioEngineInit() {
+    refreshDeviceSelection();
+}
+
 void DialogSettings::refreshDeviceSelection() {
     // TODO get all the default info from the AudioEngine
     QComboBox *driverBox = ui->comboBoxDriver0;
@@ -164,7 +163,9 @@ void DialogSettings::refreshDeviceSelection() {
     ui->comboBoxDriver1->setEnabled(inited);
     ui->comboBoxOutputDevice1->clear();
     ui->comboBoxOutputDevice1->setEnabled(inited);
-    ui->pushButtonOutput->setEnabled(inited);
+    ui->pushButtonPlay->setEnabled(inited && a->activeDevices().size() > 0);
+    ui->pushButtonPause->setEnabled(inited && a->activeDevices().size() > 0);
+    ui->pushButtonStop->setEnabled(inited && a->activeDevices().size() > 0);
     ui->pushButtonRefresh->setEnabled(inited);
     ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
     ui->groupBoxDevice1->setTitle(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
@@ -280,4 +281,19 @@ void DialogSettings::on_tabWidget_currentChanged(int index)
 void DialogSettings::closeEvent(QCloseEvent *bar) {
     handleClose();
     bar->accept();
+}
+
+void DialogSettings::on_pushButtonPlay_clicked()
+{
+    audio.play();
+}
+
+void DialogSettings::on_pushButtonPause_clicked()
+{
+    audio.pause();
+}
+
+void DialogSettings::on_pushButtonStop_clicked()
+{
+    audio.stop();
 }

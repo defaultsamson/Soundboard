@@ -46,6 +46,7 @@ HEADERS += \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
+    src/Dialog/dialogtestaudio.h \
     src/Widget/listitemboard.h \
     src/Widget/listitemsound.h \
     src/Widget/widgetkeybind.h \

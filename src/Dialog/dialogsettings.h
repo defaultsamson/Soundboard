@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include "../Audio/audioobject.h"
 #include "../Audio/audioengine.h"
+#include "dialogtestaudio.h"
 
 #include <portaudio.h>
 
@@ -21,7 +22,7 @@ struct AudioDisplayContainer {
     int deviceDisplayIndex;
 };
 
-class DialogSettings : public QDialog
+class DialogSettings : public DialogTestAudio
 {
     Q_OBJECT
 
@@ -32,11 +33,11 @@ public:
     void refreshDeviceSelection();
     void changeHost();
     void changeDevice();
+    void audioEngineInit();
 
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
-    void on_pushButtonOutput_clicked();
     void host0Changed(int index);
     void device0Changed(int index);
     void host1Changed(int index);
@@ -44,6 +45,9 @@ private slots:
     void on_checkBoxDarkTheme_stateChanged(int arg1);
     void on_pushButtonRefresh_clicked();
     void on_tabWidget_currentChanged(int index);
+    void on_pushButtonPlay_clicked();
+    void on_pushButtonPause_clicked();
+    void on_pushButtonStop_clicked();
 
 private:
     Ui::DialogSettings *ui;

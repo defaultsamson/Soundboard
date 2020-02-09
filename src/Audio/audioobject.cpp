@@ -6,8 +6,6 @@
 #include <sndfile.hh>
 #include "audioengine.h"
 
-#include <iostream>
-
 AudioObject::AudioObject()
 {
 
@@ -23,7 +21,7 @@ bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
     if (!file) return;
-    std::cout << "Stopping" << std::endl;
+    // std::cout << "Stopping" << std::endl;
     paused = false;
     stopped = true;
     readStop = false;
@@ -116,6 +114,10 @@ void AudioObject::setFile(const QString &filename) {
     std::cout << "Sample rate:       " << file->samplerate() << std::endl;
     std::cout << "Channels:          " << file->channels() << std::endl;
     */
+}
+
+bool AudioObject::hasFile() {
+    return file;
 }
 
 void AudioObject::setVolume(const float volume) {
