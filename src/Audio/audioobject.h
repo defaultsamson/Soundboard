@@ -40,6 +40,8 @@ private:
     size_t sideBufferWrite = 0;
     size_t sideBufferRead = 0;
     std::mutex safeRead;
+    bool readStop = false;
+    size_t readLoopsAhead = 0;
 };
 
 #endif // AUDIOOBJECT_H
