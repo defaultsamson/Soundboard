@@ -19,8 +19,8 @@ DialogSound::DialogSound(Main *main, ListItemSound *sound, bool creatingNew) :
     ui->lineEditName->setText(creatingNew ? "" : sound->text());
     if (sound->hasKey()) ui->lineEdiKeybind->setKey(sound->key());
     ui->lineEditFile->setText(sound->filename());
-    ui->sliderVolume->setValue(sound->volume());
     ui->spinBoxVolume->setValue(sound->volume());
+    ui->sliderVolume->setValue(sound->volume());
 
     originalFileName = sound->filename();
     originalVolume = sound->volume();
@@ -51,7 +51,7 @@ void DialogSound::on_buttonBox_accepted()
     if (ui->lineEdiKeybind->hasKey()) sound->setKey(ui->lineEdiKeybind->key());
     else sound->unSetKey();
     sound->setFileName(ui->lineEditFile->text());
-    sound->setVolume(ui->sliderVolume->value());
+    sound->setVolume(ui->spinBoxVolume->value());
 
     // If anything's ACTUALLY changed, then tell the program
     if (creatingNew
@@ -73,8 +73,11 @@ void DialogSound::on_buttonBox_rejected()
 
 void DialogSound::on_sliderVolume_valueChanged(int value)
 {
-    ui->spinBoxVolume->setValue(value);
-    sound->setVolume(value);
+    // Allow users to edit the number in the box past what the slider goes to
+    if (!(value == ui->sliderVolume->maximum() && ui->spinBoxVolume->value() > value)) {
+        ui->spinBoxVolume->setValue(value);
+        sound->setVolume(value);
+    }
 }
 
 void DialogSound::on_spinBoxVolume_valueChanged(int value)

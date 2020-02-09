@@ -139,7 +139,7 @@
       <item>
        <widget class="QSlider" name="sliderVolume">
         <property name="maximum">
-         <number>100</number>
+         <number>200</number>
         </property>
         <property name="value">
          <number>100</number>
@@ -171,7 +171,7 @@
       <item>
        <widget class="QSpinBox" name="spinBoxVolume">
         <property name="maximum">
-         <number>100</number>
+         <number>10000</number>
         </property>
         <property name="value">
          <number>100</number>
