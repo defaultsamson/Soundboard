@@ -53,7 +53,7 @@ private:
     HostInfoContainer *_displayHost1 = nullptr;
     void closeEvent(QCloseEvent *bar);
     void handleClose();
-    void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer *displayHost);
+    void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer **displayHost);
 };
 
 #endif // DIALOGSETTINGS_H

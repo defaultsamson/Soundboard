@@ -81,7 +81,7 @@ void DialogSettings::host0Changed(int index)
 
 void DialogSettings::device0Changed(int index)
 {
-    deviceChanged(ui->comboBoxOutputDevice0, index, 0, _displayHost0);
+    deviceChanged(ui->comboBoxOutputDevice0, index, 0, &_displayHost0);
 }
 
 void DialogSettings::host1Changed(int index)
@@ -97,7 +97,7 @@ void DialogSettings::host1Changed(int index)
 
 void DialogSettings::device1Changed(int index)
 {
-    deviceChanged(ui->comboBoxOutputDevice1, index, 1, _displayHost1);
+    deviceChanged(ui->comboBoxOutputDevice1, index, 1, &_displayHost1);
 }
 
 void DialogSettings::on_pushButtonOutput_clicked()
@@ -106,7 +106,7 @@ void DialogSettings::on_pushButtonOutput_clicked()
     audio.play();
 }
 
-void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer* /*displayHost*/)
+void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost)
 {
     QVariant qvar = selector->itemData(selectorIndex);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
@@ -121,9 +121,7 @@ void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int d
     main->audio()->removeActiveDevice(deviceDisplayIndex);
     main->audio()->addActiveDevice(dev);
 
-    // USINGHACK displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    _displayHost0 = nullptr; // HACK
-    _displayHost1 = nullptr; // HACK
+    *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     refreshDeviceSelection();
 
     switch (deviceDisplayIndex) {
@@ -238,14 +236,31 @@ void DialogSettings::refreshDeviceSelection() {
             devices->addItem("NONE", QVariant::fromValue(nullptr));
 
             // Then add the default device
-            if (a->defaultDevice() && !displayedDevices.contains(a->defaultDevice()) && displayHost == a->defaultDevice()->host)
-                devices->addItem(a->defaultDevice()->info->name, QVariant::fromValue(a->defaultDevice()));
+            if (a->defaultDevice() && !displayedDevices.contains(a->defaultDevice()) && displayHost == a->defaultDevice()->host) {
+                // If the device is active
+                if (a->activeDevices().contains(a->defaultDevice())) {
+                    // Make sure it's not being displayed by another device display
+                    if (display.deviceDisplayIndex == a->defaultDevice()->indexes.displayIndex) {
+                        devices->addItem(a->defaultDevice()->info->name, QVariant::fromValue(a->defaultDevice()));
+                    }
+                } else {
+                    devices->addItem(a->defaultDevice()->info->name, QVariant::fromValue(a->defaultDevice()));
+                }
+            }
 
             // Then add other devices
             for (DeviceInfoContainer* dev : a->devices()) {
                 // If it's not already being displayed, it's not the default (because we just added it), and it's under this host
                 if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != a->defaultDevice()) {
-                    devices->addItem(dev->info->name, QVariant::fromValue(dev));
+                    // If the device is active
+                    if (a->activeDevices().contains(dev)) {
+                        // Make sure it's not being displayed by another device display
+                        if (display.deviceDisplayIndex == dev->indexes.displayIndex) {
+                            devices->addItem(dev->info->name, QVariant::fromValue(dev));
+                        }
+                    } else {
+                        devices->addItem(dev->info->name, QVariant::fromValue(dev));
+                    }
                 }
             }
         }
