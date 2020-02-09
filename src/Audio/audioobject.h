@@ -25,15 +25,19 @@ public:
     bool isStopped();
 
 private:
-    SndfileHandle *file0 = nullptr;
-    SndfileHandle *file1 = nullptr;
+    SndfileHandle *file = nullptr;
     bool paused = false;
     bool stopped = true;
     float _volume = 1; // 0.0 - 1.0
     float *sideBuffer = nullptr;
-    sf_count_t bufferRead;
-    const size_t SIDE_BUFFER_MULTIPLIER = 2;
-    size_t sideBufferScan = 0;
+    size_t bufferRead = 0;
+    // Sometimes there are 4 or possibly more reads and writes done consecutively.
+    // When that happens, we need to make sure that there's enough of a buffer for
+    // all of those consecutive reads, and fresh space for all the new writes.
+    // When writing to the audio buffer
+    const size_t SIDE_BUFFER_MULTIPLIER = 64;
+    size_t sideBufferWrite = 0;
+    size_t sideBufferRead = 0;
 };
 
 #endif // AUDIOOBJECT_H

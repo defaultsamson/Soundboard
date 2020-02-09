@@ -102,11 +102,8 @@ void DialogSettings::device1Changed(int index)
 
 void DialogSettings::on_pushButtonOutput_clicked()
 {
-    if (audio.isPlaying()) {
-        audio.pause();
-    } else {
-        audio.play();
-    }
+    audio.stop();
+    audio.play();
 }
 
 void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer* /*displayHost*/)
