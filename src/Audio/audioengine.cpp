@@ -193,7 +193,7 @@ void AudioEngine::unregisterAudio(AudioObject *obj) {
 }
 
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
-void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex) {
+void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex, bool singleDevice) {
 
     size_t frames = framesPerBuffer * CHANNELS;
 
@@ -201,7 +201,7 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex
     memset(buffer, 0, frames * sizeof(float));
 
     for (AudioObject *audio : _audioObjectRegistry) {
-        audio->mix(buffer, framesPerBuffer, deviceListIndex);
+        audio->mix(buffer, framesPerBuffer, deviceListIndex, singleDevice);
     }
 
     // Update with the greatest level
@@ -222,7 +222,7 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
 
     float *out = static_cast<float*>(outputBuffer);
     CallbackInfo *info = static_cast<CallbackInfo*>(userData);
-    info->audio->mix(out, framesPerBuffer, info->device->indexes.deviceListIndex);
+    info->audio->mix(out, framesPerBuffer, info->device->indexes.deviceListIndex, info->audio->activeDevices().size() == 1);
     return paContinue;
 
     /*

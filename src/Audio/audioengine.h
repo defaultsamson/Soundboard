@@ -79,7 +79,7 @@ public:
                             PaStreamCallbackFlags statusFlags,
                             void *userData);
 
-    void mix(float* buffer, size_t frames, int deviceListIndex);
+    void mix(float* buffer, size_t frames, int deviceListIndex, bool singleDevice);
 
     void registerAudio(AudioObject *);
     void unregisterAudio(AudioObject *);

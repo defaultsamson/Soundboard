@@ -6,6 +6,8 @@
 #include <sndfile.hh>
 #include "audioengine.h"
 
+#include <iostream>
+
 AudioObject::AudioObject()
 {
 
@@ -21,7 +23,7 @@ bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
     if (!file) return;
-    // std::cout << "Stopping" << std::endl;
+    std::cout << "Stopping" << std::endl;
     paused = false;
     stopped = true;
     readStop = false;
@@ -51,7 +53,7 @@ void AudioObject::play() {
     }
 }
 
-void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListIndex) {
+void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListIndex, bool singleDevice) {
     if (!file) return; // If there's no file
     // If it's paused or stopped
     if (paused || stopped) return;
@@ -72,15 +74,16 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListI
         for (size_t i = 0; i < read; i++){
             buffer[i] += mixBuffer[i] * _volume;
         }
-        memcpy(sideBuffer + start, buffer, read * sizeof(float));
+        if (!singleDevice) memcpy(sideBuffer + start, buffer, read * sizeof(float));
         if (sideBufferWrite++ >= SIDE_BUFFER_MULTIPLIER) {
-            readLoopsAhead++;
+            if (!singleDevice) readLoopsAhead++;
             sideBufferWrite = 0;
         }
 
         // Ran out of things to read, the file stream is over
         if (read == 0 || read < frames) {
-            readStop = true;
+            if (singleDevice) stop();
+            else readStop = true;
         }
     } else {
         size_t start = frames * sideBufferRead;

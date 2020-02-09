@@ -19,7 +19,7 @@ public:
     void stop();
     void pause();
 
-    void mix(float* buffer, size_t framesPerBuffer, int deviceListIndex);
+    void mix(float* buffer, size_t framesPerBuffer, int deviceListIndex, bool singleDevice);
 
     bool isPlaying();
     bool isPaused();
