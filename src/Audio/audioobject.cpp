@@ -4,10 +4,16 @@
 
 #include <portaudio.h>
 #include <sndfile.hh>
+#include "audioengine.h"
 
 AudioObject::AudioObject()
 {
 
+}
+AudioObject::~AudioObject() {
+    free(sideBuffer);
+    delete file0;
+    delete file1;
 }
 
 bool AudioObject::isPlaying() { return !isPaused() && !isStopped(); }
@@ -15,21 +21,19 @@ bool AudioObject::isPaused() { return paused; }
 bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
-    if (!file) return;
     // std::cout << "Stopping" << std::endl;
     paused = false;
     stopped = true;
 }
 
 void AudioObject::pause() {
-    if (!file || stopped) return;
     // std::cout << "Pausing" << std::endl;
     paused = true;
     stopped = false;
 }
 
 void AudioObject::play() {
-    if (!file) return;
+    if (!(file0 && file1)) return;
     // std::cout << "Playing" << std::endl;
     if (paused) {
         // Resume
@@ -37,23 +41,27 @@ void AudioObject::play() {
     } else if (stopped) {
         // Play from beginning of file
         stopped = false;
-        file->seek(0, SEEK_SET);
+        file0->seek(0, SEEK_SET);
+        file1->seek(0, SEEK_SET);
     }
 }
 
-void AudioObject::mix(float* buffer, size_t framesPerBuffer) {
-    if (!file || paused || stopped) return;
-    size_t channels = 2; // TODO
+void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListIndex) {
+    if (!file0 || paused || stopped) return;
 
-    size_t frames = framesPerBuffer * channels;
+    size_t frames = AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
+
+    SndfileHandle *file = deviceListIndex == 0 ? file0 : file1;
 
     float *mixBuffer = static_cast<float*>(malloc(frames * sizeof(float)));
     sf_count_t read = file->read(mixBuffer, static_cast<sf_count_t>(frames));
+    bufferRead = read;
 
-    for (int i = 0; i < read; i += channels) {
-        buffer[i] += mixBuffer[i] * _volume; // Left
-        buffer[i + 1] += mixBuffer[i + 1] * _volume; // Right
+    for (int i = 0; i < read; i ++){
+        buffer[i] += mixBuffer[i] * _volume;
     }
+    sideBufferScan++;
+    if (sideBufferScan >= SIDE_BUFFER_MULTIPLIER) sideBufferScan = 0;
 
     free(mixBuffer);
 
@@ -65,10 +73,14 @@ void AudioObject::mix(float* buffer, size_t framesPerBuffer) {
 
 void AudioObject::setFile(const QString &filename) {
     stop();
-    if (file) delete file;
+    if (file0) delete file0;
+    if (file1) delete file1;
     paused = false;
     stopped = true;
-    file = new SndfileHandle(filename.toStdString());
+    sideBuffer = static_cast<float*>(malloc(SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(float)));
+    sideBufferScan = 0;
+    file0 = new SndfileHandle(filename.toStdString());
+    file1 = new SndfileHandle(filename.toStdString());
     /*
     std::cout << "Initializing File: " << filename.toStdString() << std::endl;
     std::cout << "Sample rate:       " << file->samplerate() << std::endl;

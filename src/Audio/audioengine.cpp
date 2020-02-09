@@ -6,8 +6,8 @@
 
 // TODO allow the user to change these
 #define SAMPLE_RATE (44100)
-#define FRAMES_PER_BUFFER 256
-#define CHANNELS 2
+size_t AudioEngine::FRAMES_PER_BUFFER = 256;
+size_t AudioEngine::CHANNELS = 2;
 
 AudioEngine::AudioEngine(Main *main) : main(main) {
 }
@@ -24,18 +24,19 @@ DeviceInfoContainer *AudioEngine::defaultDevice() {
 
 void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
     if (_activeDevices.contains(device) || !device) return;
+    device->indexes.deviceListIndex = _activeDevices.size();
     _activeDevices.append(device);
     _selectedDeviceIndexes.append(device->indexes);
 
     Pa_CloseStream(device->stream);
     device->stream = nullptr;
-    int channels = CHANNELS <= device->info->maxOutputChannels ? CHANNELS : device->info->maxOutputChannels;
+    // size_t channels = CHANNELS <= device->info->maxOutputChannels ? CHANNELS : device->info->maxOutputChannels;
 
     PaError err;
     PaStreamParameters outputParameters;
     // bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
     outputParameters.device = device->indexes.deviceIndex;
-    outputParameters.channelCount = channels; // device.info->maxOutputChannels;
+    outputParameters.channelCount = CHANNELS; // device.info->maxOutputChannels;
     outputParameters.sampleFormat = paFloat32;
     outputParameters.suggestedLatency = device->info->defaultLowOutputLatency ;
     outputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
@@ -48,7 +49,7 @@ void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
                     FRAMES_PER_BUFFER,
                     paNoFlag, //flags that can be used to define dither, clip settings and more
                     &AudioEngine::readCallback, //your callback function
-                    (void *) this); //data to be passed to callback. In C++, it is frequently (void *)this
+                    static_cast<CallbackInfo*>(new CallbackInfo{this, device})); //data to be passed to callback. In C++, it is frequently (void *)this
     //don't forget to check errors!
     if (err != paNoError) qDebug() << "Error opening stream";
     // else qDebug() << "Stream opened successfully!";
@@ -60,11 +61,18 @@ void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
 void AudioEngine::removeActiveDevice(DeviceInfoContainer* device) {
     Pa_CloseStream(device->stream);
     device->indexes.displayIndex = -1;
-    // Remove its info so upon reaload or refresh it doesn't select it again
-    for (int i = 0; i < _selectedDeviceIndexes.size(); i++)
-        if (_selectedDeviceIndexes.at(i).deviceIndex == device->indexes.deviceIndex)
+    // Remove its info so upon reaload or refresh it doesn't select the device again
+    for (int i = 0; i < _selectedDeviceIndexes.size(); i++) {
+        if (_selectedDeviceIndexes.at(i).deviceIndex == device->indexes.deviceIndex) {
             _selectedDeviceIndexes.removeAt(i);
+            break;
+        }
+    }
     _activeDevices.removeOne(device);
+    // Updates the deviceListIndex data
+    for (int i = 0; i < _activeDevices.size(); i++) {
+        _activeDevices.at(i)->indexes.deviceListIndex = i;
+    }
 }
 void AudioEngine::removeActiveDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
     for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) removeActiveDevice(dev);
@@ -111,7 +119,7 @@ void AudioEngine::refreshDevices() {
         if (device->maxOutputChannels == 0) { // isInput
             qDebug() << "Ignoring input channel... [" << i << "]";
         } else {
-            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1}};
+            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}};
             _devices.append(dev);
             if (Pa_GetDefaultOutputDevice() == i) {
                 _defaultDevice = dev;
@@ -185,7 +193,7 @@ void AudioEngine::unregisterAudio(AudioObject *obj) {
 }
 
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
-void AudioEngine::mix(float* buffer, size_t framesPerBuffer) {
+void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex) {
 
     size_t frames = framesPerBuffer * CHANNELS;
 
@@ -193,7 +201,7 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer) {
     memset(buffer, 0, frames * sizeof(float));
 
     for (AudioObject *audio : _audioObjectRegistry) {
-        audio->mix(buffer, framesPerBuffer);
+        audio->mix(buffer, framesPerBuffer, deviceListIndex);
     }
 
     // Update with the greatest level
@@ -213,8 +221,8 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
                               void *userData) {
 
     float *out = static_cast<float*>(outputBuffer);
-    AudioEngine *audio = static_cast<AudioEngine*>(userData);
-    audio->mix(out, framesPerBuffer);
+    CallbackInfo *info = static_cast<CallbackInfo*>(userData);
+    info->audio->mix(out, framesPerBuffer, info->device->indexes.deviceListIndex);
     return paContinue;
 
     /*

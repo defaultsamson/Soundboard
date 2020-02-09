@@ -206,7 +206,6 @@ void DialogSettings::refreshDeviceSelection() {
                     drivers->addItem(dev->host->name, QVariant::fromValue(dev->host));
                     devices->addItem(dev->info->name, QVariant::fromValue(dev));
 
-                    qDebug() << "Setting: From active device";
                     displayHost = dev->host;
                 }
 

@@ -32,7 +32,7 @@ protected:
     void run();
 private:
     Main &main;
-};
+};        
 
 void MyThread::run()
 {

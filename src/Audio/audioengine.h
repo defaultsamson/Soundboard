@@ -9,18 +9,27 @@
 
 #include <portaudio.h>
 
+// Forward declarations
 struct HostInfoContainer;
+struct DeviceInfoContainer;
+class AudioEngine;
+
+struct CallbackInfo {
+    AudioEngine *audio;
+    DeviceInfoContainer *device;
+};
 
 struct DeviceIndexInfo {
     PaDeviceIndex deviceIndex;
     int displayIndex;
+    int deviceListIndex;
 };
 
 struct DeviceInfoContainer {
     HostInfoContainer *host;
     const PaDeviceInfo *info;
     PaStream *stream;
-    int channels;
+    size_t channels;
     DeviceIndexInfo indexes;
 };
 
@@ -45,6 +54,9 @@ class AudioEngine : public QObject
 public:
     AudioEngine(Main *main);
 
+    static size_t FRAMES_PER_BUFFER;
+    static size_t CHANNELS;
+
     HostInfoContainer *defaultHost();
     DeviceInfoContainer *defaultDevice();
 
@@ -67,7 +79,7 @@ public:
                             PaStreamCallbackFlags statusFlags,
                             void *userData);
 
-    void mix(float* buffer, size_t frames);
+    void mix(float* buffer, size_t frames, int deviceListIndex);
 
     void registerAudio(AudioObject *);
     void unregisterAudio(AudioObject *);
