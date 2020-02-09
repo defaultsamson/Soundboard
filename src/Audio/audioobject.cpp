@@ -6,8 +6,6 @@
 #include <sndfile.hh>
 #include "audioengine.h"
 
-#include <iostream>
-
 AudioObject::AudioObject()
 {
 
@@ -26,6 +24,10 @@ void AudioObject::stop() {
     // std::cout << "Stopping" << std::endl;
     paused = false;
     stopped = true;
+    // We can never seek whilst reading
+    safeRead.lock();
+    file->seek(0, SEEK_SET);
+    safeRead.unlock();
 }
 
 void AudioObject::pause() {
@@ -44,7 +46,7 @@ void AudioObject::play() {
     } else if (stopped) {
         // Play from beginning of file
         stopped = false;
-        file->seek(0, SEEK_SET);
+        // std::cout << "Playing" << std::endl;
     }
 }
 
@@ -59,7 +61,9 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListI
     if (deviceListIndex == 0) {
         float mixBuffer[frames * sizeof(float)];
 
+        safeRead.lock();
         size_t read = static_cast<size_t>(file->read(mixBuffer, static_cast<sf_count_t>(frames)));
+        safeRead.unlock();
         bufferRead = read;
 
         size_t start = frames * sideBufferWrite;

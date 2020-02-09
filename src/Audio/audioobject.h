@@ -5,6 +5,7 @@
 
 #include <portaudio.h>
 #include <sndfile.hh>
+#include <mutex>
 
 class AudioObject
 {
@@ -38,6 +39,7 @@ private:
     const size_t SIDE_BUFFER_MULTIPLIER = 64;
     size_t sideBufferWrite = 0;
     size_t sideBufferRead = 0;
+    std::mutex safeRead;
 };
 
 #endif // AUDIOOBJECT_H
