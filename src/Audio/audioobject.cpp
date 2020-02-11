@@ -12,6 +12,7 @@ AudioObject::AudioObject()
 }
 AudioObject::~AudioObject() {
     delete [] sideBuffer;
+    delete [] bufferRead;
     delete file;
 }
 
@@ -51,13 +52,14 @@ void AudioObject::play() {
     }
 }
 
-void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListIndex, bool singleDevice) {
+void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListIndex, float deviceVolume, bool singleDevice) {
     if (!file) return; // If there's no file
     // If it's paused or stopped
     if (paused || stopped) return;
     if (readStop && deviceListIndex == 0) return;
 
     size_t frames = AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
+    float finalVolume = _volume * deviceVolume;
 
     // If it's the first device, then load up the sideBuffer
     if (deviceListIndex == 0) {
@@ -66,13 +68,13 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListI
         safeRead.lock();
         size_t read = static_cast<size_t>(file->read(mixBuffer, static_cast<sf_count_t>(frames)));
         safeRead.unlock();
-        bufferRead = read;
+        bufferRead[sideBufferWrite] = read;
 
         size_t start = frames * sideBufferWrite;
-        for (size_t i = 0; i < read; i++){
-            buffer[i] += mixBuffer[i] * _volume;
-        }
         if (!singleDevice) memcpy(sideBuffer + start, buffer, read * sizeof(float));
+        for (size_t i = 0; i < read; i++){
+            buffer[i] += mixBuffer[i] * finalVolume;
+        }
         if (sideBufferWrite++ >= SIDE_BUFFER_MULTIPLIER) {
             if (!singleDevice) readLoopsAhead++;
             sideBufferWrite = 0;
@@ -85,8 +87,11 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListI
         }
     } else {
         size_t start = frames * sideBufferRead;
-        memcpy(buffer, sideBuffer + start, bufferRead * sizeof (float));
-        memset(sideBuffer + start, 0, bufferRead * sizeof (float));
+        // memcpy(buffer, sideBuffer + start, bufferRead[sideBufferRead] * sizeof (float));
+        for (size_t i = 0; i < bufferRead[sideBufferRead]; i++){
+            buffer[i] += sideBuffer[start + i] * finalVolume;
+        }
+        // TODO? memset(sideBuffer + start, 0, bufferRead[sideBufferRead] * sizeof (float));
         if (sideBufferRead++ >= SIDE_BUFFER_MULTIPLIER) {
             sideBufferRead = 0;
             readLoopsAhead--;
@@ -103,9 +108,13 @@ void AudioObject::setFile(const QString &filename) {
     if (file) delete file;
     paused = false;
     stopped = true;
+
     sideBuffer = new float[SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(float)];
     memset(sideBuffer, 0, SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(float));
-    bufferRead = 0;
+
+    bufferRead = new size_t[SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(size_t)];
+    memset(bufferRead, 0, SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(size_t));
+
     sideBufferWrite = 0;
     sideBufferRead = 0;
     file = new SndfileHandle(filename.toStdString());

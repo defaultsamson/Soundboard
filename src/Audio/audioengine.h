@@ -31,6 +31,8 @@ struct DeviceInfoContainer {
     PaStream *stream;
     size_t channels;
     DeviceIndexInfo indexes;
+    int volumeInt;
+    float volume;
 };
 
 struct HostInfoContainer {
@@ -63,6 +65,7 @@ public:
     void addActiveDevice(DeviceInfoContainer*);
     void removeActiveDevice(DeviceInfoContainer*);
     void removeActiveDevice(int deviceDisplayIndex);
+    DeviceInfoContainer* getActiveDevice(int deviceDisplayIndex);
     const QList<DeviceInfoContainer*> activeDevices();
 
     const QList<HostInfoContainer*> hosts();
@@ -79,7 +82,7 @@ public:
                             PaStreamCallbackFlags statusFlags,
                             void *userData);
 
-    void mix(float* buffer, size_t frames, int deviceListIndex, bool singleDevice);
+    void mix(float* buffer, size_t frames, int deviceListIndex, float deviceVolume, bool singleDevice);
 
     void registerAudio(AudioObject *);
     void unregisterAudio(AudioObject *);

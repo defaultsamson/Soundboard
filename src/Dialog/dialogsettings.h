@@ -49,6 +49,15 @@ private slots:
     void on_pushButtonPause_clicked();
     void on_pushButtonStop_clicked();
 
+    void on_sliderDevice0_valueChanged(int value);
+    void on_spinBoxDevice0_valueChanged(int arg1);
+    void on_sliderDevice1_valueChanged(int value);
+    void on_spinBoxDevice1_valueChanged(int arg1);
+    void on_sliderInput_valueChanged(int value);
+    void on_spinBoxInput_valueChanged(int arg1);
+    void on_sliderTest_valueChanged(int value);
+    void on_spinBoxTest_valueChanged(int arg1);
+
 private:
     Ui::DialogSettings *ui;
     Main *main;
@@ -58,6 +67,7 @@ private:
     void closeEvent(QCloseEvent *bar);
     void handleClose();
     void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer **displayHost);
+    void setDeviceVolume(int value, int devDisplayIndex);
 };
 
 #endif // DIALOGSETTINGS_H

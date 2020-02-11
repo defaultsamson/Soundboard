@@ -297,3 +297,71 @@ void DialogSettings::on_pushButtonStop_clicked()
 {
     audio.stop();
 }
+
+void DialogSettings::setDeviceVolume(int value, int devDisplayIndex) {
+    DeviceInfoContainer* dev = main->audio()->getActiveDevice(devDisplayIndex);
+    if (dev) {
+        dev->volumeInt = value;
+        dev->volume = value / static_cast<float>(100);
+    }
+}
+
+void DialogSettings::on_sliderDevice0_valueChanged(int value)
+{
+    // Allow users to edit the number in the box past what the slider goes to
+    if (!(value == ui->sliderDevice0->maximum() && ui->spinBoxDevice0->value() > value)) {
+        ui->spinBoxDevice0->setValue(value);
+        setDeviceVolume(value, 0);
+    }
+}
+
+void DialogSettings::on_spinBoxDevice0_valueChanged(int value)
+{
+    ui->sliderDevice0->setValue(value);
+    setDeviceVolume(value, 0);
+}
+
+void DialogSettings::on_sliderDevice1_valueChanged(int value)
+{
+    // Allow users to edit the number in the box past what the slider goes to
+    if (!(value == ui->sliderDevice1->maximum() && ui->spinBoxDevice1->value() > value)) {
+        ui->spinBoxDevice1->setValue(value);
+        setDeviceVolume(value, 1);
+    }
+}
+
+void DialogSettings::on_spinBoxDevice1_valueChanged(int value)
+{
+    ui->sliderDevice1->setValue(value);
+    setDeviceVolume(value, 1);
+}
+
+void DialogSettings::on_sliderInput_valueChanged(int value)
+{
+    // Allow users to edit the number in the box past what the slider goes to
+    if (!(value == ui->sliderInput->maximum() && ui->spinBoxInput->value() > value)) {
+        ui->spinBoxInput->setValue(value);
+        setDeviceVolume(value, 2);
+    }
+}
+
+void DialogSettings::on_spinBoxInput_valueChanged(int value)
+{
+    ui->sliderInput->setValue(value);
+    setDeviceVolume(value, 3);
+}
+
+void DialogSettings::on_sliderTest_valueChanged(int value)
+{
+    // Allow users to edit the number in the box past what the slider goes to
+    if (!(value == ui->sliderTest->maximum() && ui->spinBoxTest->value() > value)) {
+        ui->spinBoxTest->setValue(value);
+        audio.setVolume(value / static_cast<float>(100));
+    }
+}
+
+void DialogSettings::on_spinBoxTest_valueChanged(int value)
+{
+    ui->sliderTest->setValue(value);
+    audio.setVolume(value / static_cast<float>(100));
+}

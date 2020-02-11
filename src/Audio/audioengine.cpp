@@ -75,7 +75,12 @@ void AudioEngine::removeActiveDevice(DeviceInfoContainer* device) {
     }
 }
 void AudioEngine::removeActiveDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
-    for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) removeActiveDevice(dev);
+    DeviceInfoContainer* dev = getDevice(deviceDisplayIndex);
+    if (dev) removeActiveDevice(dev);
+}
+DeviceInfoContainer* AudioEngine::getActiveDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+    for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) return dev;
+    return nullptr;
 }
 const QList<DeviceInfoContainer*> AudioEngine::activeDevices() {
     return _activeDevices;
@@ -119,7 +124,7 @@ void AudioEngine::refreshDevices() {
         if (device->maxOutputChannels == 0) { // isInput
             qDebug() << "Ignoring input channel... [" << i << "]";
         } else {
-            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}};
+            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}, 100, 1};
             _devices.append(dev);
             if (Pa_GetDefaultOutputDevice() == i) {
                 _defaultDevice = dev;
@@ -193,7 +198,7 @@ void AudioEngine::unregisterAudio(AudioObject *obj) {
 }
 
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
-void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex, bool singleDevice) {
+void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex, float deviceVolume, bool singleDevice) {
 
     size_t frames = framesPerBuffer * CHANNELS;
 
@@ -201,7 +206,7 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex
     memset(buffer, 0, frames * sizeof(float));
 
     for (AudioObject *audio : _audioObjectRegistry) {
-        audio->mix(buffer, framesPerBuffer, deviceListIndex, singleDevice);
+        audio->mix(buffer, framesPerBuffer, deviceListIndex, deviceVolume, singleDevice);
     }
 
     // Update with the greatest level
@@ -222,7 +227,7 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
 
     float *out = static_cast<float*>(outputBuffer);
     CallbackInfo *info = static_cast<CallbackInfo*>(userData);
-    info->audio->mix(out, framesPerBuffer, info->device->indexes.deviceListIndex, info->audio->activeDevices().size() == 1);
+    info->audio->mix(out, framesPerBuffer, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeDevices().size() == 1);
     return paContinue;
 
     /*
