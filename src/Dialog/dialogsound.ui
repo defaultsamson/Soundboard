@@ -139,7 +139,7 @@
       <item>
        <widget class="QSlider" name="sliderVolume">
         <property name="maximum">
-         <number>100</number>
+         <number>200</number>
         </property>
         <property name="value">
          <number>100</number>
@@ -171,7 +171,7 @@
       <item>
        <widget class="QSpinBox" name="spinBoxVolume">
         <property name="maximum">
-         <number>100</number>
+         <number>10000</number>
         </property>
         <property name="value">
          <number>100</number>
@@ -197,15 +197,71 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="pushButtonPlay">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>40</width>
          <height>20</height>
         </size>
        </property>
        <property name="text">
-        <string>Test</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../res.qrc">
+         <normaloff>:/icons/res/play.png</normaloff>:/icons/res/play.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonPause">
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../res.qrc">
+         <normaloff>:/icons/res/pause.png</normaloff>:/icons/res/pause.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonStop">
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../res.qrc">
+         <normaloff>:/icons/res/stop.png</normaloff>:/icons/res/stop.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -236,6 +292,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../res.qrc"/>
+ </resources>
  <connections/>
 </ui>

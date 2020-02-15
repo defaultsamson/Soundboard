@@ -46,6 +46,7 @@ HEADERS += \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
+    src/Dialog/dialogtestaudio.h \
     src/Widget/listitemboard.h \
     src/Widget/listitemsound.h \
     src/Widget/widgetkeybind.h \
@@ -68,6 +69,12 @@ SOURCES += src/Hotkey/hotkeypass.cpp
 mac: SOURCES += src/Hotkey/hotkeypass_mac.cpp
 else:win32: SOURCES += src/Hotkey/hotkeypass_win.cpp
 else:unix: SOURCES += src/Hotkey/hotkeypass_x11.cpp
+
+# Sources for HotkeyUtil
+HEADERS += src/Hotkey/hotkeyutil.h
+mac: SOURCES += src/Hotkey/hotkeyutil_mac.cpp
+else:win32: SOURCES += src/Hotkey/hotkeyutil_win.cpp
+else:unix: SOURCES += src/Hotkey/hotkeyutil_x11.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -45,15 +45,21 @@ void HotkeyPass::triggerPassthrough() {
     KeySym nativKeyCode = XkbKeycodeToKeysym(display, KeyCode(currentNativeShortcut().key), 0, 0);
     // std::cout << "Native Key Code: " << nativKeyCode << std::endl;
 
-    // Send a fake key press event to the window.
-    XKeyEvent event = createKeyEvent(display, winFocus, winRoot, true, nativKeyCode, 0);
+    // Send a fake key release event to the window.
+    XKeyEvent event = createKeyEvent(display, winFocus, winRoot, false, nativKeyCode, 0);
     XSendEvent(event.display, event.window, True, KeyPressMask, reinterpret_cast<XEvent*>(&event));
     XFlush(display);
 
+    // Send a fake key press event to the window.
+    event = createKeyEvent(display, winFocus, winRoot, true, nativKeyCode, 0);
+    XSendEvent(event.display, event.window, True, KeyPressMask, reinterpret_cast<XEvent*>(&event));
+    XFlush(display);
+
+    /*
     // Send a fake key release event to the window.
     event = createKeyEvent(display, winFocus, winRoot, false, nativKeyCode, 0);
     XSendEvent(event.display, event.window, True, KeyPressMask, reinterpret_cast<XEvent*>(&event));
-    XFlush(display);
+    XFlush(display);*/
 
     XCloseDisplay(display);
 }

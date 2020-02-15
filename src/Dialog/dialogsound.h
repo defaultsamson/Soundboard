@@ -4,6 +4,7 @@
 #include <QDialog>
 
 #include "../Widget/listitemsound.h"
+#include "dialogtestaudio.h"
 
 class Main;
 
@@ -11,13 +12,14 @@ namespace Ui {
 class DialogSound;
 }
 
-class DialogSound : public QDialog
+class DialogSound : public DialogTestAudio
 {
     Q_OBJECT
 
 public:
     explicit DialogSound(Main *main, ListItemSound *sound, bool creatingNew = false);
     ~DialogSound();
+    void audioEngineInit();
 
 private slots:
     void on_buttonBox_accepted();
@@ -26,7 +28,11 @@ private slots:
     void on_spinBoxVolume_valueChanged(int arg1);
     void on_pushButtonFile_clicked();
     void onClose();
-    void on_pushButton_2_clicked();
+    void on_pushButtonPlay_clicked();
+    void on_pushButtonPause_clicked();
+    void on_pushButtonStop_clicked();
+
+    void on_lineEditFile_textEdited(const QString &arg1);
 
 private:
     Ui::DialogSound *ui;
@@ -37,6 +43,10 @@ private:
 
     QString originalFileName;
     int originalVolume;
+
+    void updateTestButtons();
+    void testFileName(QString fn);
+    bool validFile = true;
 };
 
 #endif // DIALOGSOUND_H

@@ -7,6 +7,7 @@
 #include "Dialog/dialogboard.h"
 #include "Dialog/dialogsound.h"
 #include "Dialog/dialogsettings.h"
+#include "Dialog/dialogtestaudio.h"
 
 #include <QApplication>
 #include <QDesktopServices>
@@ -32,7 +33,7 @@ protected:
     void run();
 private:
     Main &main;
-};
+};        
 
 void MyThread::run()
 {
@@ -43,14 +44,14 @@ void MyThread::run()
     }
 
     main.audio()->init();
-    if (main.getSettingsDialog()) main.getSettingsDialog()->refreshDeviceSelection();
+    if (main.getAudioTestDialog()) main.getAudioTestDialog()->audioEngineInit();
 }
 
-void Main::setSettingsDialog(DialogSettings *s) {
-    _settingsDialog = s;
+void Main::setAudioTestDialog(DialogTestAudio *s) {
+    _audioTestDialog = s;
 }
-DialogSettings *Main::getSettingsDialog() {
-    return _settingsDialog;
+DialogTestAudio *Main::getAudioTestDialog() {
+    return _audioTestDialog;
 }
 
 int main(int argc, char *argv[])
@@ -77,11 +78,16 @@ QString Main::ACTIVE_BOARD = "active_board";
 QString Main::ACTIVE_BOARD_DEFAULT = "";
 QString Main::HAS_ACTIVE_BOARD = "has_active_board";
 bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
+QString Main::SETTINGS_TAB = "settings_tab";
+
+QString Main::EXPLICIT_NO_DEVICES = "explicit_no_devices";
+QString Main::DEVICE_INDEX0 = "device_index0";
+QString Main::DEVICE_INDEX1 = "device_index1";
 
 Main::Main(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainApp),
-    _audio(new AudioEngine()),
+    _audio(new AudioEngine(this)),
     _settings(new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat)),
     defaultPalette(qApp->palette())
 {
@@ -188,14 +194,38 @@ void Main::contextMenuSound(const QPoint &pos) {
 // New
 void Main::on_actionNew_triggered()
 {
+    if (_changed) {
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
+        switch (resBtn) {
+        case QMessageBox::Save:
+            save();
+        case QMessageBox::Discard:
+            break;
+        default:
+            return;
+        }
+    }
+
     clear();
     hasFile = false;
     fileName = "";
+    updateTitle();
 }
 
 // Open
 void Main::on_actionOpen_triggered()
 {
+    if (_changed) {
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
+        switch (resBtn) {
+        case QMessageBox::Save:
+            save();
+        case QMessageBox::Discard:
+            break;
+        default:
+            return;
+        }
+    }
     load();
 }
 
@@ -214,6 +244,17 @@ void Main::on_actionSaveAs_triggered()
 // Exit program
 void Main::on_actionExit_triggered()
 {
+    if (_changed) {
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
+        switch (resBtn) {
+        case QMessageBox::Save:
+            save();
+        case QMessageBox::Discard:
+            break;
+        default:
+            return;
+        }
+    }
     QApplication::quit();
 }
 
@@ -345,14 +386,14 @@ void Main::addSound() {
     editSound(sound, true);
 }
 
-void Main::removeBoard(ListItemBoard *board) {
-    removeBoard(ui->listBoards->row(board));
+void Main::removeBoard(ListItemBoard *board, bool wasNew) {
+    removeBoard(ui->listBoards->row(board), wasNew);
 }
 
-void Main::removeBoard(int row) {
+void Main::removeBoard(int row, bool wasNew) {
     if (row < 0 || row >= ui->listBoards->count()) return;
     delete ui->listBoards->takeItem(row);
-    setChanged();
+    if (!wasNew) setChanged();
 }
 
 ListItemBoard *Main::getBoard(int row) {
@@ -426,15 +467,15 @@ void Main::setCurrentSound(ListItemSound *sound) {
     // TODO play audio
 }
 
-void Main::removeSound(ListItemSound *sound) {
-    removeSound(ui->listSounds->row(sound));
+void Main::removeSound(ListItemSound *sound, bool wasNew) {
+    removeSound(ui->listSounds->row(sound), wasNew);
 }
 
-void Main::removeSound(int row) {
+void Main::removeSound(int row, bool wasNew) {
     if (row < 0 || row >= ui->listSounds->count()) return;
     delete ui->listSounds->takeItem(row);
     displayBoard(currentBoard);
-    setChanged();
+    if (!wasNew) setChanged();
 }
 
 ListItemSound *Main::getSound(int row) {
@@ -579,13 +620,17 @@ QSettings *Main::settings() {
     return _settings;
 }
 
+QMessageBox::StandardButton Main::unsavedChangedDialogue() {
+    return QMessageBox::question( this, "Soundboard",
+                                  tr("Handle unsaved changes?"),
+                                  QMessageBox::Cancel | QMessageBox::Discard | QMessageBox::Save,
+                                  QMessageBox::Save);
+}
+
 void Main::closeEvent (QCloseEvent *event)
 {
     if (_changed) {
-        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Soundboard",
-                                                                    tr("Handle unsaved changes?"),
-                                                                    QMessageBox::Cancel | QMessageBox::Discard | QMessageBox::Save,
-                                                                    QMessageBox::Save);
+        QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();
         switch (resBtn) {
         case QMessageBox::Save:
             save();

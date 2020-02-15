@@ -9,42 +9,69 @@
 
 #include <portaudio.h>
 
-// Hotkey-Audio Connector Object
-struct HACObj {
-    ListItemSound* listItem;
-    AudioObject* audio;
+// Forward declarations
+struct HostInfoContainer;
+struct DeviceInfoContainer;
+class AudioEngine;
+
+struct CallbackInfo {
+    AudioEngine *audio;
+    DeviceInfoContainer *device;
+};
+
+struct DeviceIndexInfo {
+    PaDeviceIndex deviceIndex;
+    int displayIndex;
+    int deviceListIndex;
+};
+
+struct DeviceInfoContainer {
+    HostInfoContainer *host;
+    const PaDeviceInfo *info;
+    PaStream *stream;
+    size_t channels;
+    DeviceIndexInfo indexes;
+    int volumeInt;
+    float volume;
 };
 
 struct HostInfoContainer {
-    PaHostApiIndex hostIndex;
-    const char* hostName;
-    QList <DeviceInfoContainer> *devices;
+    PaHostApiIndex index;
+    const char* name;
+    QList <DeviceInfoContainer*> *devices;
+
+    ~HostInfoContainer() {
+        if (devices) {
+            for (int i = 0; i < devices->size(); i++) delete devices->at(i);
+            delete devices;
+        }
+    }
 };
+
 
 class AudioEngine : public QObject
 {
     Q_OBJECT
 
 public:
-    AudioEngine();
+    AudioEngine(Main *main);
 
-    bool hasDefaultHost();
-    HostInfoContainer defaultHost();
-    bool hasDefaultDevice();
-    DeviceInfoContainer defaultDevice();
-    bool hasSelectedHost();
-    void setSelectedHost(HostInfoContainer);
-    HostInfoContainer selectedHost();
-    bool hasSelectedDevice();
-    void setSelectedDevice(DeviceInfoContainer);
-    DeviceInfoContainer selectedDevice();
-    QList<HostInfoContainer> hosts();
+    static size_t FRAMES_PER_BUFFER;
+    static size_t CHANNELS;
+
+    HostInfoContainer *defaultHost();
+    DeviceInfoContainer *defaultDevice();
+
+    void addActiveDevice(DeviceInfoContainer*);
+    void removeActiveDevice(DeviceInfoContainer*);
+    void removeActiveDisplayDevice(int deviceDisplayIndex);
+    DeviceInfoContainer* getActiveDisplayDevice(int deviceDisplayIndex);
+    const QList<DeviceInfoContainer*> activeDevices();
+
+    const QList<HostInfoContainer*> hosts();
+    const QList<DeviceInfoContainer*> devices();
+
     void refreshDevices();
-
-    bool hasActiveHost();
-    HostInfoContainer activeHost();
-    bool hasActiveDevice();
-    DeviceInfoContainer activeDevice();
 
     void init();
     bool isInitialized();
@@ -55,29 +82,26 @@ public:
                             PaStreamCallbackFlags statusFlags,
                             void *userData);
 
-    void mix(float* buffer, size_t frames);
+    void mix(float* buffer, size_t frames, int deviceListIndex, float deviceVolume, bool singleDevice);
 
     void registerAudio(AudioObject *);
     void unregisterAudio(AudioObject *);
 
-private:
-    PaStream *stream = nullptr;
-    int channels = 0;
-    PaHostApiIndex selectedDeviceIndex = -1;
+    ~AudioEngine();
 
+private:
+    Main *main;
     bool _isInitialized = false;
 
-    bool _hasDefaultHost = false;
-    HostInfoContainer _defaultHost;
-    bool _hasDefaultDevice = false;
-    DeviceInfoContainer _defaultDevice;
-    bool _hasSelectedHost = false;
-    HostInfoContainer _selectedHost;
-    bool _hasSelectedDevice = false;
-    DeviceInfoContainer _selectedDevice;
-    QList<HostInfoContainer> _hosts;
-
+    HostInfoContainer *_defaultHost = nullptr;
+    DeviceInfoContainer *_defaultDevice = nullptr;
+    QList<HostInfoContainer*> _hosts;
+    QList<DeviceInfoContainer*> _devices;
+    QList<DeviceInfoContainer*> _activeDevices;
+    QList<DeviceIndexInfo> _selectedDeviceIndexes;
     QList<AudioObject *> _audioObjectRegistry;
+
+    DeviceInfoContainer *getDevice(int deviceIndex);
 
 signals:
     void update(qreal m_level);

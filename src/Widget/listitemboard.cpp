@@ -19,7 +19,14 @@ ListItemBoard::ListItemBoard(Main *main) :
 }
 
 ListItemBoard::~ListItemBoard() {
-    for (size_t i = 0; i < sounds.size(); ++i) delete sounds.at(i);
+    if (sounds.size() > 0) {
+        size_t i = sounds.size();
+        while (i--) {
+            delete sounds.at(i);
+            if (i == 0) break;
+        }
+        sounds.clear();
+    }
 }
 
 void ListItemBoard::addSound(ListItemSound *sound) {

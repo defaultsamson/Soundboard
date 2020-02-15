@@ -7,9 +7,11 @@
 #include <QWidget>
 #include <QSettings>
 #include <QModelIndex>
+#include <QMessageBox>
 
 #include "Audio/audioengine.h"
 #include "Dialog/dialogsettings.h"
+#include "Dialog/dialogtestaudio.h"
 #include "Widget/listitem.h"
 #include "Widget/listitemboard.h"
 #include "Widget/listitemsound.h"
@@ -34,7 +36,11 @@ public:
     static QString ACTIVE_BOARD_DEFAULT;
     static QString HAS_ACTIVE_BOARD;
     static bool HAS_ACTIVE_BOARD_DEFAULT;
+    static QString SETTINGS_TAB;
 
+    static QString EXPLICIT_NO_DEVICES;
+    static QString DEVICE_INDEX0;
+    static QString DEVICE_INDEX1;
 
     explicit Main(QWidget *parent = nullptr);
     ~Main();
@@ -44,21 +50,21 @@ public:
     void clear();
     void setCurrentBoard(ListItemBoard *board);
     void setCurrentBoard(int row);
-    void removeBoard(ListItemBoard *board);
-    void removeBoard(int row);
+    void removeBoard(ListItemBoard *board, bool wasNew = false);
+    void removeBoard(int row, bool wasNew = false);
     ListItemBoard *getBoard(int row);
     void setCurrentSound(ListItemSound *sound);
     void setCurrentSound(int row);
-    void removeSound(ListItemSound *sound);
-    void removeSound(int row);
+    void removeSound(ListItemSound *sound, bool wasNew = false);
+    void removeSound(int row, bool wasNew = false);
     ListItemSound *getSound(int row);
     void setDarkTheme(bool set = true);
     QSettings *settings();
     AudioEngine *audio();
 
-    // This is only used while initializing the AudioEngine
-    void setSettingsDialog(DialogSettings *);
-    DialogSettings *getSettingsDialog();
+    // This is only used while initializing the AudioEngine, makes the audio player work better
+    void setAudioTestDialog(DialogTestAudio *);
+    DialogTestAudio *getAudioTestDialog();
 
     void setChanged(bool changed = true);
 
@@ -110,7 +116,7 @@ private:
     QSettings *_settings;
     bool _changed = false;
 
-    DialogSettings *_settingsDialog = nullptr;
+    DialogTestAudio *_audioTestDialog = nullptr;
 
     QPalette darkPalette;
     QPalette defaultPalette;
@@ -124,7 +130,7 @@ private:
     void addSound();
     ListItemSound *currentSound();
     void updateTitle();
-
+    QMessageBox::StandardButton unsavedChangedDialogue();
     void closeEvent(QCloseEvent *bar);
 };
 

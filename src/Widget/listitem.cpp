@@ -2,12 +2,15 @@
 
 #include "../mainapp.h"
 #include "../Hotkey/hotkeypass.h"
+#include "../Hotkey/hotkeyutil.h"
 #include <QObject>
+#include <QHotkey>
 
 ListItem::ListItem(Main *main) :
     QObject(main),
     main(main),
-    _key(-1),
+    _hasKey(false),
+    _key(0),
     hotkey(new HotkeyPass(main))
 {
     // Sets up the keybind
@@ -18,24 +21,35 @@ ListItem::~ListItem() {
     delete hotkey;
 }
 
-int ListItem::key() {
+
+quint32 ListItem::key() {
     return _key;
 }
 
-void ListItem::setKey(int k) {
+void ListItem::unSetKey() {
+    _hasKey = false;
+}
+
+void ListItem::setKey(quint32 k) {
     _key = k;
-    if (k < 0) return;
-    hotkey->setShortcut(QKeySequence(k), false);
+    _hasKey = true;
+    hotkey->setNativeShortcut(HotkeyUtil::scancodeToNative(k));
+}
+
+bool ListItem::hasKey() {
+    return _hasKey;
 }
 
 void ListItem::load(const QJsonObject &json) {
     setText(json["name"].toString());
-    setKey(json["key"].toInt());
+    if (json["haskey"].toBool())
+        setKey(static_cast<quint32>(json["key"].toInt()));
 }
 
 void ListItem::save(QJsonObject &json) {
     json["name"] = text();
-    json["key"] = key();
+    json["haskey"] = hasKey();
+    json["key"] = static_cast<int>(key());
 }
 
 void ListItem::trigger() {
