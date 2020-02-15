@@ -21,15 +21,15 @@ bool AudioObject::isPaused() { return paused; }
 bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
-    if (!file) return;
-    // std::cout << "Stopping" << std::endl;
     paused = false;
     stopped = true;
-    readStop = false;
+    device0Finished = false;
     // We can never seek whilst reading
-    safeRead.lock();
-    file->seek(0, SEEK_SET);
-    safeRead.unlock();
+    if (file) {
+        safeRead.lock();
+        file->seek(0, SEEK_SET);
+        safeRead.unlock();
+    }
 }
 
 void AudioObject::pause() {
@@ -56,7 +56,7 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListI
     if (!file) return; // If there's no file
     // If it's paused or stopped
     if (paused || stopped) return;
-    if (readStop && deviceListIndex == 0) return;
+    if (device0Finished && deviceListIndex == 0) return;
 
     size_t frames = AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
     float finalVolume = _volume * deviceVolume;
@@ -71,33 +71,43 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListI
         bufferRead[sideBufferWrite] = read;
 
         size_t start = frames * sideBufferWrite;
-        if (!singleDevice) memcpy(sideBuffer + start, buffer, read * sizeof(float));
+        if (!singleDevice) memcpy(sideBuffer + start, mixBuffer, read * sizeof(float));
         for (size_t i = 0; i < read; i++){
             buffer[i] += mixBuffer[i] * finalVolume;
         }
-        if (sideBufferWrite++ >= SIDE_BUFFER_MULTIPLIER) {
-            if (!singleDevice) readLoopsAhead++;
+        sideBufferWrite++;
+        if (sideBufferWrite >= SIDE_BUFFER_MULTIPLIER) {
+            if (!singleDevice) device0LoopsAhead++;
             sideBufferWrite = 0;
         }
 
         // Ran out of things to read, the file stream is over
         if (read == 0 || read < frames) {
             if (singleDevice) stop();
-            else readStop = true;
+            else device0Finished = true;
         }
-    } else {
+
+    // Makes sure that the sideBuffer writing is always ahead of the reading
+    } else if (sideBufferWrite + (SIDE_BUFFER_MULTIPLIER * device0LoopsAhead) > sideBufferRead) {
         size_t start = frames * sideBufferRead;
+        //qDebug() << "sideBufferRead: " << sideBufferRead;
+        //qDebug() << "start:          " << start;
         // memcpy(buffer, sideBuffer + start, bufferRead[sideBufferRead] * sizeof (float));
         for (size_t i = 0; i < bufferRead[sideBufferRead]; i++){
             buffer[i] += sideBuffer[start + i] * finalVolume;
         }
         // TODO? memset(sideBuffer + start, 0, bufferRead[sideBufferRead] * sizeof (float));
-        if (sideBufferRead++ >= SIDE_BUFFER_MULTIPLIER) {
+        sideBufferRead++;
+        if (sideBufferRead >= SIDE_BUFFER_MULTIPLIER) {
             sideBufferRead = 0;
-            readLoopsAhead--;
+            device0LoopsAhead--;
         }
+        //qDebug() << "Finished:          " << device0Finished;
+        //qDebug() << "device0LoopsAhead: " << device0LoopsAhead;
+        //qDebug() << "sideBufferRead:    " << sideBufferRead;
+        //qDebug() << "sideBufferWrite:   " << sideBufferWrite;
         // If it stopped reading the file, and the other device has caught up
-        if (readStop && readLoopsAhead == 0 && sideBufferRead >= sideBufferWrite) {
+        if (device0Finished && device0LoopsAhead == 0 && sideBufferRead >= sideBufferWrite) {
             stop();
         }
     }
@@ -106,8 +116,6 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, int deviceListI
 void AudioObject::setFile(const QString &filename) {
     stop();
     if (file) delete file;
-    paused = false;
-    stopped = true;
 
     sideBuffer = new float[SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(float)];
     memset(sideBuffer, 0, SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(float));

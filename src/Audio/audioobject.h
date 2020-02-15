@@ -34,6 +34,7 @@ private:
     float _volume = 1; // 0.0 - 1.0
     float *sideBuffer = nullptr;
     size_t *bufferRead = nullptr;
+
     // Sometimes there are 4 or possibly more reads and writes done consecutively.
     // When that happens, we need to make sure that there's enough of a buffer for
     // all of those consecutive reads, and fresh space for all the new writes.
@@ -42,8 +43,8 @@ private:
     size_t sideBufferWrite = 0;
     size_t sideBufferRead = 0;
     std::mutex safeRead;
-    bool readStop = false;
-    size_t readLoopsAhead = 0;
+    bool device0Finished = false;
+    size_t device0LoopsAhead = 0;
 };
 
 #endif // AUDIOOBJECT_H
