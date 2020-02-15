@@ -106,28 +106,40 @@ void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int d
     QVariant qvar = selector->itemData(selectorIndex);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
-    // Current device. Be cautious here, as dev may be null. only happens when "NONE" is selected
     DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
-    if (dev) {
-        if (main->audio()->activeDevices().contains(dev)) return; // If it's already active, ignore
-        dev->indexes.displayIndex = deviceDisplayIndex;
-    }
+    if (main->audio()->activeDevices().contains(dev)) return; // If it's already active, ignore
+    dev->indexes.displayIndex = deviceDisplayIndex;
 
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     main->audio()->removeActiveDisplayDevice(deviceDisplayIndex);
-    if (dev) main->audio()->addActiveDevice(dev);
+    main->audio()->addActiveDevice(dev);
 
     switch (deviceDisplayIndex) {
     case 0:
-        main->settings()->setValue(Main::DEVICE_INDEX0, dev ? dev->indexes.deviceIndex : -1);
+        main->settings()->setValue(Main::DEVICE_INDEX0, dev->indexes.deviceIndex);
         break;
     case 1:
-        main->settings()->setValue(Main::DEVICE_INDEX1, dev ? dev->indexes.deviceIndex : -1);
+        main->settings()->setValue(Main::DEVICE_INDEX1, dev->indexes.deviceIndex);
         break;
     }
-
     main->settings()->setValue(Main::EXPLICIT_NO_DEVICES, main->audio()->activeDevices().count() == 0);
+    refreshDeviceSelection();
+}
 
+void DialogSettings::deviceRemoved(int deviceDisplayIndex, HostInfoContainer **displayHost)
+{
+    *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
+    main->audio()->removeActiveDisplayDevice(deviceDisplayIndex);
+
+    switch (deviceDisplayIndex) {
+    case 0:
+        main->settings()->setValue(Main::DEVICE_INDEX0, -1);
+        break;
+    case 1:
+        main->settings()->setValue(Main::DEVICE_INDEX1, -1);
+        break;
+    }
+    main->settings()->setValue(Main::EXPLICIT_NO_DEVICES, main->audio()->activeDevices().count() == 0);
     refreshDeviceSelection();
 }
 
@@ -172,8 +184,8 @@ void DialogSettings::refreshDeviceSelection() {
     if (!inited) return;
 
     QList<AudioDisplayContainer> deviceDisplays;
-    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxOutputDevice0, _displayHost0, 0});
-    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxOutputDevice1, _displayHost1, 1});
+    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxOutputDevice0, ui->deleteButtonDevice0, _displayHost0, 0});
+    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxOutputDevice1, ui->deleteButtonDevice1, _displayHost1, 1});
     QList<DeviceInfoContainer*> displayedDevices;
 
     for (AudioDisplayContainer display : deviceDisplays) {
@@ -183,6 +195,7 @@ void DialogSettings::refreshDeviceSelection() {
         devices->clear();
         drivers->setEnabled(true);
         devices->setEnabled(true);
+        display.deleteButton->setEnabled(true);
 
         HostInfoContainer *displayHost = nullptr;
         bool notActiveDriver = false;
@@ -221,6 +234,7 @@ void DialogSettings::refreshDeviceSelection() {
         if (!displayHost) {
             drivers->addItem("Select driver...", QVariant(QVariant::Invalid));
             devices->setEnabled(false);
+            display.deleteButton->setEnabled(false);
             // Display the available drivers
             for (HostInfoContainer* host : a->hosts()) {
                 drivers->addItem(host->name, QVariant::fromValue(host));
@@ -231,10 +245,10 @@ void DialogSettings::refreshDeviceSelection() {
                 if (host != displayHost) drivers->addItem(host->name, QVariant::fromValue(host));
             }
 
-            if (notActiveDriver)
+            if (notActiveDriver) {
                 devices->addItem("Select device...", QVariant(QVariant::Invalid));
-
-            devices->addItem("NONE", QVariant::fromValue(nullptr));
+                display.deleteButton->setEnabled(false);
+            }
 
             // Then add the default device
             if (a->defaultDevice() && !displayedDevices.contains(a->defaultDevice()) && displayHost == a->defaultDevice()->host) {
@@ -364,4 +378,19 @@ void DialogSettings::on_spinBoxTest_valueChanged(int value)
 {
     ui->sliderTest->setValue(value);
     audio.setVolume(value / static_cast<float>(100));
+}
+
+void DialogSettings::on_deleteButtonDevice0_clicked()
+{
+    deviceRemoved(0, &_displayHost0);
+}
+
+void DialogSettings::on_deleteButtonDevice1_clicked()
+{
+    deviceRemoved(1, &_displayHost1);
+}
+
+void DialogSettings::on_deleteButtonDeviceInput_clicked()
+{
+
 }

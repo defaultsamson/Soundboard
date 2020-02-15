@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include <QPushButton>
 #include "../Audio/audioobject.h"
 #include "../Audio/audioengine.h"
 #include "dialogtestaudio.h"
@@ -18,6 +19,7 @@ class DialogSettings;
 struct AudioDisplayContainer {
     QComboBox *drivers;
     QComboBox *devices;
+    QPushButton *deleteButton;
     HostInfoContainer* displayHost;
     int deviceDisplayIndex;
 };
@@ -58,6 +60,12 @@ private slots:
     void on_sliderTest_valueChanged(int value);
     void on_spinBoxTest_valueChanged(int arg1);
 
+    void on_deleteButtonDevice0_clicked();
+
+    void on_deleteButtonDevice1_clicked();
+
+    void on_deleteButtonDeviceInput_clicked();
+
 private:
     Ui::DialogSettings *ui;
     Main *main;
@@ -67,6 +75,7 @@ private:
     void closeEvent(QCloseEvent *bar);
     void handleClose();
     void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer **displayHost);
+    void deviceRemoved(int deviceDisplayIndex, HostInfoContainer **displayHost);
     void setDeviceVolume(int value, int devDisplayIndex);
 };
 
