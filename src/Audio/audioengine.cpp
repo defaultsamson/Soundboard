@@ -74,11 +74,10 @@ void AudioEngine::removeActiveDevice(DeviceInfoContainer* device) {
         _activeDevices.at(i)->indexes.deviceListIndex = i;
     }
 }
-void AudioEngine::removeActiveDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
-    DeviceInfoContainer* dev = getDevice(deviceDisplayIndex);
-    if (dev) removeActiveDevice(dev);
+void AudioEngine::removeActiveDisplayDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+    for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) { removeActiveDevice(dev); break; }
 }
-DeviceInfoContainer* AudioEngine::getActiveDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+DeviceInfoContainer* AudioEngine::getActiveDisplayDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
     for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) return dev;
     return nullptr;
 }

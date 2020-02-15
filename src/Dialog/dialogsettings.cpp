@@ -101,23 +101,21 @@ void DialogSettings::device1Changed(int index)
     deviceChanged(ui->comboBoxOutputDevice1, index, 1, &_displayHost1);
 }
 
-void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost)
+void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer **displayHost)
 {
     QVariant qvar = selector->itemData(selectorIndex);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
-    // Be cautious here, as dev may be null. only happens when "NONE" is selected
+    // Current device. Be cautious here, as dev may be null. only happens when "NONE" is selected
     DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
     if (dev) {
         if (main->audio()->activeDevices().contains(dev)) return; // If it's already active, ignore
         dev->indexes.displayIndex = deviceDisplayIndex;
     }
 
-    main->audio()->removeActiveDevice(deviceDisplayIndex);
-    main->audio()->addActiveDevice(dev);
-
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    refreshDeviceSelection();
+    main->audio()->removeActiveDisplayDevice(deviceDisplayIndex);
+    if (dev) main->audio()->addActiveDevice(dev);
 
     switch (deviceDisplayIndex) {
     case 0:
@@ -129,6 +127,8 @@ void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int d
     }
 
     main->settings()->setValue(Main::EXPLICIT_NO_DEVICES, main->audio()->activeDevices().count() == 0);
+
+    refreshDeviceSelection();
 }
 
 void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
@@ -299,7 +299,7 @@ void DialogSettings::on_pushButtonStop_clicked()
 }
 
 void DialogSettings::setDeviceVolume(int value, int devDisplayIndex) {
-    DeviceInfoContainer* dev = main->audio()->getActiveDevice(devDisplayIndex);
+    DeviceInfoContainer* dev = main->audio()->getActiveDisplayDevice(devDisplayIndex);
     if (dev) {
         dev->volumeInt = value;
         dev->volume = value / static_cast<float>(100);

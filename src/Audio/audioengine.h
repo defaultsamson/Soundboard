@@ -64,8 +64,8 @@ public:
 
     void addActiveDevice(DeviceInfoContainer*);
     void removeActiveDevice(DeviceInfoContainer*);
-    void removeActiveDevice(int deviceDisplayIndex);
-    DeviceInfoContainer* getActiveDevice(int deviceDisplayIndex);
+    void removeActiveDisplayDevice(int deviceDisplayIndex);
+    DeviceInfoContainer* getActiveDisplayDevice(int deviceDisplayIndex);
     const QList<DeviceInfoContainer*> activeDevices();
 
     const QList<HostInfoContainer*> hosts();
