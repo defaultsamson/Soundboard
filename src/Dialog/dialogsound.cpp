@@ -101,16 +101,8 @@ void DialogSound::on_lineEditFile_textEdited(const QString &fn) {
 
 void DialogSound::testFileName(QString fn) {
     // test to see if the file exists and is readable
-    QFile file(fn);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open audio file.");
-        validFile = false;
-    } else {
-        ui->lineEditFile->setText(fn);
-        sound->setFileName(fn);
-        validFile = true;
-    }
-    file.close();
+    sound->setFileName(fn);
+    ui->lineEditFile->setText(fn);
     updateTestButtons();
 }
 
@@ -147,7 +139,7 @@ void DialogSound::audioEngineInit() {
 }
 
 void DialogSound::updateTestButtons() {
-    bool enabled = main->audio()->isInitialized() && validFile && sound->audio()->hasFile();
+    bool enabled = main->audio()->isInitialized() && sound->audio()->hasFile();
 
     ui->pushButtonPlay->setEnabled(enabled);
     ui->pushButtonPause->setEnabled(enabled);

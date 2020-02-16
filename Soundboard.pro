@@ -25,12 +25,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 CONFIG += c++11
 
 # This uses the -O3 compiler instead of -O2
-CONFIG(release, debug|release) {
-    CONFIG += optimize_full
-}
+#CONFIG(release, debug|release) {
+#    CONFIG += optimize_full
+#}
 
 SOURCES += \
     src/Audio/audioengine.cpp \
+    src/Audio/iofile.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
@@ -45,6 +46,8 @@ SOURCES += \
 
 HEADERS += \
     src/Audio/audioengine.h \
+    src/Audio/iodevice.h \
+    src/Audio/iofile.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \

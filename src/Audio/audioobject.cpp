@@ -1,10 +1,10 @@
 #include "audioobject.h"
 
 #include <QString>
-
+#include <QFile>
 #include <portaudio.h>
-#include <sndfile.hh>
 #include "audioengine.h"
+#include "iofile.h"
 
 AudioObject::AudioObject()
 {
@@ -13,7 +13,6 @@ AudioObject::AudioObject()
 AudioObject::~AudioObject() {
     delete [] sideBuffer;
     delete [] bytesRead;
-    delete file;
 }
 
 bool AudioObject::isPlaying() { return !isPaused() && !isStopped(); }
@@ -21,35 +20,36 @@ bool AudioObject::isPaused() { return paused; }
 bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
+    qDebug() << "Stopping 1";
+    device0Finished = false;
     paused = false;
     stopped = true;
-    device0Finished = false;
-    if (file) {
-        // We can never seek whilst reading
-        safeRead.lock();
-        file->seek(0, SEEK_SET);
-        safeRead.unlock();
-    }
+    qDebug() << "Stopping 2";
+    _file.clear();
 }
 
 void AudioObject::pause() {
-    if (!file || stopped) return;
-    paused = true;
-    stopped = false;
-}
-
-void AudioObject::play() {
-    if (!file) return;
-    if (paused) {
-        // Resume
-        paused = false;
-    } else if (stopped) {
+    if (!stopped) {
+        paused = true;
         stopped = false;
     }
 }
 
+void AudioObject::play() {
+    qDebug() << "Playing 1";
+    qDebug() << "Playing 2";
+    if (!_hasFile) return;
+    if (paused) {
+        // Resume
+        paused = false;
+    } else {
+        stopped = false;
+        _file.openFile(_filename);
+    }
+}
+
 void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channels*/, int deviceListIndex, float deviceVolume, bool singleDevice) {
-    if (!file) return;
+    if (!_hasFile) { stop(); return; }
     // If it's paused or stopped, return
     if (paused || stopped) return;
     // The 2nd device is still reading, if this is being called by the first device, return
@@ -65,9 +65,11 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
         float *readBuffer = new float[frames];
 
         // Read frames from the file to the readBuffer
-        safeRead.lock();
-        size_t read = static_cast<size_t>(file->read(readBuffer, static_cast<sf_count_t>(frames)));
-        safeRead.unlock();
+        size_t read = static_cast<size_t>(_file.read(readBuffer, frames));
+        if (read == 0) {
+            delete [] readBuffer;
+            return;
+        }
 
         if (!singleDevice) {
             // Copy the readBuffer into sideBuffer
@@ -95,7 +97,7 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
 
         // Ran out of bytes to read, the file stream is over
         if (read == 0 || read < frames) {
-            if (singleDevice) stop();
+            if (singleDevice) ;// stop();
             else device0Finished = true;
         }
 
@@ -118,7 +120,7 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
         // Note: sideBufferRead should never be > sideBufferWrite, we want this to stop
         // when they are equal, but JUST in case, we use >=
         if (device0Finished && device0LoopsAhead == 0 && sideBufferRead >= sideBufferWrite) {
-            stop();
+            // stop();
         }
     }
 }
@@ -137,12 +139,20 @@ void AudioObject::setFile(const QString &filename) {
     sideBufferWrite = 0;
     sideBufferRead = 0;
 
-    if (file) delete file;
-    file = new SndfileHandle(filename.toStdString());
+    _filename = filename.toStdString();
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't open audio file.");
+        _hasFile = false;
+    } else {
+        _hasFile = true;
+    }
+    file.close();
 }
 
 bool AudioObject::hasFile() {
-    return file;
+    return _hasFile;
 }
 
 void AudioObject::setVolume(const float volume) {

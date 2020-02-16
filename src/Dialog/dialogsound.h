@@ -46,7 +46,6 @@ private:
 
     void updateTestButtons();
     void testFileName(QString fn);
-    bool validFile = true;
 };
 
 #endif // DIALOGSOUND_H

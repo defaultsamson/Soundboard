@@ -3,8 +3,10 @@
 
 #include <QString>
 
+#include "iofile.h"
 #include <portaudio.h>
 #include <sndfile.hh>
+#include <string>
 #include <mutex>
 
 class AudioObject
@@ -28,7 +30,9 @@ public:
     bool hasFile();
 
 private:
-    SndfileHandle *file = nullptr;
+    IOMultiFile _file;
+    std::string _filename;
+    bool _hasFile = false;
     bool paused = false;
     bool stopped = true;
     float _volume = 1; // 0.0 - 1.0
@@ -42,7 +46,6 @@ private:
     const size_t SIDE_BUFFER_MULTIPLIER = 64;
     size_t sideBufferWrite = 0;
     size_t sideBufferRead = 0;
-    std::mutex safeRead;
     bool device0Finished = false;
     size_t device0LoopsAhead = 0;
 };
