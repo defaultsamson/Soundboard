@@ -16,17 +16,29 @@ AudioEngine::~AudioEngine() {
 }
 
 HostInfoContainer *AudioEngine::defaultHost() {
-    return _defaultHost;
+    return _defaultOutputHost;
 }
-DeviceInfoContainer *AudioEngine::defaultDevice() {
-    return _defaultDevice;
+DeviceInfoContainer *AudioEngine::defaultOutput() {
+    return _defaultOutput;
+}
+DeviceInfoContainer *AudioEngine::defaultInput() {
+    return _defaultInput;
 }
 
 void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
-    if (_activeDevices.contains(device) || !device) return;
+    if (!device) return;
+
+    bool in = device->isInput;
+    if (in && _activeInputs.contains(device)) return;
+    if (!in && _activeOutputs.contains(device)) return;
+
     // Adding device to the end of the list
-    device->indexes.deviceListIndex = _activeDevices.size();
-    _activeDevices.append(device);
+    device->indexes.deviceListIndex = in ? _activeInputs.size() : _activeOutputs.size();
+
+    // Add the device to its respective list
+    if (in) _activeInputs.append(device);
+    else _activeOutputs.append(device);
+
     _selectedDeviceIndexes.append(device->indexes);
 
     Pa_CloseStream(device->stream);
@@ -34,22 +46,30 @@ void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
     // size_t channels = CHANNELS <= device->info->maxOutputChannels ? CHANNELS : device->info->maxOutputChannels;
 
     PaError err;
+    PaStreamParameters inputParameters;
     PaStreamParameters outputParameters;
-    // bzero( &outputParameters, sizeof( outputParameters ) ); // not necessary if you are filling in all the fields
-    outputParameters.device = device->indexes.deviceIndex;
-    outputParameters.channelCount = CHANNELS; // device.info->maxOutputChannels;
-    outputParameters.sampleFormat = paFloat32;
-    outputParameters.suggestedLatency = device->info->defaultLowOutputLatency ;
-    outputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
+    if (in) {
+        inputParameters.device = device->indexes.deviceIndex;
+        inputParameters.channelCount = static_cast<int>(CHANNELS); // device.info->maxOutputChannels;
+        inputParameters.sampleFormat = paFloat32;
+        inputParameters.suggestedLatency = device->info->defaultLowOutputLatency ;
+        inputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
+    } else {
+        outputParameters.device = device->indexes.deviceIndex;
+        outputParameters.channelCount = static_cast<int>(CHANNELS); // device.info->maxOutputChannels;
+        outputParameters.sampleFormat = paFloat32;
+        outputParameters.suggestedLatency = device->info->defaultLowOutputLatency ;
+        outputParameters.hostApiSpecificStreamInfo = nullptr; // See your specific host's API docs for info on using this field
+    }
 
     err = Pa_OpenStream(
                     &device->stream,
-                    nullptr,
-                    &outputParameters,
+                    in ? &inputParameters : nullptr,
+                    !in ? &outputParameters : nullptr,
                     device->info->defaultSampleRate,
                     FRAMES_PER_BUFFER,
                     paNoFlag, //flags that can be used to define dither, clip settings and more
-                    &AudioEngine::readCallback, //your callback function
+                    in ? &AudioEngine::inputCallback : &AudioEngine::outputCallback, //your callback function
                     static_cast<CallbackInfo*>(new CallbackInfo{this, device})); //data to be passed to callback. In C++, it is frequently (void *)this
     //don't forget to check errors!
     if (err != paNoError) qDebug() << "Error opening stream";
@@ -69,21 +89,41 @@ void AudioEngine::removeActiveDevice(DeviceInfoContainer* device) {
             break;
         }
     }
-    _activeDevices.removeOne(device);
-    // Updates the deviceListIndex data
-    for (int i = 0; i < _activeDevices.size(); i++) {
-        _activeDevices.at(i)->indexes.deviceListIndex = i;
+    if (device->isInput) {
+        _activeInputs.removeOne(device);
+        // Updates the deviceListIndex data
+        for (int i = 0; i < _activeInputs.size(); i++) {
+            _activeInputs.at(i)->indexes.deviceListIndex = i;
+        }
+    } else {
+        _activeOutputs.removeOne(device);
+        // Updates the deviceListIndex data
+        for (int i = 0; i < _activeOutputs.size(); i++) {
+            _activeOutputs.at(i)->indexes.deviceListIndex = i;
+        }
     }
 }
-void AudioEngine::removeActiveDisplayDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
-    for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) { removeActiveDevice(dev); break; }
+
+void AudioEngine::removeActiveDisplayOutput(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+    for (auto dev : _activeOutputs) if (dev->indexes.displayIndex == deviceDisplayIndex) { removeActiveDevice(dev); break; }
 }
-DeviceInfoContainer* AudioEngine::getActiveDisplayDevice(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
-    for (auto dev : _activeDevices) if (dev->indexes.displayIndex == deviceDisplayIndex) return dev;
+DeviceInfoContainer* AudioEngine::getActiveDisplayOutput(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+    for (auto dev : _activeOutputs) if (dev->indexes.displayIndex == deviceDisplayIndex) return dev;
     return nullptr;
 }
-const QList<DeviceInfoContainer*> AudioEngine::activeDevices() {
-    return _activeDevices;
+const QList<DeviceInfoContainer*> AudioEngine::activeOutputs() {
+    return _activeOutputs;
+}
+
+void AudioEngine::removeActiveDisplayInput(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+    for (auto dev : _activeInputs) if (dev->indexes.displayIndex == deviceDisplayIndex) { removeActiveDevice(dev); break; }
+}
+DeviceInfoContainer* AudioEngine::getActiveDisplayInput(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
+    for (auto dev : _activeInputs) if (dev->indexes.displayIndex == deviceDisplayIndex) return dev;
+    return nullptr;
+}
+const QList<DeviceInfoContainer*> AudioEngine::activeInputs() {
+    return _activeInputs;
 }
 
 const QList<HostInfoContainer*> AudioEngine::hosts() {
@@ -108,13 +148,13 @@ void AudioEngine::refreshDevices() {
     int devices = Pa_GetDeviceCount();
     qDebug() << "Refreshing devices... [" << devices << "]";
 
-    _defaultHost = nullptr;
-    _defaultDevice = nullptr;
+    _defaultOutputHost = nullptr;
+    _defaultOutput = nullptr;
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
     _hosts.clear();
     _devices.clear();
-    for (auto dev : _activeDevices) Pa_CloseStream(dev->stream);
-    _activeDevices.clear();
+    for (auto dev : _activeOutputs) Pa_CloseStream(dev->stream);
+    _activeOutputs.clear();
 
     const PaDeviceInfo *device;
 
@@ -123,10 +163,10 @@ void AudioEngine::refreshDevices() {
         if (device->maxOutputChannels == 0) { // isInput
             qDebug() << "Ignoring input channel... [" << i << "]";
         } else {
-            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}, 100, 1};
+            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}, 100, 1, false};
             _devices.append(dev);
             if (Pa_GetDefaultOutputDevice() == i) {
-                _defaultDevice = dev;
+                _defaultOutput = dev;
                 qDebug() << "Default device... [" << i << "]";
             }
             // Try to find the container for the specific host that contains all its devices
@@ -152,7 +192,7 @@ void AudioEngine::refreshDevices() {
                 _hosts.append(hostCon);
                 // Default stuff
                 if (device->hostApi == Pa_GetDefaultHostApi()) {
-                    _defaultHost = hostCon;
+                    _defaultOutputHost = hostCon;
                     qDebug() << "Default host... [" << device->hostApi << "]";
                 }
             }
@@ -178,10 +218,10 @@ void AudioEngine::refreshDevices() {
     }
 
     // If no device was found, and the devices weren't explicitly all removed, load the defaults
-    if (_activeDevices.size() == 0 && _defaultDevice && !main->settings()->value(Main::EXPLICIT_NO_OUTPUT_DEVICES, false).toBool()) {
-        main->settings()->setValue(Main::DEVICE_INDEX0, _defaultDevice ? _defaultDevice->indexes.deviceIndex : -1);
-        _defaultDevice->indexes.displayIndex = 0;
-        addActiveDevice(_defaultDevice);
+    if (_activeOutputs.size() == 0 && _defaultOutput && !main->settings()->value(Main::EXPLICIT_NO_OUTPUT_DEVICES, false).toBool()) {
+        main->settings()->setValue(Main::DEVICE_INDEX0, _defaultOutput ? _defaultOutput->indexes.deviceIndex : -1);
+        _defaultOutput->indexes.displayIndex = 0;
+        addActiveDevice(_defaultOutput);
     }
 }
 
@@ -217,12 +257,12 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, in
     for (size_t i = 0; i < frames; ++i) {
         float b = buffer[i];
         if (b < 0) b *= -1;
-        if (b > level) level = b;
+        if (static_cast<qreal>(b) > level) level = static_cast<qreal>(b);
     }
     emit update(level);
 }
 
-int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
+int AudioEngine::outputCallback(const void* /*inputBuffer*/, void *outputBuffer,
                               unsigned long framesPerBuffer,
                               const PaStreamCallbackTimeInfo* /*timeInfo*/,
                               PaStreamCallbackFlags /*statusFlags*/,
@@ -230,20 +270,18 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
 
     float *out = static_cast<float*>(outputBuffer);
     CallbackInfo *info = static_cast<CallbackInfo*>(userData);
-    info->audio->mix(out, framesPerBuffer, CHANNELS, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeDevices().size() == 1);
+    info->audio->mix(out, framesPerBuffer, CHANNELS, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeOutputs().size() == 1);
     return paContinue;
+}
 
-    /*
-     * To ensure that the callback continues
- to be called, it should return paContinue (0). Either paComplete or paAbort
- can be returned to finish stream processing, after either of these values is
- returned the callback will not be called again. If paAbort is returned the
- stream will finish as soon as possible. If paComplete is returned, the stream
- will continue until all buffers generated by the callback have been played.
- This may be useful in applications such as soundfile players where a specific
- duration of output is required. However, it is not necessary to utilize this
- mechanism as Pa_StopStream(), Pa_AbortStream() or Pa_CloseStream() can also
- be used to stop the stream. The callback must always fill the entire output
- buffer irrespective of its return value.
- */
+int AudioEngine::inputCallback(const void* inputBuffer, void* /*outputBuffer*/,
+                              unsigned long framesPerBuffer,
+                              const PaStreamCallbackTimeInfo* /*timeInfo*/,
+                              PaStreamCallbackFlags /*statusFlags*/,
+                              void *userData) {
+
+    const float *in = static_cast<const float*>(inputBuffer);
+    CallbackInfo *info = static_cast<CallbackInfo*>(userData);
+    //info->audio->mix(in, framesPerBuffer, CHANNELS, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeOutputs().size() == 1);
+    return paContinue;
 }

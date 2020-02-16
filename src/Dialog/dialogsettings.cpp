@@ -117,11 +117,11 @@ void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int d
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
     DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
-    if (main->audio()->activeDevices().contains(dev)) return; // If it's already active, ignore
+    if (main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
     dev->indexes.displayIndex = deviceDisplayIndex;
 
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayDevice(deviceDisplayIndex);
+    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
     main->audio()->addActiveDevice(dev);
 
     switch (deviceDisplayIndex) {
@@ -132,14 +132,14 @@ void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int d
         main->settings()->setValue(Main::DEVICE_INDEX1, dev->indexes.deviceIndex);
         break;
     }
-    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeDevices().count() == 0);
+    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
     refreshDeviceSelection();
 }
 
 void DialogSettings::deviceRemoved(int deviceDisplayIndex, HostInfoContainer **displayHost)
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayDevice(deviceDisplayIndex);
+    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
 
     switch (deviceDisplayIndex) {
     case 0:
@@ -149,7 +149,7 @@ void DialogSettings::deviceRemoved(int deviceDisplayIndex, HostInfoContainer **d
         main->settings()->setValue(Main::DEVICE_INDEX1, -1);
         break;
     }
-    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeDevices().count() == 0);
+    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
     refreshDeviceSelection();
 }
 
@@ -185,9 +185,9 @@ void DialogSettings::refreshDeviceSelection() {
     ui->comboBoxDriver1->setEnabled(inited);
     ui->comboBoxOutputDevice1->clear();
     ui->comboBoxOutputDevice1->setEnabled(inited);
-    ui->pushButtonPlay->setEnabled(inited && a->activeDevices().size() > 0);
-    ui->pushButtonPause->setEnabled(inited && a->activeDevices().size() > 0);
-    ui->pushButtonStop->setEnabled(inited && a->activeDevices().size() > 0);
+    ui->pushButtonPlay->setEnabled(inited && a->activeOutputs().size() > 0);
+    ui->pushButtonPause->setEnabled(inited && a->activeOutputs().size() > 0);
+    ui->pushButtonStop->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonRefresh->setEnabled(inited);
     ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
     ui->groupBoxDevice1->setTitle(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
@@ -211,7 +211,7 @@ void DialogSettings::refreshDeviceSelection() {
         bool notActiveDriver = false;
 
         // First add a single active device
-        for (DeviceInfoContainer* dev : a->activeDevices()) {
+        for (DeviceInfoContainer* dev : a->activeOutputs()) {
             // If the device hasn't already been added somewhere, and the display indexes match
             if (!displayedDevices.contains(dev) && display.deviceDisplayIndex == dev->indexes.displayIndex) {
                 displayedDevices.append(dev);
@@ -261,24 +261,24 @@ void DialogSettings::refreshDeviceSelection() {
             }
 
             // Then add the default device
-            if (a->defaultDevice() && !displayedDevices.contains(a->defaultDevice()) && displayHost == a->defaultDevice()->host) {
+            if (a->defaultOutput() && !displayedDevices.contains(a->defaultOutput()) && displayHost == a->defaultOutput()->host) {
                 // If the device is active
-                if (a->activeDevices().contains(a->defaultDevice())) {
+                if (a->activeOutputs().contains(a->defaultOutput())) {
                     // Make sure it's not being displayed by another device display
-                    if (display.deviceDisplayIndex == a->defaultDevice()->indexes.displayIndex) {
-                        devices->addItem(a->defaultDevice()->info->name, QVariant::fromValue(a->defaultDevice()));
+                    if (display.deviceDisplayIndex == a->defaultOutput()->indexes.displayIndex) {
+                        devices->addItem(a->defaultOutput()->info->name, QVariant::fromValue(a->defaultOutput()));
                     }
                 } else {
-                    devices->addItem(a->defaultDevice()->info->name, QVariant::fromValue(a->defaultDevice()));
+                    devices->addItem(a->defaultOutput()->info->name, QVariant::fromValue(a->defaultOutput()));
                 }
             }
 
             // Then add other devices
             for (DeviceInfoContainer* dev : a->devices()) {
                 // If it's not already being displayed, it's not the default (because we just added it), and it's under this host
-                if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != a->defaultDevice()) {
+                if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != a->defaultOutput()) {
                     // If the device is active
-                    if (a->activeDevices().contains(dev)) {
+                    if (a->activeOutputs().contains(dev)) {
                         // Make sure it's not being displayed by another device display
                         if (display.deviceDisplayIndex == dev->indexes.displayIndex) {
                             devices->addItem(dev->info->name, QVariant::fromValue(dev));
@@ -323,7 +323,7 @@ void DialogSettings::on_pushButtonStop_clicked()
 }
 
 void DialogSettings::setDeviceVolume(int value, int devDisplayIndex) {
-    DeviceInfoContainer* dev = main->audio()->getActiveDisplayDevice(devDisplayIndex);
+    DeviceInfoContainer* dev = main->audio()->getActiveDisplayOutput(devDisplayIndex);
     if (dev) {
         dev->volumeInt = value;
         dev->volume = value / static_cast<float>(100);

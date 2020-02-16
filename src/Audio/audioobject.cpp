@@ -125,7 +125,6 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
 
 void AudioObject::setFile(const QString &filename) {
     stop();
-    if (file) delete file;
 
     // Set up the sideBuffer to hold as much data as a device's total requested frames (frames per buffer * channels), times the SIDE_BUFFER_MULTIPLIER
     sideBuffer = new float[SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS];
@@ -138,6 +137,7 @@ void AudioObject::setFile(const QString &filename) {
     sideBufferWrite = 0;
     sideBufferRead = 0;
 
+    if (file) delete file;
     file = new SndfileHandle(filename.toStdString());
 }
 

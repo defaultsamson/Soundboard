@@ -33,6 +33,7 @@ struct DeviceInfoContainer {
     DeviceIndexInfo indexes;
     int volumeInt;
     float volume;
+    bool isInput;
 };
 
 struct HostInfoContainer {
@@ -60,13 +61,19 @@ public:
     static size_t CHANNELS;
 
     HostInfoContainer *defaultHost();
-    DeviceInfoContainer *defaultDevice();
+    DeviceInfoContainer *defaultOutput();
+    DeviceInfoContainer *defaultInput();
 
     void addActiveDevice(DeviceInfoContainer*);
     void removeActiveDevice(DeviceInfoContainer*);
-    void removeActiveDisplayDevice(int deviceDisplayIndex);
-    DeviceInfoContainer* getActiveDisplayDevice(int deviceDisplayIndex);
-    const QList<DeviceInfoContainer*> activeDevices();
+
+    void removeActiveDisplayOutput(int deviceDisplayIndex);
+    DeviceInfoContainer* getActiveDisplayOutput(int deviceDisplayIndex);
+    const QList<DeviceInfoContainer*> activeOutputs();
+
+    void removeActiveDisplayInput(int deviceDisplayIndex);
+    DeviceInfoContainer* getActiveDisplayInput(int deviceDisplayIndex);
+    const QList<DeviceInfoContainer*> activeInputs();
 
     const QList<HostInfoContainer*> hosts();
     const QList<DeviceInfoContainer*> devices();
@@ -76,7 +83,13 @@ public:
     void init();
     bool isInitialized();
 
-    static int readCallback(const void *inputBuffer, void *outputBuffer,
+    static int outputCallback(const void *inputBuffer, void *outputBuffer,
+                            unsigned long framesPerBuffer,
+                            const PaStreamCallbackTimeInfo* timeInfo,
+                            PaStreamCallbackFlags statusFlags,
+                            void *userData);
+
+    static int inputCallback(const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags,
@@ -93,11 +106,14 @@ private:
     Main *main;
     bool _isInitialized = false;
 
-    HostInfoContainer *_defaultHost = nullptr;
-    DeviceInfoContainer *_defaultDevice = nullptr;
+    HostInfoContainer *_defaultOutputHost = nullptr;
+    DeviceInfoContainer *_defaultOutput = nullptr;
+    HostInfoContainer *_defaultInputHost = nullptr;
+    DeviceInfoContainer *_defaultInput = nullptr;
     QList<HostInfoContainer*> _hosts;
     QList<DeviceInfoContainer*> _devices;
-    QList<DeviceInfoContainer*> _activeDevices;
+    QList<DeviceInfoContainer*> _activeOutputs;
+    QList<DeviceInfoContainer*> _activeInputs;
     QList<DeviceIndexInfo> _selectedDeviceIndexes;
     QList<AudioObject *> _audioObjectRegistry;
 
