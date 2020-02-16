@@ -22,6 +22,7 @@ struct AudioDisplayContainer {
     QPushButton *deleteButton;
     HostInfoContainer* displayHost;
     int deviceDisplayIndex;
+    bool isInput;
 };
 
 class DialogSettings : public DialogTestAudio
@@ -40,10 +41,14 @@ public:
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+
     void host0Changed(int index);
     void device0Changed(int index);
     void host1Changed(int index);
     void device1Changed(int index);
+    void hostInputChanged(int index);
+    void deviceInputChanged(int index);
+
     void on_checkBoxDarkTheme_stateChanged(int arg1);
     void on_pushButtonRefresh_clicked();
     void on_tabWidget_currentChanged(int index);
@@ -57,13 +62,12 @@ private slots:
     void on_spinBoxDevice1_valueChanged(int arg1);
     void on_sliderInput_valueChanged(int value);
     void on_spinBoxInput_valueChanged(int arg1);
+
     void on_sliderTest_valueChanged(int value);
     void on_spinBoxTest_valueChanged(int arg1);
 
     void on_deleteButtonDevice0_clicked();
-
     void on_deleteButtonDevice1_clicked();
-
     void on_deleteButtonDeviceInput_clicked();
 
 private:
@@ -72,10 +76,11 @@ private:
     AudioObject audio;
     HostInfoContainer *_displayHost0 = nullptr;
     HostInfoContainer *_displayHost1 = nullptr;
+    HostInfoContainer *_displayHostInput = nullptr;
     void closeEvent(QCloseEvent *bar);
     void handleClose();
-    void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer **displayHost);
-    void deviceRemoved(int deviceDisplayIndex, HostInfoContainer **displayHost);
+    void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost);
+    void deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost);
     void setDeviceVolume(int value, int devDisplayIndex);
 };
 

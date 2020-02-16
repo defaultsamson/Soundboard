@@ -80,13 +80,14 @@ QString Main::HAS_ACTIVE_BOARD = "has_active_board";
 bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
 QString Main::SETTINGS_TAB = "settings_tab";
 
-QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_devices";
-QString Main::DEVICE_INDEX0 = "device_index0";
-QString Main::DEVICE_INDEX1 = "device_index1";
-QString Main::DEVICE_INDEX_INPUT = "device_index_input";
-QString Main::DEVICE_VOLUME0 = "device_volume0";
-QString Main::DEVICE_VOLUME1 = "device_volume1";
-QString Main::DEVICE_VOLUME_INPUT = "device_volume_input";
+QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
+QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
+QString Main::OUTPUT_INDEX0 = "output_index0";
+QString Main::OUTPUT_INDEX1 = "output_index1";
+QString Main::INPUT_INDEX0 = "input_index0";
+QString Main::OUTPUT_VOLUME0 = "output_volume0";
+QString Main::OUTPUT_VOLUME1 = "output_volume1";
+QString Main::INPUT_VOLUME0 = "input_volume0";
 QString Main::TEST_VOLUME = "test_volume";
 
 Main::Main(QWidget *parent) :

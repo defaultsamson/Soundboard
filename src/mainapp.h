@@ -39,12 +39,13 @@ public:
     static QString SETTINGS_TAB;
 
     static QString EXPLICIT_NO_OUTPUT_DEVICES;
-    static QString DEVICE_INDEX0;
-    static QString DEVICE_INDEX1;
-    static QString DEVICE_INDEX_INPUT;
-    static QString DEVICE_VOLUME0;
-    static QString DEVICE_VOLUME1;
-    static QString DEVICE_VOLUME_INPUT;
+    static QString EXPLICIT_NO_INPUT_DEVICES;
+    static QString OUTPUT_INDEX0;
+    static QString OUTPUT_INDEX1;
+    static QString INPUT_INDEX0;
+    static QString OUTPUT_VOLUME0;
+    static QString OUTPUT_VOLUME1;
+    static QString INPUT_VOLUME0;
     static QString TEST_VOLUME;
 
     explicit Main(QWidget *parent = nullptr);

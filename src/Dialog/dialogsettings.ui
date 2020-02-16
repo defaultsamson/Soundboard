@@ -205,7 +205,7 @@
                            <widget class="QComboBox" name="comboBoxDriver0"/>
                           </item>
                           <item>
-                           <widget class="QComboBox" name="comboBoxOutputDevice0"/>
+                           <widget class="QComboBox" name="comboBoxDevice0"/>
                           </item>
                          </layout>
                         </item>
@@ -361,7 +361,7 @@
                            <widget class="QComboBox" name="comboBoxDriver1"/>
                           </item>
                           <item>
-                           <widget class="QComboBox" name="comboBoxOutputDevice1"/>
+                           <widget class="QComboBox" name="comboBoxDevice1"/>
                           </item>
                          </layout>
                         </item>

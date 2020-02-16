@@ -203,28 +203,40 @@ void AudioEngine::refreshDevices() {
     }
 
     // Devices are loaded, now determine which are supposed to be active
-    DeviceInfoContainer* dev0 = getDevice(main->settings()->value(Main::DEVICE_INDEX0, -1).toInt());
-    DeviceInfoContainer* dev1 = getDevice(main->settings()->value(Main::DEVICE_INDEX1, -1).toInt());
+    DeviceInfoContainer* out0 = getDevice(main->settings()->value(Main::OUTPUT_INDEX0, -1).toInt());
+    DeviceInfoContainer* out1 = getDevice(main->settings()->value(Main::OUTPUT_INDEX1, -1).toInt());
+    DeviceInfoContainer* in0 = getDevice(main->settings()->value(Main::INPUT_INDEX0, -1).toInt());
 
     // There's a saved device, load it
-    if (dev0) {
-        dev0->indexes.displayIndex = 0;
-        dev0->volumeInt = main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt();
-        dev0->volume = main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt() / static_cast<float>(100);
-        addActiveDevice(dev0);
+    if (out0) {
+        out0->indexes.displayIndex = 0;
+        out0->volumeInt = main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt();
+        out0->volume = main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt() / static_cast<float>(100);
+        addActiveDevice(out0);
     }
-    if (dev1) {
-        dev1->indexes.displayIndex = 1;
-        dev1->volumeInt = main->settings()->value(Main::DEVICE_VOLUME1, 100).toInt();
-        dev1->volume = main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt() / static_cast<float>(100);
-        addActiveDevice(dev1);
+    if (out1) {
+        out1->indexes.displayIndex = 1;
+        out1->volumeInt = main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt();
+        out1->volume = main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt() / static_cast<float>(100);
+        addActiveDevice(out1);
+    }
+    if (in0) {
+        in0->indexes.displayIndex = 0;
+        in0->volumeInt = main->settings()->value(Main::INPUT_VOLUME0, 100).toInt();
+        in0->volume = main->settings()->value(Main::INPUT_VOLUME0, 100).toInt() / static_cast<float>(100);
+        addActiveDevice(in0);
     }
 
     // If no device was found, and the devices weren't explicitly all removed, load the defaults
     if (_activeOutputs.size() == 0 && _defaultOutput && !main->settings()->value(Main::EXPLICIT_NO_OUTPUT_DEVICES, false).toBool()) {
-        main->settings()->setValue(Main::DEVICE_INDEX0, _defaultOutput ? _defaultOutput->indexes.deviceIndex : -1);
+        main->settings()->setValue(Main::OUTPUT_INDEX0, _defaultOutput ? _defaultOutput->indexes.deviceIndex : -1);
         _defaultOutput->indexes.displayIndex = 0;
         addActiveDevice(_defaultOutput);
+    }
+    if (_activeInputs.size() == 0 && _defaultInput && !main->settings()->value(Main::EXPLICIT_NO_INPUT_DEVICES, false).toBool()) {
+        main->settings()->setValue(Main::INPUT_INDEX0, _defaultInput ? _defaultInput->indexes.deviceIndex : -1);
+        _defaultInput->indexes.displayIndex = 0;
+        addActiveDevice(_defaultInput);
     }
 }
 

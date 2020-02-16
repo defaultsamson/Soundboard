@@ -31,13 +31,25 @@ DialogSettings::DialogSettings(Main *main) :
 
     refreshDeviceSelection();
 
-    connect(ui->comboBoxOutputDevice0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device0Changed);
+    connect(ui->comboBoxDevice0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device0Changed);
     connect(ui->comboBoxDriver0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host0Changed);
-    connect(ui->comboBoxOutputDevice1, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device1Changed);
+    connect(ui->comboBoxDevice1, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device1Changed);
     connect(ui->comboBoxDriver1, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host1Changed);
+    connect(ui->comboBoxDeviceInput, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceInputChanged);
+    connect(ui->comboBoxDriverInput, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostInputChanged);
+
+    ui->spinBoxDevice0->setValue(main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
+    ui->sliderDevice0->setValue(main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
+    ui->spinBoxDevice1->setValue(main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
+    ui->sliderDevice1->setValue(main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
+    ui->spinBoxInput->setValue(main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+    ui->sliderInput->setValue(main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+
+    ui->spinBoxTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    ui->sliderTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
 
     audio.setFile(Main::TEST_AUDIO);
-    audio.setVolume(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    audio.setVolume(main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
     main->audio()->registerAudio(&audio);
 
     connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
@@ -45,15 +57,6 @@ DialogSettings::DialogSettings(Main *main) :
     });
 
     main->setAudioTestDialog(this);
-
-    ui->spinBoxDevice0->setValue(main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt());
-    ui->sliderDevice0->setValue(main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt());
-    ui->spinBoxDevice1->setValue(main->settings()->value(Main::DEVICE_VOLUME1, 100).toInt());
-    ui->sliderDevice1->setValue(main->settings()->value(Main::DEVICE_VOLUME1, 100).toInt());
-    ui->spinBoxInput->setValue(main->settings()->value(Main::DEVICE_VOLUME_INPUT, 100).toInt());
-    ui->sliderInput->setValue(main->settings()->value(Main::DEVICE_VOLUME_INPUT, 100).toInt());
-    ui->spinBoxTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
-    ui->sliderTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
 }
 
 DialogSettings::~DialogSettings()
@@ -92,7 +95,7 @@ void DialogSettings::host0Changed(int index)
 
 void DialogSettings::device0Changed(int index)
 {
-    deviceChanged(ui->comboBoxOutputDevice0, index, 0, &_displayHost0);
+    deviceChanged(ui->comboBoxDevice0, index, 0, false, &_displayHost0);
 }
 
 void DialogSettings::host1Changed(int index)
@@ -108,48 +111,86 @@ void DialogSettings::host1Changed(int index)
 
 void DialogSettings::device1Changed(int index)
 {
-    deviceChanged(ui->comboBoxOutputDevice1, index, 1, &_displayHost1);
+    deviceChanged(ui->comboBoxDevice1, index, 1, false, &_displayHost1);
 }
 
-void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer **displayHost)
+void DialogSettings::hostInputChanged(int index)
+{
+    QVariant qvar = ui->comboBoxDriverInput->itemData(index);
+    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select backend..."
+
+    HostInfoContainer* host = qvar.value<HostInfoContainer*>();
+    if (_displayHostInput == host) return; // _displayHost1 starts out null, so doesn't work the first time, but prevents most unneccessary refreshes
+    _displayHostInput = host;
+    refreshDeviceSelection();
+}
+
+void DialogSettings::deviceInputChanged(int index)
+{
+    deviceChanged(ui->comboBoxDeviceInput, index, 0, true, &_displayHostInput);
+}
+
+void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost)
 {
     QVariant qvar = selector->itemData(selectorIndex);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
     DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
-    if (main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
+    if (isInput ? main->audio()->activeInputs().contains(dev) : main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
     dev->indexes.displayIndex = deviceDisplayIndex;
 
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
+    if (isInput) main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
+    else main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
     main->audio()->addActiveDevice(dev);
 
-    switch (deviceDisplayIndex) {
-    case 0:
-        main->settings()->setValue(Main::DEVICE_INDEX0, dev->indexes.deviceIndex);
-        break;
-    case 1:
-        main->settings()->setValue(Main::DEVICE_INDEX1, dev->indexes.deviceIndex);
-        break;
+    if (isInput) {
+        switch (deviceDisplayIndex) {
+        case 0:
+            main->settings()->setValue(Main::INPUT_INDEX0, dev->indexes.deviceIndex);
+            break;
+        }
+        main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
+    } else {
+        switch (deviceDisplayIndex) {
+        case 0:
+            main->settings()->setValue(Main::OUTPUT_INDEX0, dev->indexes.deviceIndex);
+            break;
+        case 1:
+            main->settings()->setValue(Main::OUTPUT_INDEX1, dev->indexes.deviceIndex);
+            break;
+        }
+        main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
     }
-    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+
     refreshDeviceSelection();
 }
 
-void DialogSettings::deviceRemoved(int deviceDisplayIndex, HostInfoContainer **displayHost)
+void DialogSettings::deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost)
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
+    if (isInput) main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
+    else main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
 
-    switch (deviceDisplayIndex) {
-    case 0:
-        main->settings()->setValue(Main::DEVICE_INDEX0, -1);
-        break;
-    case 1:
-        main->settings()->setValue(Main::DEVICE_INDEX1, -1);
-        break;
+    if (isInput) {
+        switch (deviceDisplayIndex) {
+        case 0:
+            main->settings()->setValue(Main::INPUT_INDEX0, -1);
+            break;
+        }
+        main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
+    } else {
+        switch (deviceDisplayIndex) {
+        case 0:
+            main->settings()->setValue(Main::OUTPUT_INDEX0, -1);
+            break;
+        case 1:
+            main->settings()->setValue(Main::OUTPUT_INDEX1, -1);
+            break;
+        }
+        main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
     }
-    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+
     refreshDeviceSelection();
 }
 
@@ -169,33 +210,30 @@ void DialogSettings::audioEngineInit() {
 }
 
 void DialogSettings::refreshDeviceSelection() {
-    // TODO get all the default info from the AudioEngine
-    QComboBox *driverBox = ui->comboBoxDriver0;
-    QComboBox *deviceBox = ui->comboBoxOutputDevice0;
-    driverBox->clear();
-    deviceBox->clear();
     AudioEngine *a = main->audio();
 
     bool inited = a->isInitialized();
     ui->comboBoxDriver0->clear();
     ui->comboBoxDriver0->setEnabled(inited);
-    ui->comboBoxOutputDevice0->clear();
-    ui->comboBoxOutputDevice0->setEnabled(inited);
+    ui->comboBoxDevice0->clear();
+    ui->comboBoxDevice0->setEnabled(inited);
     ui->comboBoxDriver1->clear();
     ui->comboBoxDriver1->setEnabled(inited);
-    ui->comboBoxOutputDevice1->clear();
-    ui->comboBoxOutputDevice1->setEnabled(inited);
+    ui->comboBoxDevice1->clear();
+    ui->comboBoxDevice1->setEnabled(inited);
     ui->pushButtonPlay->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonPause->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonStop->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonRefresh->setEnabled(inited);
     ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
     ui->groupBoxDevice1->setTitle(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
+    ui->groupBoxDeviceInput->setTitle(inited ? "Input Device" : "Input Device (INITIALIZING...)");
     if (!inited) return;
 
     QList<AudioDisplayContainer> deviceDisplays;
-    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxOutputDevice0, ui->deleteButtonDevice0, _displayHost0, 0});
-    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxOutputDevice1, ui->deleteButtonDevice1, _displayHost1, 1});
+    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxDevice0, ui->deleteButtonDevice0, _displayHost0, 0, false});
+    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxDevice1, ui->deleteButtonDevice1, _displayHost1, 1, false});
+    deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriverInput, ui->comboBoxDeviceInput, ui->deleteButtonDeviceInput, _displayHostInput, 0, true});
     QList<DeviceInfoContainer*> displayedDevices;
 
     for (AudioDisplayContainer display : deviceDisplays) {
@@ -211,7 +249,7 @@ void DialogSettings::refreshDeviceSelection() {
         bool notActiveDriver = false;
 
         // First add a single active device
-        for (DeviceInfoContainer* dev : a->activeOutputs()) {
+        for (DeviceInfoContainer* dev : display.isInput ? a->activeInputs() : a->activeOutputs()) {
             // If the device hasn't already been added somewhere, and the display indexes match
             if (!displayedDevices.contains(dev) && display.deviceDisplayIndex == dev->indexes.displayIndex) {
                 displayedDevices.append(dev);
@@ -261,24 +299,31 @@ void DialogSettings::refreshDeviceSelection() {
             }
 
             // Then add the default device
-            if (a->defaultOutput() && !displayedDevices.contains(a->defaultOutput()) && displayHost == a->defaultOutput()->host) {
+            if (display.isInput
+                    ? a->defaultInput() && !displayedDevices.contains(a->defaultInput()) && displayHost == a->defaultInput()->host
+                    : a->defaultOutput() && !displayedDevices.contains(a->defaultOutput()) && displayHost == a->defaultOutput()->host) {
                 // If the device is active
-                if (a->activeOutputs().contains(a->defaultOutput())) {
+                if (display.isInput
+                        ? a->activeInputs().contains(a->defaultInput())
+                        : a->activeOutputs().contains(a->defaultOutput())) {
                     // Make sure it's not being displayed by another device display
-                    if (display.deviceDisplayIndex == a->defaultOutput()->indexes.displayIndex) {
+                    if (display.isInput
+                            ? display.deviceDisplayIndex == a->defaultInput()->indexes.displayIndex
+                            : display.deviceDisplayIndex == a->defaultOutput()->indexes.displayIndex) {
                         devices->addItem(a->defaultOutput()->info->name, QVariant::fromValue(a->defaultOutput()));
                     }
                 } else {
-                    devices->addItem(a->defaultOutput()->info->name, QVariant::fromValue(a->defaultOutput()));
+                    devices->addItem(display.isInput ? a->defaultInput()->info->name : a->defaultOutput()->info->name,
+                                     QVariant::fromValue(display.isInput ? a->defaultInput() : a->defaultOutput()));
                 }
             }
 
             // Then add other devices
-            for (DeviceInfoContainer* dev : a->outputs()) {
+            for (DeviceInfoContainer* dev : display.isInput ? a->inputs() : a->outputs()) {
                 // If it's not already being displayed, it's not the default (because we just added it), and it's under this host
-                if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != a->defaultOutput()) {
+                if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != (display.isInput ? a->defaultInput() : a->defaultOutput())) {
                     // If the device is active
-                    if (a->activeOutputs().contains(dev)) {
+                    if (display.isInput ? a->activeInputs().contains(dev) : a->activeOutputs().contains(dev)) {
                         // Make sure it's not being displayed by another device display
                         if (display.deviceDisplayIndex == dev->indexes.displayIndex) {
                             devices->addItem(dev->info->name, QVariant::fromValue(dev));
@@ -336,7 +381,7 @@ void DialogSettings::on_sliderDevice0_valueChanged(int value)
     if (!(value == ui->sliderDevice0->maximum() && ui->spinBoxDevice0->value() > value)) {
         ui->spinBoxDevice0->setValue(value);
         setDeviceVolume(value, 0);
-        main->settings()->setValue(Main::DEVICE_VOLUME0, value);
+        main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
     }
 }
 
@@ -344,7 +389,7 @@ void DialogSettings::on_spinBoxDevice0_valueChanged(int value)
 {
     ui->sliderDevice0->setValue(value);
     setDeviceVolume(value, 0);
-    main->settings()->setValue(Main::DEVICE_VOLUME0, value);
+    main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
 }
 
 void DialogSettings::on_sliderDevice1_valueChanged(int value)
@@ -353,7 +398,7 @@ void DialogSettings::on_sliderDevice1_valueChanged(int value)
     if (!(value == ui->sliderDevice1->maximum() && ui->spinBoxDevice1->value() > value)) {
         ui->spinBoxDevice1->setValue(value);
         setDeviceVolume(value, 1);
-        main->settings()->setValue(Main::DEVICE_VOLUME1, value);
+        main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
     }
 }
 
@@ -361,7 +406,7 @@ void DialogSettings::on_spinBoxDevice1_valueChanged(int value)
 {
     ui->sliderDevice1->setValue(value);
     setDeviceVolume(value, 1);
-    main->settings()->setValue(Main::DEVICE_VOLUME1, value);
+    main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
 }
 
 void DialogSettings::on_sliderInput_valueChanged(int value)
@@ -370,7 +415,7 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
     if (!(value == ui->sliderInput->maximum() && ui->spinBoxInput->value() > value)) {
         ui->spinBoxInput->setValue(value);
         setDeviceVolume(value, 2);
-        main->settings()->setValue(Main::DEVICE_VOLUME_INPUT, value);
+        main->settings()->setValue(Main::INPUT_VOLUME0, value);
     }
 }
 
@@ -378,7 +423,7 @@ void DialogSettings::on_spinBoxInput_valueChanged(int value)
 {
     ui->sliderInput->setValue(value);
     setDeviceVolume(value, 2);
-    main->settings()->setValue(Main::DEVICE_VOLUME_INPUT, value);
+    main->settings()->setValue(Main::INPUT_VOLUME0, value);
 }
 
 void DialogSettings::on_sliderTest_valueChanged(int value)
@@ -400,15 +445,15 @@ void DialogSettings::on_spinBoxTest_valueChanged(int value)
 
 void DialogSettings::on_deleteButtonDevice0_clicked()
 {
-    deviceRemoved(0, &_displayHost0);
+    deviceRemoved(0, false, &_displayHost0);
 }
 
 void DialogSettings::on_deleteButtonDevice1_clicked()
 {
-    deviceRemoved(1, &_displayHost1);
+    deviceRemoved(1, false, &_displayHost1);
 }
 
 void DialogSettings::on_deleteButtonDeviceInput_clicked()
 {
-
+    deviceRemoved(0, true, &_displayHostInput);
 }
