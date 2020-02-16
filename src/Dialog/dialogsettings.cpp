@@ -213,22 +213,31 @@ void DialogSettings::refreshDeviceSelection() {
     AudioEngine *a = main->audio();
 
     bool inited = a->isInitialized();
-    ui->comboBoxDriver0->clear();
-    ui->comboBoxDriver0->setEnabled(inited);
-    ui->comboBoxDevice0->clear();
-    ui->comboBoxDevice0->setEnabled(inited);
-    ui->comboBoxDriver1->clear();
-    ui->comboBoxDriver1->setEnabled(inited);
-    ui->comboBoxDevice1->clear();
-    ui->comboBoxDevice1->setEnabled(inited);
+    ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
+    ui->groupBoxDevice1->setTitle(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
+    ui->groupBoxDeviceInput->setTitle(inited ? "Input Device" : "Input Device (INITIALIZING...)");
     ui->pushButtonPlay->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonPause->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonStop->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonRefresh->setEnabled(inited);
-    ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
-    ui->groupBoxDevice1->setTitle(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
-    ui->groupBoxDeviceInput->setTitle(inited ? "Input Device" : "Input Device (INITIALIZING...)");
-    if (!inited) return;
+    if (!inited) {
+        ui->comboBoxDriver0->clear();
+        ui->comboBoxDriver0->setEnabled(false);
+        ui->comboBoxDevice0->clear();
+        ui->comboBoxDevice0->setEnabled(false);
+        ui->comboBoxDriver1->clear();
+        ui->comboBoxDriver1->setEnabled(false);
+        ui->comboBoxDevice1->clear();
+        ui->comboBoxDevice1->setEnabled(false);
+        ui->comboBoxDriverInput->clear();
+        ui->comboBoxDriverInput->setEnabled(false);
+        ui->comboBoxDeviceInput->clear();
+        ui->comboBoxDeviceInput->setEnabled(false);
+        ui->deleteButtonDevice0->setEnabled(false);
+        ui->deleteButtonDevice1->setEnabled(false);
+        ui->deleteButtonDeviceInput->setEnabled(false);
+        return;
+    }
 
     QList<AudioDisplayContainer> deviceDisplays;
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxDevice0, ui->deleteButtonDevice0, _displayHost0, 0, false});
