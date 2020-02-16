@@ -103,8 +103,6 @@ bool AudioEngine::isInitialized() {
 }
 
 void AudioEngine::refreshDevices() {
-    // Make the default device active
-    // TODO allow changing which devices are active via the settings menu
 
     int devices = Pa_GetDeviceCount();
     qDebug() << "Refreshing devices... [" << devices << "]";
@@ -114,6 +112,7 @@ void AudioEngine::refreshDevices() {
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
     _hosts.clear();
     _devices.clear();
+    for (auto dev : _activeDevices) Pa_CloseStream(dev->stream);
     _activeDevices.clear();
 
     const PaDeviceInfo *device;
