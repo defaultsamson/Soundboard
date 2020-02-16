@@ -274,7 +274,7 @@ void DialogSettings::refreshDeviceSelection() {
             }
 
             // Then add other devices
-            for (DeviceInfoContainer* dev : a->devices()) {
+            for (DeviceInfoContainer* dev : a->outputs()) {
                 // If it's not already being displayed, it's not the default (because we just added it), and it's under this host
                 if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != a->defaultOutput()) {
                     // If the device is active

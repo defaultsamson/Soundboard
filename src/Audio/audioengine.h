@@ -60,7 +60,6 @@ public:
     static size_t FRAMES_PER_BUFFER;
     static size_t CHANNELS;
 
-    HostInfoContainer *defaultHost();
     DeviceInfoContainer *defaultOutput();
     DeviceInfoContainer *defaultInput();
 
@@ -76,7 +75,8 @@ public:
     const QList<DeviceInfoContainer*> activeInputs();
 
     const QList<HostInfoContainer*> hosts();
-    const QList<DeviceInfoContainer*> devices();
+    const QList<DeviceInfoContainer*> outputs();
+    const QList<DeviceInfoContainer*> inputs();
 
     void refreshDevices();
 
@@ -106,12 +106,11 @@ private:
     Main *main;
     bool _isInitialized = false;
 
-    HostInfoContainer *_defaultOutputHost = nullptr;
     DeviceInfoContainer *_defaultOutput = nullptr;
-    HostInfoContainer *_defaultInputHost = nullptr;
     DeviceInfoContainer *_defaultInput = nullptr;
     QList<HostInfoContainer*> _hosts;
-    QList<DeviceInfoContainer*> _devices;
+    QList<DeviceInfoContainer*> _outputs;
+    QList<DeviceInfoContainer*> _inputs;
     QList<DeviceInfoContainer*> _activeOutputs;
     QList<DeviceInfoContainer*> _activeInputs;
     QList<DeviceIndexInfo> _selectedDeviceIndexes;

@@ -15,9 +15,6 @@ AudioEngine::~AudioEngine() {
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
 }
 
-HostInfoContainer *AudioEngine::defaultHost() {
-    return _defaultOutputHost;
-}
 DeviceInfoContainer *AudioEngine::defaultOutput() {
     return _defaultOutput;
 }
@@ -129,8 +126,11 @@ const QList<DeviceInfoContainer*> AudioEngine::activeInputs() {
 const QList<HostInfoContainer*> AudioEngine::hosts() {
     return _hosts;
 }
-const QList<DeviceInfoContainer*> AudioEngine::devices() {
-    return _devices;
+const QList<DeviceInfoContainer*> AudioEngine::outputs() {
+    return _outputs;
+}
+const QList<DeviceInfoContainer*> AudioEngine::inputs() {
+    return _inputs;
 }
 
 void AudioEngine::init() {
@@ -148,11 +148,12 @@ void AudioEngine::refreshDevices() {
     int devices = Pa_GetDeviceCount();
     qDebug() << "Refreshing devices... [" << devices << "]";
 
-    _defaultOutputHost = nullptr;
     _defaultOutput = nullptr;
+    _defaultInput = nullptr;
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
     _hosts.clear();
-    _devices.clear();
+    _outputs.clear();
+    _inputs.clear();
     for (auto dev : _activeOutputs) Pa_CloseStream(dev->stream);
     _activeOutputs.clear();
 
@@ -160,42 +161,44 @@ void AudioEngine::refreshDevices() {
 
     for (int i = 0; i < devices; ++i ) {
         device = Pa_GetDeviceInfo(i);
-        if (device->maxOutputChannels == 0) { // isInput
-            qDebug() << "Ignoring input channel... [" << i << "]";
+        bool isInput = device->maxOutputChannels == 0;
+        DeviceInfoContainer *dev = dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}, 100, 1, isInput};
+
+        if (isInput) {
+            _inputs.append(dev);
+            if (Pa_GetDefaultInputDevice() == i) {
+                _defaultInput = dev;
+                qDebug() << "Default input device... [" << i << "]";
+            }
         } else {
-            DeviceInfoContainer *dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}, 100, 1, false};
-            _devices.append(dev);
+            _outputs.append(dev);
             if (Pa_GetDefaultOutputDevice() == i) {
                 _defaultOutput = dev;
-                qDebug() << "Default device... [" << i << "]";
+                qDebug() << "Default output device... [" << i << "]";
             }
-            // Try to find the container for the specific host that contains all its devices
-            bool foundCon = false;
-            for (auto hostCon : _hosts) {
-                if (hostCon->index == device->hostApi) {
-                    foundCon = true;
-                    dev->host = hostCon;
-                    hostCon->devices->append(dev);
-                    break;
-                }
-            }
-            // Create the container if not found
-            if (!foundCon) {
-                QList<DeviceInfoContainer*> *list = new QList<DeviceInfoContainer*>();
-                list->append(dev);
-                HostInfoContainer *hostCon = new HostInfoContainer{
-                    device->hostApi,
-                    Pa_GetHostApiInfo(device->hostApi)->name,
-                    list
-                };
+        }
+
+        // Try to find the container for the specific host that contains all its devices
+        bool foundCon = false;
+        for (auto hostCon : _hosts) {
+            if (hostCon->index == device->hostApi) {
+                foundCon = true;
                 dev->host = hostCon;
-                _hosts.append(hostCon);
-                // Default stuff
-                if (device->hostApi == Pa_GetDefaultHostApi()) {
-                    _defaultOutputHost = hostCon;
-                    qDebug() << "Default host... [" << device->hostApi << "]";
-                }
+                hostCon->devices->append(dev);
+                break;
             }
+        }
+        // Create the container if not found
+        if (!foundCon) {
+            QList<DeviceInfoContainer*> *list = new QList<DeviceInfoContainer*>();
+            list->append(dev);
+            HostInfoContainer *hostCon = new HostInfoContainer{
+                device->hostApi,
+                Pa_GetHostApiInfo(device->hostApi)->name,
+                list
+            };
+            dev->host = hostCon;
+            _hosts.append(hostCon);
         }
     }
 
@@ -226,7 +229,11 @@ void AudioEngine::refreshDevices() {
 }
 
 DeviceInfoContainer* AudioEngine::getDevice(int deviceIndex) {
-    for (auto dev : _devices)
+    for (auto dev : _outputs)
+        if (dev->indexes.deviceIndex == deviceIndex)
+            return dev;
+
+    for (auto dev : _inputs)
         if (dev->indexes.deviceIndex == deviceIndex)
             return dev;
 
