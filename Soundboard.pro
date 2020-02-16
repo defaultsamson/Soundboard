@@ -24,8 +24,10 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 CONFIG += c++11
 
-# This enables the X11 library to be used. Handles keypresses
-# LIBS += -lX11
+# This uses the -O3 compiler instead of -O2
+CONFIG(release, debug|release) {
+    CONFIG += optimize_full
+}
 
 SOURCES += \
     src/Audio/audioengine.cpp \

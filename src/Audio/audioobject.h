@@ -19,7 +19,7 @@ public:
     void stop();
     void pause();
 
-    void mix(float* buffer, size_t framesPerBuffer, int deviceListIndex, float deviceVolume, bool singleDevice);
+    void mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice);
 
     bool isPlaying();
     bool isPaused();
@@ -33,7 +33,7 @@ private:
     bool stopped = true;
     float _volume = 1; // 0.0 - 1.0
     float *sideBuffer = nullptr;
-    size_t *bufferRead = nullptr;
+    size_t *bytesRead = nullptr;
 
     // Sometimes there are 4 or possibly more reads and writes done consecutively.
     // When that happens, we need to make sure that there's enough of a buffer for

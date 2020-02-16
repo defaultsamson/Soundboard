@@ -24,6 +24,7 @@ DeviceInfoContainer *AudioEngine::defaultDevice() {
 
 void AudioEngine::addActiveDevice(DeviceInfoContainer *device) {
     if (_activeDevices.contains(device) || !device) return;
+    // Adding device to the end of the list
     device->indexes.deviceListIndex = _activeDevices.size();
     _activeDevices.append(device);
     _selectedDeviceIndexes.append(device->indexes);
@@ -172,7 +173,7 @@ void AudioEngine::refreshDevices() {
         addActiveDevice(dev1);
     }
 
-    // If no device was found, load the defaults
+    // If no device was found, and the devices weren't explicitly all removed, load the defaults
     if (_activeDevices.size() == 0 && _defaultDevice && !main->settings()->value(Main::EXPLICIT_NO_DEVICES, false).toBool()) {
         main->settings()->setValue(Main::DEVICE_INDEX0, _defaultDevice ? _defaultDevice->indexes.deviceIndex : -1);
         _defaultDevice->indexes.displayIndex = 0;
@@ -196,15 +197,15 @@ void AudioEngine::unregisterAudio(AudioObject *obj) {
 }
 
 // Mixes audio from all the AudioObjects (future: perhaps mic too?)
-void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex, float deviceVolume, bool singleDevice) {
+void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice) {
 
-    size_t frames = framesPerBuffer * CHANNELS;
+    size_t frames = framesPerBuffer * channels;
 
     // Fills the buffer with zeros
     memset(buffer, 0, frames * sizeof(float));
 
     for (AudioObject *audio : _audioObjectRegistry) {
-        audio->mix(buffer, framesPerBuffer, deviceListIndex, deviceVolume, singleDevice);
+        audio->mix(buffer, framesPerBuffer, channels, deviceListIndex, deviceVolume, singleDevice);
     }
 
     // Update with the greatest level
@@ -212,7 +213,7 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, int deviceListIndex
     for (size_t i = 0; i < frames; ++i) {
         float b = buffer[i];
         if (b < 0) b *= -1;
-        if (b  > level) level = b;
+        if (b > level) level = b;
     }
     emit update(level);
 }
@@ -225,7 +226,7 @@ int AudioEngine::readCallback(const void* /*inputBuffer*/, void *outputBuffer,
 
     float *out = static_cast<float*>(outputBuffer);
     CallbackInfo *info = static_cast<CallbackInfo*>(userData);
-    info->audio->mix(out, framesPerBuffer, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeDevices().size() == 1);
+    info->audio->mix(out, framesPerBuffer, CHANNELS, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeDevices().size() == 1);
     return paContinue;
 
     /*
