@@ -37,6 +37,7 @@ DialogSettings::DialogSettings(Main *main) :
     connect(ui->comboBoxDriver1, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host1Changed);
 
     audio.setFile(Main::TEST_AUDIO);
+    audio.setVolume(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
     main->audio()->registerAudio(&audio);
 
     connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
@@ -44,6 +45,15 @@ DialogSettings::DialogSettings(Main *main) :
     });
 
     main->setAudioTestDialog(this);
+
+    ui->spinBoxDevice0->setValue(main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt());
+    ui->sliderDevice0->setValue(main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt());
+    ui->spinBoxDevice1->setValue(main->settings()->value(Main::DEVICE_VOLUME1, 100).toInt());
+    ui->sliderDevice1->setValue(main->settings()->value(Main::DEVICE_VOLUME1, 100).toInt());
+    ui->spinBoxInput->setValue(main->settings()->value(Main::DEVICE_VOLUME_INPUT, 100).toInt());
+    ui->sliderInput->setValue(main->settings()->value(Main::DEVICE_VOLUME_INPUT, 100).toInt());
+    ui->spinBoxTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    ui->sliderTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
 }
 
 DialogSettings::~DialogSettings()
@@ -122,7 +132,7 @@ void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int d
         main->settings()->setValue(Main::DEVICE_INDEX1, dev->indexes.deviceIndex);
         break;
     }
-    main->settings()->setValue(Main::EXPLICIT_NO_DEVICES, main->audio()->activeDevices().count() == 0);
+    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeDevices().count() == 0);
     refreshDeviceSelection();
 }
 
@@ -139,7 +149,7 @@ void DialogSettings::deviceRemoved(int deviceDisplayIndex, HostInfoContainer **d
         main->settings()->setValue(Main::DEVICE_INDEX1, -1);
         break;
     }
-    main->settings()->setValue(Main::EXPLICIT_NO_DEVICES, main->audio()->activeDevices().count() == 0);
+    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeDevices().count() == 0);
     refreshDeviceSelection();
 }
 
@@ -326,6 +336,7 @@ void DialogSettings::on_sliderDevice0_valueChanged(int value)
     if (!(value == ui->sliderDevice0->maximum() && ui->spinBoxDevice0->value() > value)) {
         ui->spinBoxDevice0->setValue(value);
         setDeviceVolume(value, 0);
+        main->settings()->setValue(Main::DEVICE_VOLUME0, value);
     }
 }
 
@@ -333,6 +344,7 @@ void DialogSettings::on_spinBoxDevice0_valueChanged(int value)
 {
     ui->sliderDevice0->setValue(value);
     setDeviceVolume(value, 0);
+    main->settings()->setValue(Main::DEVICE_VOLUME0, value);
 }
 
 void DialogSettings::on_sliderDevice1_valueChanged(int value)
@@ -341,6 +353,7 @@ void DialogSettings::on_sliderDevice1_valueChanged(int value)
     if (!(value == ui->sliderDevice1->maximum() && ui->spinBoxDevice1->value() > value)) {
         ui->spinBoxDevice1->setValue(value);
         setDeviceVolume(value, 1);
+        main->settings()->setValue(Main::DEVICE_VOLUME1, value);
     }
 }
 
@@ -348,6 +361,7 @@ void DialogSettings::on_spinBoxDevice1_valueChanged(int value)
 {
     ui->sliderDevice1->setValue(value);
     setDeviceVolume(value, 1);
+    main->settings()->setValue(Main::DEVICE_VOLUME1, value);
 }
 
 void DialogSettings::on_sliderInput_valueChanged(int value)
@@ -356,13 +370,15 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
     if (!(value == ui->sliderInput->maximum() && ui->spinBoxInput->value() > value)) {
         ui->spinBoxInput->setValue(value);
         setDeviceVolume(value, 2);
+        main->settings()->setValue(Main::DEVICE_VOLUME_INPUT, value);
     }
 }
 
 void DialogSettings::on_spinBoxInput_valueChanged(int value)
 {
     ui->sliderInput->setValue(value);
-    setDeviceVolume(value, 3);
+    setDeviceVolume(value, 2);
+    main->settings()->setValue(Main::DEVICE_VOLUME_INPUT, value);
 }
 
 void DialogSettings::on_sliderTest_valueChanged(int value)
@@ -371,6 +387,7 @@ void DialogSettings::on_sliderTest_valueChanged(int value)
     if (!(value == ui->sliderTest->maximum() && ui->spinBoxTest->value() > value)) {
         ui->spinBoxTest->setValue(value);
         audio.setVolume(value / static_cast<float>(100));
+        main->settings()->setValue(Main::TEST_VOLUME, value);
     }
 }
 
@@ -378,6 +395,7 @@ void DialogSettings::on_spinBoxTest_valueChanged(int value)
 {
     ui->sliderTest->setValue(value);
     audio.setVolume(value / static_cast<float>(100));
+    main->settings()->setValue(Main::TEST_VOLUME, value);
 }
 
 void DialogSettings::on_deleteButtonDevice0_clicked()

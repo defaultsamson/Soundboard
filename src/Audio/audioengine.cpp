@@ -166,15 +166,19 @@ void AudioEngine::refreshDevices() {
     // There's a saved device, load it
     if (dev0) {
         dev0->indexes.displayIndex = 0;
+        dev0->volumeInt = main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt();
+        dev0->volume = main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt() / static_cast<float>(100);
         addActiveDevice(dev0);
     }
     if (dev1) {
         dev1->indexes.displayIndex = 1;
+        dev1->volumeInt = main->settings()->value(Main::DEVICE_VOLUME1, 100).toInt();
+        dev1->volume = main->settings()->value(Main::DEVICE_VOLUME0, 100).toInt() / static_cast<float>(100);
         addActiveDevice(dev1);
     }
 
     // If no device was found, and the devices weren't explicitly all removed, load the defaults
-    if (_activeDevices.size() == 0 && _defaultDevice && !main->settings()->value(Main::EXPLICIT_NO_DEVICES, false).toBool()) {
+    if (_activeDevices.size() == 0 && _defaultDevice && !main->settings()->value(Main::EXPLICIT_NO_OUTPUT_DEVICES, false).toBool()) {
         main->settings()->setValue(Main::DEVICE_INDEX0, _defaultDevice ? _defaultDevice->indexes.deviceIndex : -1);
         _defaultDevice->indexes.displayIndex = 0;
         addActiveDevice(_defaultDevice);

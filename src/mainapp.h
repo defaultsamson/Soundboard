@@ -38,9 +38,14 @@ public:
     static bool HAS_ACTIVE_BOARD_DEFAULT;
     static QString SETTINGS_TAB;
 
-    static QString EXPLICIT_NO_DEVICES;
+    static QString EXPLICIT_NO_OUTPUT_DEVICES;
     static QString DEVICE_INDEX0;
     static QString DEVICE_INDEX1;
+    static QString DEVICE_INDEX_INPUT;
+    static QString DEVICE_VOLUME0;
+    static QString DEVICE_VOLUME1;
+    static QString DEVICE_VOLUME_INPUT;
+    static QString TEST_VOLUME;
 
     explicit Main(QWidget *parent = nullptr);
     ~Main();
