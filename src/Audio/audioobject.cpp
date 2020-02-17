@@ -20,11 +20,9 @@ bool AudioObject::isPaused() { return paused; }
 bool AudioObject::isStopped() { return stopped; }
 
 void AudioObject::stop() {
-    qDebug() << "Stopping 1";
     device0Finished = false;
     paused = false;
     stopped = true;
-    qDebug() << "Stopping 2";
     _file.clear();
 }
 
@@ -36,8 +34,6 @@ void AudioObject::pause() {
 }
 
 void AudioObject::play() {
-    qDebug() << "Playing 1";
-    qDebug() << "Playing 2";
     if (!_hasFile) return;
     if (paused) {
         // Resume
@@ -62,12 +58,11 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
 
     // If it's the first device, then load up the sideBuffer
     if (deviceListIndex == 0) {
-        float *readBuffer = new float[frames];
+        float readBuffer[frames];
 
         // Read frames from the file to the readBuffer
         size_t read = static_cast<size_t>(_file.read(readBuffer, frames));
         if (read == 0) {
-            delete [] readBuffer;
             return;
         }
 
@@ -82,8 +77,6 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
         for (size_t i = 0; i < read; i++){
             buffer[i] += readBuffer[i] * finalVolume;
         }
-
-        delete [] readBuffer;
 
         if (!singleDevice) {
             sideBufferWrite++;
