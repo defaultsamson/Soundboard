@@ -6,7 +6,7 @@
 
 QString HotkeyUtil::keycodeToString(quint32 keycode) {
     // Obtain the X11 display.
-    Display *display = XOpenDisplay(nullptr);
+    Display* display = XOpenDisplay(nullptr);
     if(display == nullptr)
        return QString("ERROR 1");
 

@@ -6,7 +6,7 @@
 class HotkeyPass : public QHotkey
 {
 public:
-    HotkeyPass(QObject *parent = nullptr);
+    HotkeyPass(QObject* parent = nullptr);
 protected:
     void triggerPassthrough();
 };

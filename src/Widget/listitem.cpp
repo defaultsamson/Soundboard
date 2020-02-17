@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QHotkey>
 
-ListItem::ListItem(Main *main) :
+ListItem::ListItem(Main* main) :
     QObject(main),
     main(main),
     _hasKey(false),

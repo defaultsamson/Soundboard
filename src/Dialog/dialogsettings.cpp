@@ -16,7 +16,7 @@
 Q_DECLARE_METATYPE(HostInfoContainer*)
 Q_DECLARE_METATYPE(DeviceInfoContainer*)
 
-DialogSettings::DialogSettings(Main *main) :
+DialogSettings::DialogSettings(Main* main) :
     DialogTestAudio(main),
     ui(new Ui::DialogSettings),
     main(main)
@@ -130,7 +130,7 @@ void DialogSettings::deviceInputChanged(int index)
     deviceChanged(ui->comboBoxDeviceInput, index, 0, true, &_displayHostInput);
 }
 
-void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost)
+void DialogSettings::deviceChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost)
 {
     QVariant qvar = selector->itemData(selectorIndex);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
@@ -166,7 +166,7 @@ void DialogSettings::deviceChanged(QComboBox *selector, int selectorIndex, int d
     refreshDeviceSelection();
 }
 
-void DialogSettings::deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost)
+void DialogSettings::deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost)
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     if (isInput) main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
@@ -210,7 +210,7 @@ void DialogSettings::audioEngineInit() {
 }
 
 void DialogSettings::refreshDeviceSelection() {
-    AudioEngine *a = main->audio();
+    AudioEngine* a = main->audio();
 
     bool inited = a->isInitialized();
     ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
@@ -246,15 +246,15 @@ void DialogSettings::refreshDeviceSelection() {
     QList<DeviceInfoContainer*> displayedDevices;
 
     for (AudioDisplayContainer display : deviceDisplays) {
-        QComboBox *drivers = display.drivers;
-        QComboBox *devices = display.devices;
+        QComboBox* drivers = display.drivers;
+        QComboBox* devices = display.devices;
         drivers->clear();
         devices->clear();
         drivers->setEnabled(true);
         devices->setEnabled(true);
         display.deleteButton->setEnabled(true);
 
-        HostInfoContainer *displayHost = nullptr;
+        HostInfoContainer* displayHost = nullptr;
         bool notActiveDriver = false;
 
         // First add a single active device
@@ -356,7 +356,7 @@ void DialogSettings::on_tabWidget_currentChanged(int index)
     main->settings()->setValue(Main::SETTINGS_TAB, index);
 }
 
-void DialogSettings::closeEvent(QCloseEvent *bar) {
+void DialogSettings::closeEvent(QCloseEvent* bar) {
     handleClose();
     bar->accept();
 }

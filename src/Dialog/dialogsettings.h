@@ -71,16 +71,16 @@ private slots:
     void on_deleteButtonDeviceInput_clicked();
 
 private:
-    Ui::DialogSettings *ui;
-    Main *main;
+    Ui::DialogSettings* ui;
+    Main* main;
     AudioObject audio;
-    HostInfoContainer *_displayHost0 = nullptr;
-    HostInfoContainer *_displayHost1 = nullptr;
-    HostInfoContainer *_displayHostInput = nullptr;
-    void closeEvent(QCloseEvent *bar);
+    HostInfoContainer* _displayHost0 = nullptr;
+    HostInfoContainer* _displayHost1 = nullptr;
+    HostInfoContainer* _displayHostInput = nullptr;
+    void closeEvent(QCloseEvent* bar);
     void handleClose();
-    void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost);
-    void deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer **displayHost);
+    void deviceChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost);
+    void deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost);
     void setDeviceVolume(int value, int devDisplayIndex);
 };
 

@@ -4,7 +4,7 @@
 #include <X11/Xlib.h>
 
 // Function to create a keyboard event
-XKeyEvent createKeyEvent(Display *display, Window &win, Window &winRoot, bool press, KeySym keycode, int modifiers) {
+XKeyEvent createKeyEvent(Display* display, Window &win, Window &winRoot, bool press, KeySym keycode, int modifiers) {
    XKeyEvent event;
 
    event.display     = display;
@@ -30,7 +30,7 @@ XKeyEvent createKeyEvent(Display *display, Window &win, Window &winRoot, bool pr
 
 void HotkeyPass::triggerPassthrough() {
     // Obtain the X11 display.
-    Display *display = XOpenDisplay(nullptr);
+    Display* display = XOpenDisplay(nullptr);
     if(display == nullptr)
        return;
 

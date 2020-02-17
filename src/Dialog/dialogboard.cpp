@@ -6,7 +6,7 @@
 
 #include <QObject>
 
-DialogBoard::DialogBoard(Main *main, ListItemBoard *board, bool creatingNew) :
+DialogBoard::DialogBoard(Main* main, ListItemBoard* board, bool creatingNew) :
     QDialog(main),
     ui(new Ui::DialogBoard),
     main(main),

@@ -9,16 +9,16 @@
 size_t AudioEngine::FRAMES_PER_BUFFER = 256;
 size_t AudioEngine::CHANNELS = 2;
 
-AudioEngine::AudioEngine(Main *main) : main(main) {
+AudioEngine::AudioEngine(Main* main) : main(main) {
 }
 AudioEngine::~AudioEngine() {
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
 }
 
-DeviceInfoContainer *AudioEngine::defaultOutput() {
+DeviceInfoContainer* AudioEngine::defaultOutput() {
     return _defaultOutput;
 }
-DeviceInfoContainer *AudioEngine::defaultInput() {
+DeviceInfoContainer* AudioEngine::defaultInput() {
     return _defaultInput;
 }
 
@@ -157,12 +157,12 @@ void AudioEngine::refreshDevices() {
     for (auto dev : _activeOutputs) Pa_CloseStream(dev->stream);
     _activeOutputs.clear();
 
-    const PaDeviceInfo *device;
+    const PaDeviceInfo* device;
 
     for (int i = 0; i < devices; ++i ) {
         device = Pa_GetDeviceInfo(i);
         bool isInput = device->maxOutputChannels == 0;
-        DeviceInfoContainer *dev = dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}, 100, 1, isInput};
+        DeviceInfoContainer* dev = dev = new DeviceInfoContainer{nullptr, device, nullptr, CHANNELS, DeviceIndexInfo{i, -1, -1}, 100, 1, isInput};
 
         if (isInput) {
             _inputs.append(dev);
@@ -192,7 +192,7 @@ void AudioEngine::refreshDevices() {
         if (!foundCon) {
             QList<DeviceInfoContainer*> *list = new QList<DeviceInfoContainer*>();
             list->append(dev);
-            HostInfoContainer *hostCon = new HostInfoContainer{
+            HostInfoContainer* hostCon = new HostInfoContainer{
                 device->hostApi,
                 Pa_GetHostApiInfo(device->hostApi)->name,
                 list
@@ -252,10 +252,10 @@ DeviceInfoContainer* AudioEngine::getDevice(int deviceIndex) {
     return nullptr;
 }
 
-void AudioEngine::registerAudio(AudioObject *obj) {
+void AudioEngine::registerAudio(AudioObject* obj) {
     if (!_audioObjectRegistry.contains(obj)) _audioObjectRegistry.append(obj);
 }
-void AudioEngine::unregisterAudio(AudioObject *obj) {
+void AudioEngine::unregisterAudio(AudioObject* obj) {
     if (_audioObjectRegistry.contains(obj)) _audioObjectRegistry.removeOne(obj);
 }
 
@@ -267,7 +267,7 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, in
     // Fills the buffer with zeros
     memset(buffer, 0, frames * sizeof(float));
 
-    for (AudioObject *audio : _audioObjectRegistry) {
+    for (AudioObject* audio : _audioObjectRegistry) {
         audio->mix(buffer, framesPerBuffer, channels, deviceListIndex, deviceVolume, singleDevice);
     }
 

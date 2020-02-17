@@ -12,9 +12,9 @@ public:
     IOMultiFile();
     ~IOMultiFile();
 
-    void write(const float *buffer, size_t n);
-    size_t read(float *buffer, size_t n);
-    size_t mix(float *buffer, size_t n);
+    void write(const float* buffer, size_t n);
+    size_t read(float* buffer, size_t n);
+    size_t mix(float* buffer, size_t n);
     void openFile(std::string filename);
     void clear();
 private:

@@ -9,7 +9,7 @@
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 
-ListItemSound::ListItemSound(Main *main, ListItemBoard *board) :
+ListItemSound::ListItemSound(Main* main, ListItemBoard* board) :
     ListItem(main),
     board(board),
     _audio(new AudioObject()),
@@ -79,7 +79,7 @@ void ListItemSound::save(QJsonObject &json) {
     json["volume"] = volume();
 }
 
-AudioObject *ListItemSound::audio() {
+AudioObject* ListItemSound::audio() {
     return _audio;
 }
 

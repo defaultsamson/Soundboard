@@ -7,11 +7,11 @@ class WidgetAudio : public QWidget
 {
     Q_OBJECT
 public:
-    explicit WidgetAudio(QWidget *parent = nullptr);
+    explicit WidgetAudio(QWidget* parent = nullptr);
     void setLevel(qreal value);
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
     qreal m_level = 0;

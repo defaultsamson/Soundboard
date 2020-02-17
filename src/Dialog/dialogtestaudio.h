@@ -6,7 +6,7 @@
 class DialogTestAudio : public QDialog
 {
 public:
-    DialogTestAudio(QWidget *parent = nullptr) : QDialog(parent) {}
+    DialogTestAudio(QWidget* parent = nullptr) : QDialog(parent) {}
     virtual void audioEngineInit() = 0;
 };
 

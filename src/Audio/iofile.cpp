@@ -21,7 +21,7 @@ size_t IOMultiFile::read(float *buffer, size_t n) {
     memset(buffer, 0, n * sizeof(float));
     return mix(buffer, n);
 }
-size_t IOMultiFile::mix(float *buffer, size_t n) {
+size_t IOMultiFile::mix(float* buffer, size_t n) {
     float readBuffer[n];
     sf_count_t maxRead = 0;
 

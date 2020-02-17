@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QFileDialog>
 
-DialogSound::DialogSound(Main *main, ListItemSound *sound, bool creatingNew) :
+DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
     DialogTestAudio(main),
     ui(new Ui::DialogSound),
     main(main),

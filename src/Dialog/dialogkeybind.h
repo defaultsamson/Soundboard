@@ -15,15 +15,15 @@ class DialogKeybind : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogKeybind(QWidget *parent, WidgetKeybind *text);
+    explicit DialogKeybind(QWidget* parent, WidgetKeybind* text);
     ~DialogKeybind();
 
 protected:
-    void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent* e);
 
 private:
-    Ui::DialogKeybind *ui;
-    WidgetKeybind *widget;
+    Ui::DialogKeybind* ui;
+    WidgetKeybind* widget;
 };
 
 #endif // DIALOGKEYBIND_H

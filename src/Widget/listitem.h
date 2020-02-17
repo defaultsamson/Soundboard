@@ -10,7 +10,7 @@ class Main;
 class ListItem : public QListWidgetItem, public QObject
 {
 public:
-    ListItem(Main *main);
+    ListItem(Main* main);
     ~ListItem();
     bool hasKey();
     quint32 key();
@@ -21,10 +21,10 @@ public:
     virtual void trigger() = 0;
 
 protected:
-    Main *main;
+    Main* main;
     bool _hasKey;
     quint32 _key;
-    QHotkey *hotkey;
+    QHotkey* hotkey;
 };
 
 #endif // LISTITEM_H
