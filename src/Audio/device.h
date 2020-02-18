@@ -10,11 +10,6 @@ class Device;
 class AudioEngine;
 struct HostInfoContainer;
 
-struct CallbackInfo {
-    AudioEngine* audio;
-    Device* device;
-};
-
 struct DeviceIndexInfo {
     PaDeviceIndex deviceIndex;
     int outputDisplayIndex;
@@ -49,7 +44,7 @@ public:
     void setInputting(bool inputting) { _isInputting = inputting; }
     void setOutputting(bool outputting) { _isOutputting = outputting; }
 
-    PaStream* stream;
+    PaStream* stream = nullptr;
 
 private:
     HostInfoContainer* _host;

@@ -2,7 +2,9 @@
 
 #include "audioobject.h"
 #include <portaudio.h>
+#ifdef Q_OS_LINUX
 #include <pa_jack.h>
+#endif
 #include "../mainapp.h"
 #include <memory>
 
@@ -14,6 +16,7 @@ size_t AudioEngine::CHANNELS = 2;
 AudioEngine::AudioEngine(Main* main) : main(main) {
 }
 AudioEngine::~AudioEngine() {
+    Pa_Terminate();
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
     delete _inputObject;
 }
@@ -188,7 +191,9 @@ const QList<Device*> AudioEngine::inputs() {
 }
 
 void AudioEngine::init() {
+#ifdef Q_OS_LINUX
     PaJack_SetClientName("Soundboard");
+#endif
     Pa_Initialize();
     _inputObject = new AudioObjectInput();
     _inputObject->setOutput0(main->settings()->value(Main::INPUT_OUT0, false).toBool());
@@ -223,7 +228,7 @@ void AudioEngine::refreshDevices() {
         device = Pa_GetDeviceInfo(i);
         bool isInput = device->maxInputChannels > 0;
         bool isOutput = device->maxOutputChannels > 0;
-        Device* dev = dev = new Device{nullptr, device, CHANNELS, std::shared_ptr<DeviceIndexInfo>(new DeviceIndexInfo{i, -1, -1}), isInput, isOutput};
+        Device* dev = dev = new Device{nullptr, device, CHANNELS, std::shared_ptr<DeviceIndexInfo>(new DeviceIndexInfo{i, -1, -1, -1, -1}), isInput, isOutput};
 
         if (isInput) {
             _inputs.append(dev);

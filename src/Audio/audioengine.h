@@ -11,6 +11,11 @@
 #include "device.h"
 #include <memory>
 
+struct CallbackInfo {
+    AudioEngine* audio;
+    Device* device;
+};
+
 class AudioEngine : public QObject
 {
     Q_OBJECT
