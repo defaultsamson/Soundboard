@@ -2,6 +2,7 @@
 
 #include "audioobject.h"
 #include <portaudio.h>
+#include <pa_jack.h>
 #include "../mainapp.h"
 #include <memory>
 
@@ -92,7 +93,7 @@ void AudioEngine::addActiveDevice(Device* dev, bool startInput, bool startOutput
                     dev->info()->defaultSampleRate,
                     FRAMES_PER_BUFFER,
                     paNoFlag, //flags that can be used to define dither, clip settings and more
-                    &AudioEngine::outputCallback, //your callback function
+                    &AudioEngine::audioCallback, //your callback function
                     static_cast<CallbackInfo*>(new CallbackInfo{this, dev})); //data to be passed to callback. In C++, it is frequently (void *)this
     //don't forget to check errors!
     if (err != paNoError) qDebug() << "Error opening stream";
@@ -104,6 +105,8 @@ void AudioEngine::addActiveDevice(Device* dev, bool startInput, bool startOutput
 
     dev->setInputting(startInput);
     dev->setOutputting(startOutput);
+
+    _inputObject->setHasInputDevice(_activeInputs.size() > 0);
 }
 void AudioEngine::removeActiveDevice(Device* dev, bool stopInput, bool stopOutput) {
     if (!dev) return;
@@ -144,9 +147,12 @@ void AudioEngine::removeActiveDevice(Device* dev, bool stopInput, bool stopOutpu
         }
     }
 
+    if (stopInput) dev->setInputting(false);
+    if (stopOutput) dev->setOutputting(false);
+
     // This closes any streams and restarts any that are neccessary
     // e.g. if the output was stopped but this device is still inputting
-    addActiveDevice(dev, !stopInput && dev->isInputting(), !stopOutput && dev->isOutputting());
+    addActiveDevice(dev, dev->isInputting(), dev->isOutputting());
 }
 
 void AudioEngine::removeActiveDisplayOutput(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
@@ -182,6 +188,7 @@ const QList<Device*> AudioEngine::inputs() {
 }
 
 void AudioEngine::init() {
+    PaJack_SetClientName("Soundboard");
     Pa_Initialize();
     _inputObject = new AudioObjectInput();
     _inputObject->setOutput0(main->settings()->value(Main::INPUT_OUT0, false).toBool());
@@ -336,16 +343,19 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, in
     emit update(level);
 }
 
-int AudioEngine::outputCallback(const void* inputBuffer, void *outputBuffer,
+int AudioEngine::audioCallback(const void* inputBuffer, void *outputBuffer,
                               unsigned long framesPerBuffer,
                               const PaStreamCallbackTimeInfo* /*timeInfo*/,
                               PaStreamCallbackFlags /*statusFlags*/,
                               void *userData) {
 
     CallbackInfo* info = static_cast<CallbackInfo*>(userData);
-    std::shared_ptr<DeviceIndexInfo> indexes = info->device->indexes();
+    AudioEngine* a = info->audio;
+    AudioObjectInput* input = a->inputObject();
+    Device* dev = info->device;
+    std::shared_ptr<DeviceIndexInfo> indexes = dev->indexes();
 
-    if (info->device->isInputting()) {
+    if (dev->isInputting()) {
         const float* in = static_cast<const float*>(inputBuffer);
         // qDebug() << in[0];
         CallbackInfo* info = static_cast<CallbackInfo*>(userData);
@@ -353,26 +363,17 @@ int AudioEngine::outputCallback(const void* inputBuffer, void *outputBuffer,
 
     }
 
-    if (info->device->isOutputting()) {
+    if (dev->isOutputting()) {
         float* out = static_cast<float*>(outputBuffer);
-        info->audio->mix(out, framesPerBuffer, CHANNELS, indexes->outputListIndex, info->device->volume(), info->audio->activeOutputs().size() == 1);
+        a->mix(out, framesPerBuffer, CHANNELS, indexes->outputListIndex, dev->volume(), a->activeOutputs().size() == 1);
 
         // Mix from the InputObject, if this device is set to output it
-        AudioObjectInput* input = info->audio->inputObject();
-        if ((input->isActiveOutput0() && indexes->outputDisplayIndex == 0)
-                || (input->isActiveOutput1() && indexes->outputDisplayIndex == 1)) {
+        if (input->hasInputDevice()
+                && ((input->isActiveOutput0() && indexes->outputDisplayIndex == 0)
+                    || (input->isActiveOutput1() && indexes->outputDisplayIndex == 1))) {
             bool single = (input->isActiveOutput0() && !input->isActiveOutput1()) || (!input->isActiveOutput0() && input->isActiveOutput1());
-            info->audio->inputObject()->mix(out, framesPerBuffer, CHANNELS, indexes->outputListIndex, info->device->volume(), single);
+            a->inputObject()->mix(out, framesPerBuffer, CHANNELS, indexes->outputListIndex, dev->volume(), single);
         }
     }
     return paContinue;
-}
-
-int AudioEngine::inputCallback(const void* inputBuffer, void* /*outputBuffer*/,
-                              unsigned long framesPerBuffer,
-                              const PaStreamCallbackTimeInfo* /*timeInfo*/,
-                              PaStreamCallbackFlags /*statusFlags*/,
-                              void *userData) {
-
-
 }

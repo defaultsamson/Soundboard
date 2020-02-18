@@ -46,13 +46,7 @@ public:
     void init();
     bool isInitialized();
 
-    static int outputCallback(const void* inputBuffer, void* outputBuffer,
-                            unsigned long framesPerBuffer,
-                            const PaStreamCallbackTimeInfo* timeInfo,
-                            PaStreamCallbackFlags statusFlags,
-                            void* userData);
-
-    static int inputCallback(const void* inputBuffer, void* outputBuffer,
+    static int audioCallback(const void* inputBuffer, void* outputBuffer,
                             unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags,

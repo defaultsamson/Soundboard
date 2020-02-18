@@ -12,11 +12,14 @@ public:
     void write(const float* buffer, size_t n);
     size_t read(float* buffer, size_t n);
     bool doMix();
+    void stop();
 
     void setOutput0(bool active) { _output0 = active; }
     bool isActiveOutput0() { return _output0; }
     void setOutput1(bool active) { _output1 = active; }
     bool isActiveOutput1() { return _output1; }
+    void setHasInputDevice(bool active) { _hasInputDevice = active; }
+    bool hasInputDevice() { return _hasInputDevice; }
 
 private:
     float *inBuffer = nullptr;
@@ -27,6 +30,7 @@ private:
 
     bool _output0 = false;
     bool _output1 = false;
+    bool _hasInputDevice = false;
 };
 
 #endif // AUDIOOBJECTINPUT_H

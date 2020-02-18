@@ -18,8 +18,19 @@ AudioObjectInput::~AudioObjectInput() {
     delete [] bytesWritten;
 }
 
+void AudioObjectInput::stop() {
+    if (stopped) return;
+    AudioObject::stop();
+    inBufferWrite = 0;
+    inBufferRead = 0;
+    inBufferLoopsAhead = 0;
+}
 
 void AudioObjectInput::write(const float* buffer, size_t n) {
+    if ((!_output0 && !_output1) || !_hasInputDevice) {
+        stop();
+        return;
+    }
     stopped = false;
 
     bytesWritten[inBufferWrite] = n;
@@ -38,24 +49,33 @@ void AudioObjectInput::write(const float* buffer, size_t n) {
 }
 
 size_t AudioObjectInput::read(float* buffer, size_t n) {
-    // The frames to read from the file. This is hardcoded for now because of how sideBuffer is initialized
-    //size_t frames = AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
-    size_t start = n * inBufferRead;
-
-    size_t toRead = bytesWritten[inBufferRead];
-    memcpy(buffer, inBuffer + start, toRead * sizeof(float));
-
-    inBufferRead++;
-    // If the inBufferRead has reached the SIDE_BUFFER_MULTIPLIER, the next read will
-    // surpass the limit of inBuffer. To avoid this, we loop it back around to the beginning
-    if (inBufferRead >= SIDE_BUFFER_MULTIPLIER) {
-        inBufferRead = 0;
-        inBufferLoopsAhead--;
+    if ((!_output0 && !_output1) || !_hasInputDevice) {
+        stop();
+        return 0;
     }
+    if (stopped) return 0;
+    // Makes sure that the inBuffer writing is always ahead of the reading
+    if (inBufferWrite + (SIDE_BUFFER_MULTIPLIER * inBufferLoopsAhead) > inBufferRead) {
+        // The frames to read from the file. This is hardcoded for now because of how sideBuffer is initialized
+        //size_t frames = AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
+        size_t start = n * inBufferRead;
 
-    if (toRead < n) stop();
+        size_t toRead = bytesWritten[inBufferRead];
+        memcpy(buffer, inBuffer + start, toRead * sizeof(float));
 
-    return toRead;
+        inBufferRead++;
+        // If the inBufferRead has reached the SIDE_BUFFER_MULTIPLIER, the next read will
+        // surpass the limit of inBuffer. To avoid this, we loop it back around to the beginning
+        if (inBufferRead >= SIDE_BUFFER_MULTIPLIER) {
+            inBufferRead = 0;
+            inBufferLoopsAhead--;
+        }
+
+        if (toRead < n) stop();
+
+        return toRead;
+    }
+    else return 0;
 }
 
 bool AudioObjectInput::doMix() {
