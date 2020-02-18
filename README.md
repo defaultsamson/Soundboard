@@ -24,6 +24,7 @@ A Soundboard written in C++ with Qt
         - Copy `C:\msys64\mingw64\lib\libportaudio.a` to my Qt install `C:\Qt\5.14.0\mingw73_64\lib\libportaudio.a`
         - Copy `C:\msys64\mingw64\lib\libportaudio.dll.a` to my Qt install `C:\Qt\5.14.0\mingw73_64\lib\libportaudio.dll.a`
         - Copy `C:\msys64\mingw64\lib\pkgconfig\portaudio-2.0.pc` to my Qt install `C:\Qt\5.14.0\mingw73_64\lib\pkgconfig\portaudio-2.0.pc`
+        - Then [download pa_jack.h from the git repository](https://app.assembla.com/spaces/portaudio/git/source/master/include/pa_jack.h) and put it in my Qt install `C:\Qt\5.14.0\mingw73_64\include\pa_jack.h`
     - Building it yourself
         - Note: Be sure to configure PortAudio with `./configure --enable-cxx`
         - On Linux: make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
