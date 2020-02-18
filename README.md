@@ -14,8 +14,6 @@ A Soundboard written in C++ with Qt
         - Add the `bin` folder to your `PATH` variable (This will make sure it can run from Qt Creator)
 5. Install [PortAudio](http://www.portaudio.com/usinggit.html)
     - On Linux `sudo apt install libportaudio2`
-        - On Linux: make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
-        - If `JACK ... no` then `sudo apt install libjack-dev`
     - On Windows: might need to [set up MSYS2 with mingw64](https://github.com/orlp/dev-on-windows/wiki/Installing-GCC--&-MSYS2) to compile PortAudio
         - I couldn't get it to compile or install properly no matter what, so what I did is...
         - Installed MSYS2
@@ -28,6 +26,8 @@ A Soundboard written in C++ with Qt
         - Copy `C:\msys64\mingw64\pkgconfig\portaudio-2.0.pc` to my Qt install `C:\Qt\5.14.0\mingw73_64\pkgconfig\portaudio-2.0.pc`
     - Building it yourself
         - Note: Be sure to configure PortAudio with `./configure --enable-cxx`
+        - On Linux: make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
+        - If `JACK ... no` then `sudo apt install libjack-dev`
         - [Compile and install](http://portaudio.com/docs/v19-doxydocs/tutorial_start.html) on the system
 6. Build the project! (e.g. Import the project via `Soundboard.pro` into QT Creator and hit the build button
 
