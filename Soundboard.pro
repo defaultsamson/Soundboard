@@ -33,6 +33,7 @@ SOURCES += \
     src/Audio/audioengine.cpp \
     src/Audio/audioobjectfile.cpp \
     src/Audio/audioobjectstream.cpp \
+    src/Audio/device.cpp \
     src/Audio/iomultifile.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     src/Audio/audioobject.h \
     src/Audio/audioobjectfile.h \
     src/Audio/audioobjectstream.h \
+    src/Audio/device.h \
     src/Audio/iomultifile.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \

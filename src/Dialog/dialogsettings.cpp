@@ -14,7 +14,7 @@
 
 // Allows storing the following types as QVariants
 Q_DECLARE_METATYPE(HostInfoContainer*)
-Q_DECLARE_METATYPE(DeviceInfoContainer*)
+Q_DECLARE_METATYPE(Device*)
 
 DialogSettings::DialogSettings(Main* main) :
     DialogTestAudio(main),
@@ -135,9 +135,9 @@ void DialogSettings::deviceChanged(QComboBox* selector, int selectorIndex, int d
     QVariant qvar = selector->itemData(selectorIndex);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
-    DeviceInfoContainer* dev = qvar.value<DeviceInfoContainer*>();
+    Device* dev = qvar.value<Device*>();
     if (isInput ? main->audio()->activeInputs().contains(dev) : main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
-    dev->indexes.displayIndex = deviceDisplayIndex;
+    dev->indexes()->displayIndex = deviceDisplayIndex;
 
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     if (isInput) main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
@@ -147,17 +147,17 @@ void DialogSettings::deviceChanged(QComboBox* selector, int selectorIndex, int d
     if (isInput) {
         switch (deviceDisplayIndex) {
         case 0:
-            main->settings()->setValue(Main::INPUT_INDEX0, dev->indexes.deviceIndex);
+            main->settings()->setValue(Main::INPUT_INDEX0, dev->indexes()->deviceIndex);
             break;
         }
         main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
     } else {
         switch (deviceDisplayIndex) {
         case 0:
-            main->settings()->setValue(Main::OUTPUT_INDEX0, dev->indexes.deviceIndex);
+            main->settings()->setValue(Main::OUTPUT_INDEX0, dev->indexes()->deviceIndex);
             break;
         case 1:
-            main->settings()->setValue(Main::OUTPUT_INDEX1, dev->indexes.deviceIndex);
+            main->settings()->setValue(Main::OUTPUT_INDEX1, dev->indexes()->deviceIndex);
             break;
         }
         main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
@@ -243,7 +243,7 @@ void DialogSettings::refreshDeviceSelection() {
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxDevice0, ui->deleteButtonDevice0, _displayHost0, 0, false});
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxDevice1, ui->deleteButtonDevice1, _displayHost1, 1, false});
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriverInput, ui->comboBoxDeviceInput, ui->deleteButtonDeviceInput, _displayHostInput, 0, true});
-    QList<DeviceInfoContainer*> displayedDevices;
+    QList<Device*> displayedDevices;
 
     for (AudioDisplayContainer display : deviceDisplays) {
         QComboBox* drivers = display.drivers;
@@ -258,21 +258,21 @@ void DialogSettings::refreshDeviceSelection() {
         bool notActiveDriver = false;
 
         // First add a single active device
-        for (DeviceInfoContainer* dev : display.isInput ? a->activeInputs() : a->activeOutputs()) {
+        for (Device* dev : display.isInput ? a->activeInputs() : a->activeOutputs()) {
             // If the device hasn't already been added somewhere, and the display indexes match
-            if (!displayedDevices.contains(dev) && display.deviceDisplayIndex == dev->indexes.displayIndex) {
+            if (!displayedDevices.contains(dev) && display.deviceDisplayIndex == dev->indexes()->displayIndex) {
                 displayedDevices.append(dev);
 
                 // If the active device is run by the displayed host (and if there is infact a display host)
-                if (display.displayHost && display.displayHost != dev->host) {
+                if (display.displayHost && display.displayHost != dev->host()) {
                     // Act as though it's being displayed, even though the displayHost will be displayed.
                     // This is to prevent the next device display from showing this device when it's active
                     // in another device selector that's displaying a different host than the active one
                 } else {
-                    drivers->addItem(dev->host->name, QVariant::fromValue(dev->host));
-                    devices->addItem(dev->info->name, QVariant::fromValue(dev));
+                    drivers->addItem(dev->host()->name, QVariant::fromValue(dev->host()));
+                    devices->addItem(dev->info()->name, QVariant::fromValue(dev));
 
-                    displayHost = dev->host;
+                    displayHost = dev->host();
                 }
 
                 break; // Break so it only adds 1 as the active
@@ -309,36 +309,36 @@ void DialogSettings::refreshDeviceSelection() {
 
             // Then add the default device
             if (display.isInput
-                    ? a->defaultInput() && !displayedDevices.contains(a->defaultInput()) && displayHost == a->defaultInput()->host
-                    : a->defaultOutput() && !displayedDevices.contains(a->defaultOutput()) && displayHost == a->defaultOutput()->host) {
+                    ? a->defaultInput() && !displayedDevices.contains(a->defaultInput()) && displayHost == a->defaultInput()->host()
+                    : a->defaultOutput() && !displayedDevices.contains(a->defaultOutput()) && displayHost == a->defaultOutput()->host()) {
                 // If the device is active
                 if (display.isInput
                         ? a->activeInputs().contains(a->defaultInput())
                         : a->activeOutputs().contains(a->defaultOutput())) {
                     // Make sure it's not being displayed by another device display
                     if (display.isInput
-                            ? display.deviceDisplayIndex == a->defaultInput()->indexes.displayIndex
-                            : display.deviceDisplayIndex == a->defaultOutput()->indexes.displayIndex) {
-                        devices->addItem(a->defaultOutput()->info->name, QVariant::fromValue(a->defaultOutput()));
+                            ? display.deviceDisplayIndex == a->defaultInput()->indexes()->displayIndex
+                            : display.deviceDisplayIndex == a->defaultOutput()->indexes()->displayIndex) {
+                        devices->addItem(a->defaultOutput()->info()->name, QVariant::fromValue(a->defaultOutput()));
                     }
                 } else {
-                    devices->addItem(display.isInput ? a->defaultInput()->info->name : a->defaultOutput()->info->name,
+                    devices->addItem(display.isInput ? a->defaultInput()->info()->name : a->defaultOutput()->info()->name,
                                      QVariant::fromValue(display.isInput ? a->defaultInput() : a->defaultOutput()));
                 }
             }
 
             // Then add other devices
-            for (DeviceInfoContainer* dev : display.isInput ? a->inputs() : a->outputs()) {
+            for (Device* dev : display.isInput ? a->inputs() : a->outputs()) {
                 // If it's not already being displayed, it's not the default (because we just added it), and it's under this host
-                if (!displayedDevices.contains(dev) && displayHost == dev->host && dev != (display.isInput ? a->defaultInput() : a->defaultOutput())) {
+                if (!displayedDevices.contains(dev) && displayHost == dev->host() && dev != (display.isInput ? a->defaultInput() : a->defaultOutput())) {
                     // If the device is active
                     if (display.isInput ? a->activeInputs().contains(dev) : a->activeOutputs().contains(dev)) {
                         // Make sure it's not being displayed by another device display
-                        if (display.deviceDisplayIndex == dev->indexes.displayIndex) {
-                            devices->addItem(dev->info->name, QVariant::fromValue(dev));
+                        if (display.deviceDisplayIndex == dev->indexes()->displayIndex) {
+                            devices->addItem(dev->info()->name, QVariant::fromValue(dev));
                         }
                     } else {
-                        devices->addItem(dev->info->name, QVariant::fromValue(dev));
+                        devices->addItem(dev->info()->name, QVariant::fromValue(dev));
                     }
                 }
             }
@@ -377,11 +377,8 @@ void DialogSettings::on_pushButtonStop_clicked()
 }
 
 void DialogSettings::setDeviceVolume(int value, int devDisplayIndex) {
-    DeviceInfoContainer* dev = main->audio()->getActiveDisplayOutput(devDisplayIndex);
-    if (dev) {
-        dev->volumeInt = value;
-        dev->volume = value / static_cast<float>(100);
-    }
+    Device* dev = main->audio()->getActiveDisplayOutput(devDisplayIndex);
+    if (dev) dev->setVolume(value);
 }
 
 void DialogSettings::on_sliderDevice0_valueChanged(int value)
