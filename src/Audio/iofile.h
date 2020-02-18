@@ -5,6 +5,7 @@
 #include <string>
 #include <QList>
 #include <sndfile.hh>
+#include <mutex>
 
 class IOMultiFile : public IODevice
 {
@@ -19,6 +20,7 @@ public:
     void clear();
 private:
     QList<SndfileHandle*> _openFiles;
+    std::mutex modifyLock;
 };
 
 #endif // IOFILE_H

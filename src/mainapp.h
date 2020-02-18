@@ -116,10 +116,10 @@ public slots:
 private:
     Ui::MainApp* ui;
     AudioEngine* _audio;
+    QSettings* _settings;
     bool hasFile = false;
     QString fileName;
     ListItemBoard* currentBoard = nullptr;
-    QSettings* _settings;
     bool _changed = false;
 
     DialogTestAudio* _audioTestDialog = nullptr;

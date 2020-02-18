@@ -147,6 +147,9 @@ Main::~Main()
 {
     clear();
     delete ui;
+    delete _audio;
+    delete _settings;
+
 }
 
 // https://stackoverflow.com/questions/31383519/qt-rightclick-on-qlistwidget-opens-contextmenu-and-delete-item

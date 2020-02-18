@@ -26,6 +26,7 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
     sf_count_t maxRead = 0;
 
     // Iterates the open files and adds their read bytes into buffer
+    modifyLock.lock();
     for (int i = _openFiles.size() - 1; i >= 0; i--) {
 
         sf_count_t read = _openFiles.at(i)->read(readBuffer, static_cast<sf_count_t>(n));
@@ -33,6 +34,7 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
         if (read > maxRead) maxRead = read;
         if (read < n) delete _openFiles.takeAt(i);
     }
+    modifyLock.unlock();
 
     return static_cast<size_t>(maxRead);
 }
@@ -45,12 +47,16 @@ void IOMultiFile::openFile(std::string filename) {
         return;
     }
     */
+    modifyLock.lock();
     _openFiles.append(new SndfileHandle(filename));
+    modifyLock.unlock();
 }
 
 void IOMultiFile::clear() {
+    modifyLock.lock();
     for (int i = _openFiles.size() - 1; i >= 0; i--) {
         delete _openFiles.takeAt(i);
     }
+    modifyLock.unlock();
 }
 

@@ -25,6 +25,7 @@ ListItemSound::ListItemSound(Main* main, ListItemBoard* board) :
 ListItemSound::~ListItemSound() {
     board->removeSound(this, false);
     main->audio()->unregisterAudio(_audio);
+    delete _audio;
 }
 
 void ListItemSound::reload() {
