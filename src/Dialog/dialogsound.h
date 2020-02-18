@@ -45,7 +45,7 @@ private:
     int originalVolume;
 
     void updateTestButtons();
-    void testFileName(QString fn);
+    void updateFileName(QString fn);
 };
 
 #endif // DIALOGSOUND_H

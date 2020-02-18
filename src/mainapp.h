@@ -28,7 +28,7 @@ public:
     static QString DEFAULT_DIR;
     static QString SETTINGS_FILE;
     static QString DEFAULT_SOUNDBOARD;
-    static QString TEST_AUDIO;
+    static QString DEFAULT_TEST_FILE;
 
     static QString DARK_THEME;
     static bool DARK_THEME_DEFAULT;
@@ -49,6 +49,7 @@ public:
     static QString TEST_VOLUME;
     static QString INPUT_OUT0;
     static QString INPUT_OUT1;
+    static QString TEST_FILE;
 
     explicit Main(QWidget* parent = nullptr);
     ~Main();

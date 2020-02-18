@@ -16,10 +16,8 @@ struct CallbackInfo {
     Device* device;
 };
 
-class AudioEngine : public QObject
+class AudioEngine
 {
-    Q_OBJECT
-
 public:
     AudioEngine(Main* main);
 
@@ -85,9 +83,6 @@ private:
     Device* getDevice(int deviceIndex);
     void addActiveDevice(Device*, bool startInput, bool startOutput);
     void removeActiveDevice(Device*, bool stopInput, bool stopOutput);
-
-signals:
-    void update(qreal m_level);
 };
 
 #endif // AUDIOENGINE_H

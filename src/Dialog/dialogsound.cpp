@@ -32,9 +32,11 @@ DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
     main->disableKeybinds();
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
 
-    connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
+    /*
+    connect(sound->audio(), &AudioObject::update, this, [&](qreal level) {
         ui->outputBar->setLevel(level);
     });
+    */
 }
 
 DialogSound::~DialogSound()
@@ -92,14 +94,15 @@ void DialogSound::on_spinBoxVolume_valueChanged(int value)
 void DialogSound::on_pushButtonFile_clicked()
 {
     QString fn = QFileDialog::getOpenFileName(this, tr("Load Audio File"), QString(), tr("(*.wav *.ogg *.flac)"));
-    testFileName(fn);
+    if (fn.isNull()) return;
+    updateFileName(fn);
 }
 
 void DialogSound::on_lineEditFile_textEdited(const QString &fn) {
-    testFileName(fn);
+    updateFileName(fn);
 }
 
-void DialogSound::testFileName(QString fn) {
+void DialogSound::updateFileName(QString fn) {
     // test to see if the file exists and is readable
     sound->setFileName(fn);
     ui->lineEditFile->setText(fn);

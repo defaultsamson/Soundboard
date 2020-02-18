@@ -8,9 +8,8 @@
 #include <QBuffer>
 #include <QObject>
 #include <QProgressBar>
-
-#include <portaudio.h>
 #include <QStandardPaths>
+#include <QFileDialog>
 
 // Allows storing the following types as QVariants
 Q_DECLARE_METATYPE(HostInfoContainer*)
@@ -28,8 +27,6 @@ DialogSettings::DialogSettings(Main* main) :
 #endif
     ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
     ui->tabWidget->setCurrentIndex(main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
-
-    refreshDeviceSelection();
 
     connect(ui->comboBoxDevice0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device0Changed);
     connect(ui->comboBoxDriver0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host0Changed);
@@ -51,13 +48,17 @@ DialogSettings::DialogSettings(Main* main) :
     ui->checkBoxInput0->setChecked(main->settings()->value(Main::INPUT_OUT0, false).toBool());
     ui->checkBoxInput1->setChecked(main->settings()->value(Main::INPUT_OUT1, false).toBool());
 
-    audio.setFile(Main::TEST_AUDIO);
+    QString testFile = main->settings()->value(Main::TEST_FILE, Main::DEFAULT_TEST_FILE).toString();
+    audio.setFile(testFile);
     audio.setVolume(main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
     main->audio()->registerAudio(&audio);
+    if (audio.hasFile()) ui->lineEditTestFile->setText(testFile);
 
-    connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
+    /*connect(&audio, &AudioObject::update, this, [&](qreal level) {
         ui->outputBar->setLevel(level);
-    });
+    });*/
+
+    refreshDeviceSelection();
 
     main->setAudioTestDialog(this);
 }
@@ -235,9 +236,9 @@ void DialogSettings::refreshDeviceSelection() {
     ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
     ui->groupBoxDevice1->setTitle(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
     ui->groupBoxDeviceInput->setTitle(inited ? "Input Device" : "Input Device (INITIALIZING...)");
-    ui->pushButtonPlay->setEnabled(inited && a->activeOutputs().size() > 0);
-    ui->pushButtonPause->setEnabled(inited && a->activeOutputs().size() > 0);
-    ui->pushButtonStop->setEnabled(inited && a->activeOutputs().size() > 0);
+    ui->pushButtonPlay->setEnabled(inited && a->activeOutputs().size() > 0 && audio.hasFile());
+    ui->pushButtonPause->setEnabled(inited && a->activeOutputs().size() > 0 && audio.hasFile());
+    ui->pushButtonStop->setEnabled(inited && a->activeOutputs().size() > 0 && audio.hasFile());
     ui->pushButtonRefresh->setEnabled(inited);
     ui->checkBoxInput0->setEnabled(inited);
     ui->checkBoxInput1->setEnabled(inited);
@@ -515,4 +516,25 @@ void DialogSettings::on_checkBoxInput1_clicked()
     bool enabled = ui->checkBoxInput1->isChecked();
     main->settings()->setValue(Main::INPUT_OUT1, enabled);
     main->audio()->inputObject()->setOutput1(enabled);
+}
+
+void DialogSettings::on_pushButtonTestFile_clicked()
+{
+    QString fn = QFileDialog::getOpenFileName(this, tr("Load Audio File"), QString(), tr("(*.wav *.ogg *.flac)"));
+    if (fn.isNull()) return;
+    updateFileName(fn);
+}
+
+void DialogSettings::on_lineEditTestFile_textEdited(const QString &text)
+{
+    updateFileName(text);
+}
+
+
+void DialogSettings::updateFileName(QString fn) {
+    // test to see if the file exists and is readable
+    audio.setFile(fn);
+    ui->lineEditTestFile->setText(fn);
+    refreshDeviceSelection();
+    main->settings()->setValue(Main::TEST_FILE, fn);
 }

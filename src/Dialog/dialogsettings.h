@@ -73,6 +73,9 @@ private slots:
     void on_checkBoxInput0_clicked();
     void on_checkBoxInput1_clicked();
 
+    void on_pushButtonTestFile_clicked();
+    void on_lineEditTestFile_textEdited(const QString &arg1);
+
 private:
     Ui::DialogSettings* ui;
     Main* main;
@@ -87,6 +90,7 @@ private:
     void outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void setDeviceVolume(int value, int devDisplayIndex);
+    void updateFileName(QString fn);
 };
 
 #endif // DIALOGSETTINGS_H

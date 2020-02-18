@@ -7,6 +7,7 @@
 #endif
 #include "../mainapp.h"
 #include <memory>
+#include <iostream>
 
 // TODO allow the user to change these
 #define SAMPLE_RATE (44100)
@@ -99,12 +100,12 @@ void AudioEngine::addActiveDevice(Device* dev, bool startInput, bool startOutput
                     &AudioEngine::audioCallback, //your callback function
                     static_cast<CallbackInfo*>(new CallbackInfo{this, dev})); //data to be passed to callback. In C++, it is frequently (void *)this
     //don't forget to check errors!
-    if (err != paNoError) qDebug() << "Error opening stream";
-    // else qDebug() << "Stream opened successfully!";
+    if (err != paNoError) std::cout << "Error opening stream" << std::endl;
+    // else std::cout << "Stream opened successfully!" << std::endl;
 
     err = Pa_StartStream(dev->stream);
-    if (err != paNoError) qDebug() << "Error starting stream";
-    // else qDebug() << "Stream started successfully!";
+    if (err != paNoError) std::cout << "Error starting stream" << std::endl;
+    // else std::cout << "Stream started successfully!" << std::endl;
 
     dev->setInputting(startInput);
     dev->setOutputting(startOutput);
@@ -209,7 +210,7 @@ bool AudioEngine::isInitialized() {
 void AudioEngine::refreshDevices() {
 
     int devices = Pa_GetDeviceCount();
-    qDebug() << "Refreshing devices... [" << devices << "]";
+    std::cout << "Refreshing devices... [" << devices << "]" << std::endl;
 
     _defaultOutput = nullptr;
     _defaultInput = nullptr;
@@ -234,17 +235,17 @@ void AudioEngine::refreshDevices() {
             _inputs.append(dev);
             if (Pa_GetDefaultInputDevice() == i) {
                 _defaultInput = dev;
-                qDebug() << "Default input device... [" << i << "]";
+                std::cout << "Default input device... [" << i << "]" << std::endl;
             } else
-                qDebug() << "Input device... [" << i << "]";
+                std::cout << "Input device... [" << i << "]" << std::endl;
         }
         if (isOutput) {
             _outputs.append(dev);
             if (Pa_GetDefaultOutputDevice() == i) {
                 _defaultOutput = dev;
-                qDebug() << "Default output device... [" << i << "]";
+                std::cout << "Default output device... [" << i << "]" << std::endl;
             }else
-                qDebug() << "Output device... [" << i << "]";
+                std::cout << "Output device... [" << i << "]" << std::endl;
         }
 
         // Try to find the container for the specific host that contains all its devices
@@ -336,16 +337,6 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, in
     for (AudioObject* audio : _audioObjectRegistry) {
         audio->mix(buffer, framesPerBuffer, channels, deviceListIndex, deviceVolume, singleDevice);
     }
-
-    // Update with the greatest level
-    // TODO move this to AudioObjects
-    qreal level = 0;
-    for (size_t i = 0; i < frames; ++i) {
-        float b = buffer[i];
-        if (b < 0) b *= -1;
-        if (static_cast<qreal>(b) > level) level = static_cast<qreal>(b);
-    }
-    emit update(level);
 }
 
 int AudioEngine::audioCallback(const void* inputBuffer, void *outputBuffer,
@@ -362,7 +353,7 @@ int AudioEngine::audioCallback(const void* inputBuffer, void *outputBuffer,
 
     if (dev->isInputting()) {
         const float* in = static_cast<const float*>(inputBuffer);
-        // qDebug() << in[0];
+        // std::cout << in[0] << std::endl;
         CallbackInfo* info = static_cast<CallbackInfo*>(userData);
         info->audio->inputObject()->write(in, framesPerBuffer * CHANNELS);
 

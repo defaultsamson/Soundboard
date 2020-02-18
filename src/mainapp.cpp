@@ -38,9 +38,9 @@ private:
 void MyThread::run()
 {
     // Set up testing audio
-    QFile testFile(Main::TEST_AUDIO);
+    QFile testFile(Main::DEFAULT_TEST_FILE);
     if (!testFile.exists()) {
-        QFile::copy(":/audio/res/test.ogg", Main::TEST_AUDIO);
+        QFile::copy(":/audio/res/test.ogg", Main::DEFAULT_TEST_FILE);
     }
 
     main.audio()->init();
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 QString Main::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/Soundboard/";
 QString Main::SETTINGS_FILE = "settings.ini";
 QString Main::DEFAULT_SOUNDBOARD = "default.json";
-QString Main::TEST_AUDIO = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/test.ogg";
+QString Main::DEFAULT_TEST_FILE = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/test.ogg";
 
 QString Main::DARK_THEME = "dark_theme";
 bool Main::DARK_THEME_DEFAULT = false;
@@ -91,6 +91,7 @@ QString Main::INPUT_VOLUME0 = "input_volume0";
 QString Main::TEST_VOLUME = "test_volume";
 QString Main::INPUT_OUT0 = "input_out0";
 QString Main::INPUT_OUT1 = "input_out1";
+QString Main::TEST_FILE = "test_file";
 
 Main::Main(QWidget* parent) :
     QMainWindow(parent),
