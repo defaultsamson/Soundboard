@@ -96,9 +96,9 @@ QDEP_DEPENDS += Skycoder42/QHotkey
 
 # Portaudio
 unix:!macx: LIBS += -lportaudio -lrt -lm -lasound -ljack
-win32: LIBS += -L$$PWD/../../../../../Qt/5.14.0/mingw73_64/lib/ -lportaudio
-win32: INCLUDEPATH += $$PWD/../../../../../Qt/5.14.0/mingw73_64/include
-win32: DEPENDPATH += $$PWD/../../../../../Qt/5.14.0/mingw73_64/include
+win32: LIBS += -L$$PWD/../../../../../Qt/$${QT_VERSION}mingw73_64/lib/ -lportaudio
+win32: INCLUDEPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
+win32: DEPENDPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
 
 #libsndfile
 unix:!macx: LIBS += -lsndfile #-lmpg123 -lmp3lame

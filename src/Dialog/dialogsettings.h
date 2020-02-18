@@ -70,9 +70,7 @@ private slots:
     void on_deleteButtonDevice1_clicked();
     void on_deleteButtonDeviceInput_clicked();
 
-
     void on_checkBoxInput0_clicked();
-
     void on_checkBoxInput1_clicked();
 
 private:
@@ -84,8 +82,10 @@ private:
     HostInfoContainer* _displayHostInput = nullptr;
     void closeEvent(QCloseEvent* bar);
     void handleClose();
-    void deviceChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost);
-    void deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost);
+    void outputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost);
+    void inputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost);
+    void outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
+    void inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void setDeviceVolume(int value, int devDisplayIndex);
 };
 

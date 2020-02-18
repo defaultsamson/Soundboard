@@ -24,8 +24,10 @@ public:
     Device* defaultOutput();
     Device* defaultInput();
 
-    void addActiveDevice(Device*);
-    void removeActiveDevice(Device*);
+    void addActiveOutput(Device*);
+    void removeActiveOutput(Device*);
+    void addActiveInput(Device*);
+    void removeActiveInput(Device*);
 
     void removeActiveDisplayOutput(int deviceDisplayIndex);
     Device* getActiveDisplayOutput(int deviceDisplayIndex);
@@ -76,11 +78,14 @@ private:
     QList<Device*> _inputs;
     QList<Device*> _activeOutputs;
     QList<Device*> _activeInputs;
-    QList<std::shared_ptr<DeviceIndexInfo>> _selectedDeviceIndexes;
+    QList<std::shared_ptr<DeviceIndexInfo>> _selectedOutputIndexes;
+    QList<std::shared_ptr<DeviceIndexInfo>> _selectedInputIndexes;
     QList<AudioObject*> _audioObjectRegistry;
     AudioObjectInput* _inputObject = nullptr;
 
     Device* getDevice(int deviceIndex);
+    void addActiveDevice(Device*, bool startInput, bool startOutput);
+    void removeActiveDevice(Device*, bool stopInput, bool stopOutput);
 
 signals:
     void update(qreal m_level);

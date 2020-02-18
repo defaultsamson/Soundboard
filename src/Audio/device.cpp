@@ -6,12 +6,14 @@ Device::Device(HostInfoContainer* host,
                const PaDeviceInfo* info,
                size_t channels,
                std::shared_ptr<DeviceIndexInfo> indexes,
-               bool isInput) :
+               bool isInput,
+               bool isOutput) :
     _host(host),
     _info(info),
     _channels(channels),
     _indexes(indexes),
-    _isInput(isInput)
+    _isInput(isInput),
+    _isOutput(isOutput)
 {
 
 }

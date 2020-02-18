@@ -17,8 +17,10 @@ struct CallbackInfo {
 
 struct DeviceIndexInfo {
     PaDeviceIndex deviceIndex;
-    int displayIndex;
-    int deviceListIndex;
+    int outputDisplayIndex;
+    int inputDisplayIndex;
+    int outputListIndex;
+    int inputListIndex;
 };
 
 class Device
@@ -28,7 +30,8 @@ public:
            const PaDeviceInfo* info,
            size_t channels,
            std::shared_ptr<DeviceIndexInfo> indexes,
-           bool isInput);
+           bool isInput,
+           bool isOutput);
 
     int volumeInt() { return _volumeInt; }
     float volume() { return _volume; }
@@ -40,6 +43,11 @@ public:
     size_t channels() { return _channels; }
     std::shared_ptr<DeviceIndexInfo> indexes() { return _indexes; }
     bool isInput() { return _isInput; }
+    bool isOutput() { return _isOutput; }
+    bool isInputting() { return _isInputting; }
+    bool isOutputting() { return _isOutputting; }
+    void setInputting(bool inputting) { _isInputting = inputting; }
+    void setOutputting(bool outputting) { _isOutputting = outputting; }
 
     PaStream* stream;
 
@@ -49,9 +57,12 @@ private:
     size_t _channels;
     std::shared_ptr<DeviceIndexInfo> _indexes;
     bool _isInput;
+    bool _isOutput;
 
     int _volumeInt = 100;
     float _volume = 1;
+    bool _isInputting = false;
+    bool _isOutputting = false;
 };
 
 struct HostInfoContainer {

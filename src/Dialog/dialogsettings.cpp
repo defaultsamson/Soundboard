@@ -98,7 +98,7 @@ void DialogSettings::host0Changed(int index)
 
 void DialogSettings::device0Changed(int index)
 {
-    deviceChanged(ui->comboBoxDevice0, index, 0, false, &_displayHost0);
+    outputChanged(ui->comboBoxDevice0, index, 0, &_displayHost0);
 }
 
 void DialogSettings::host1Changed(int index)
@@ -114,7 +114,7 @@ void DialogSettings::host1Changed(int index)
 
 void DialogSettings::device1Changed(int index)
 {
-    deviceChanged(ui->comboBoxDevice1, index, 1, false, &_displayHost1);
+    outputChanged(ui->comboBoxDevice1, index, 1, &_displayHost1);
 }
 
 void DialogSettings::hostInputChanged(int index)
@@ -130,69 +130,85 @@ void DialogSettings::hostInputChanged(int index)
 
 void DialogSettings::deviceInputChanged(int index)
 {
-    deviceChanged(ui->comboBoxDeviceInput, index, 0, true, &_displayHostInput);
+    inputChanged(ui->comboBoxDeviceInput, index, 0, &_displayHostInput);
 }
 
-void DialogSettings::deviceChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost)
+void DialogSettings::outputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost)
 {
     QVariant qvar = selector->itemData(selectorIndex);
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
     Device* dev = qvar.value<Device*>();
-    if (isInput ? main->audio()->activeInputs().contains(dev) : main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
-    dev->indexes()->displayIndex = deviceDisplayIndex;
+    if (main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
+    dev->indexes()->outputDisplayIndex = deviceDisplayIndex;
 
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    if (isInput) main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
-    else main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
-    main->audio()->addActiveDevice(dev);
+    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
+    main->audio()->addActiveOutput(dev);
 
-    if (isInput) {
-        switch (deviceDisplayIndex) {
-        case 0:
-            main->settings()->setValue(Main::INPUT_INDEX0, dev->indexes()->deviceIndex);
-            break;
-        }
-        main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
-    } else {
-        switch (deviceDisplayIndex) {
-        case 0:
-            main->settings()->setValue(Main::OUTPUT_INDEX0, dev->indexes()->deviceIndex);
-            break;
-        case 1:
-            main->settings()->setValue(Main::OUTPUT_INDEX1, dev->indexes()->deviceIndex);
-            break;
-        }
-        main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+    switch (deviceDisplayIndex) {
+    case 0:
+        main->settings()->setValue(Main::OUTPUT_INDEX0, dev->indexes()->deviceIndex);
+        break;
+    case 1:
+        main->settings()->setValue(Main::OUTPUT_INDEX1, dev->indexes()->deviceIndex);
+        break;
     }
+    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+
+    refreshDeviceSelection();
+}
+void DialogSettings::inputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost)
+{
+    QVariant qvar = selector->itemData(selectorIndex);
+    if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
+
+    Device* dev = qvar.value<Device*>();
+    if (main->audio()->activeInputs().contains(dev)) return; // If it's already active, ignore
+    dev->indexes()->inputDisplayIndex = deviceDisplayIndex;
+
+    *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
+    main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
+    main->audio()->addActiveInput(dev);
+
+    switch (deviceDisplayIndex) {
+    case 0:
+        main->settings()->setValue(Main::INPUT_INDEX0, dev->indexes()->deviceIndex);
+        break;
+    }
+    main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
 
     refreshDeviceSelection();
 }
 
-void DialogSettings::deviceRemoved(int deviceDisplayIndex, bool isInput, HostInfoContainer** displayHost)
+void DialogSettings::outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost)
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    if (isInput) main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
-    else main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
+    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
 
-    if (isInput) {
-        switch (deviceDisplayIndex) {
-        case 0:
-            main->settings()->setValue(Main::INPUT_INDEX0, -1);
-            break;
-        }
-        main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
-    } else {
-        switch (deviceDisplayIndex) {
-        case 0:
-            main->settings()->setValue(Main::OUTPUT_INDEX0, -1);
-            break;
-        case 1:
-            main->settings()->setValue(Main::OUTPUT_INDEX1, -1);
-            break;
-        }
-        main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+    switch (deviceDisplayIndex) {
+    case 0:
+        main->settings()->setValue(Main::OUTPUT_INDEX0, -1);
+        break;
+    case 1:
+        main->settings()->setValue(Main::OUTPUT_INDEX1, -1);
+        break;
     }
+    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+
+    refreshDeviceSelection();
+}
+void DialogSettings::inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost)
+{
+    *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
+    main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
+
+    switch (deviceDisplayIndex) {
+    case 0:
+        main->settings()->setValue(Main::INPUT_INDEX0, -1);
+        break;
+    }
+    main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
 
     refreshDeviceSelection();
 }
@@ -260,7 +276,8 @@ void DialogSettings::refreshDeviceSelection() {
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxDevice0, ui->deleteButtonDevice0, _displayHost0, 0, false});
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver1, ui->comboBoxDevice1, ui->deleteButtonDevice1, _displayHost1, 1, false});
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriverInput, ui->comboBoxDeviceInput, ui->deleteButtonDeviceInput, _displayHostInput, 0, true});
-    QList<Device*> displayedDevices;
+    QList<Device*>* displayedOutputs = new QList<Device*>();
+    QList<Device*>* displayedInputs = new QList<Device*>();
 
     for (AudioDisplayContainer display : deviceDisplays) {
         QComboBox* drivers = display.drivers;
@@ -271,14 +288,16 @@ void DialogSettings::refreshDeviceSelection() {
         devices->setEnabled(true);
         display.deleteButton->setEnabled(true);
 
+        QList<Device*>* displayedDevices = display.isInput ? displayedInputs : displayedOutputs;
+
         HostInfoContainer* displayHost = nullptr;
         bool notActiveDriver = false;
 
         // First add a single active device
         for (Device* dev : display.isInput ? a->activeInputs() : a->activeOutputs()) {
             // If the device hasn't already been added somewhere, and the display indexes match
-            if (!displayedDevices.contains(dev) && display.deviceDisplayIndex == dev->indexes()->displayIndex) {
-                displayedDevices.append(dev);
+            if (!displayedDevices->contains(dev) && display.deviceDisplayIndex == (display.isInput ? dev->indexes()->inputDisplayIndex : dev->indexes()->outputDisplayIndex)) {
+                displayedDevices->append(dev);
 
                 // If the active device is run by the displayed host (and if there is infact a display host)
                 if (display.displayHost && display.displayHost != dev->host()) {
@@ -326,16 +345,16 @@ void DialogSettings::refreshDeviceSelection() {
 
             // Then add the default device
             if (display.isInput
-                    ? a->defaultInput() && !displayedDevices.contains(a->defaultInput()) && displayHost == a->defaultInput()->host()
-                    : a->defaultOutput() && !displayedDevices.contains(a->defaultOutput()) && displayHost == a->defaultOutput()->host()) {
+                    ? a->defaultInput() && !displayedDevices->contains(a->defaultInput()) && displayHost == a->defaultInput()->host()
+                    : a->defaultOutput() && !displayedDevices->contains(a->defaultOutput()) && displayHost == a->defaultOutput()->host()) {
                 // If the device is active
                 if (display.isInput
                         ? a->activeInputs().contains(a->defaultInput())
                         : a->activeOutputs().contains(a->defaultOutput())) {
                     // Make sure it's not being displayed by another device display
                     if (display.isInput
-                            ? display.deviceDisplayIndex == a->defaultInput()->indexes()->displayIndex
-                            : display.deviceDisplayIndex == a->defaultOutput()->indexes()->displayIndex) {
+                            ? display.deviceDisplayIndex == a->defaultInput()->indexes()->inputDisplayIndex
+                            : display.deviceDisplayIndex == a->defaultOutput()->indexes()->outputDisplayIndex) {
                         devices->addItem(a->defaultOutput()->info()->name, QVariant::fromValue(a->defaultOutput()));
                     }
                 } else {
@@ -347,11 +366,11 @@ void DialogSettings::refreshDeviceSelection() {
             // Then add other devices
             for (Device* dev : display.isInput ? a->inputs() : a->outputs()) {
                 // If it's not already being displayed, it's not the default (because we just added it), and it's under this host
-                if (!displayedDevices.contains(dev) && displayHost == dev->host() && dev != (display.isInput ? a->defaultInput() : a->defaultOutput())) {
+                if (!displayedDevices->contains(dev) && displayHost == dev->host() && dev != (display.isInput ? a->defaultInput() : a->defaultOutput())) {
                     // If the device is active
                     if (display.isInput ? a->activeInputs().contains(dev) : a->activeOutputs().contains(dev)) {
                         // Make sure it's not being displayed by another device display
-                        if (display.deviceDisplayIndex == dev->indexes()->displayIndex) {
+                        if (display.deviceDisplayIndex == (display.isInput ? dev->indexes()->inputDisplayIndex : dev->indexes()->outputDisplayIndex)) {
                             devices->addItem(dev->info()->name, QVariant::fromValue(dev));
                         }
                     } else {
@@ -366,6 +385,9 @@ void DialogSettings::refreshDeviceSelection() {
         if (drivers->count() > 0) drivers->setCurrentIndex(0);
         if (devices->count() > 0) devices->setCurrentIndex(0);
     }
+
+    delete displayedOutputs;
+    delete displayedInputs;
 }
 
 void DialogSettings::on_tabWidget_currentChanged(int index)
@@ -468,17 +490,17 @@ void DialogSettings::on_spinBoxTest_valueChanged(int value)
 
 void DialogSettings::on_deleteButtonDevice0_clicked()
 {
-    deviceRemoved(0, false, &_displayHost0);
+    outputRemoved(0, &_displayHost0);
 }
 
 void DialogSettings::on_deleteButtonDevice1_clicked()
 {
-    deviceRemoved(1, false, &_displayHost1);
+    outputRemoved(1, &_displayHost1);
 }
 
 void DialogSettings::on_deleteButtonDeviceInput_clicked()
 {
-    deviceRemoved(0, true, &_displayHostInput);
+    inputRemoved(0, &_displayHostInput);
 }
 
 void DialogSettings::on_checkBoxInput0_clicked()
