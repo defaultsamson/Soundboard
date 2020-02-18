@@ -1,4 +1,4 @@
-#include "iofile.h"
+#include "iomultifile.h"
 
 #include <string>
 #include <QList>

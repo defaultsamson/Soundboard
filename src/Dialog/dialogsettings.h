@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QComboBox>
 #include <QPushButton>
-#include "../Audio/audioobject.h"
+#include "../Audio/audioobjectfile.h"
 #include "../Audio/audioengine.h"
 #include "dialogtestaudio.h"
 
@@ -73,7 +73,7 @@ private slots:
 private:
     Ui::DialogSettings* ui;
     Main* main;
-    AudioObject audio;
+    AudioObjectFile audio;
     HostInfoContainer* _displayHost0 = nullptr;
     HostInfoContainer* _displayHost1 = nullptr;
     HostInfoContainer* _displayHostInput = nullptr;

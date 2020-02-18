@@ -1,6 +1,6 @@
 #include "audioengine.h"
 
-#include "audioobject.h"
+#include "audioobjectfile.h"
 #include <portaudio.h>
 #include "../mainapp.h"
 
@@ -252,14 +252,14 @@ DeviceInfoContainer* AudioEngine::getDevice(int deviceIndex) {
     return nullptr;
 }
 
-void AudioEngine::registerAudio(AudioObject* obj) {
+void AudioEngine::registerAudio(AudioObjectFile* obj) {
     if (!_audioObjectRegistry.contains(obj)) _audioObjectRegistry.append(obj);
 }
-void AudioEngine::unregisterAudio(AudioObject* obj) {
+void AudioEngine::unregisterAudio(AudioObjectFile* obj) {
     if (_audioObjectRegistry.contains(obj)) _audioObjectRegistry.removeOne(obj);
 }
 
-// Mixes audio from all the AudioObjects (future: perhaps mic too?)
+// Mixes audio from all the AudioObjects
 void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice) {
 
     size_t frames = framesPerBuffer * channels;
@@ -267,11 +267,12 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, in
     // Fills the buffer with zeros
     memset(buffer, 0, frames * sizeof(float));
 
-    for (AudioObject* audio : _audioObjectRegistry) {
+    for (AudioObjectFile* audio : _audioObjectRegistry) {
         audio->mix(buffer, framesPerBuffer, channels, deviceListIndex, deviceVolume, singleDevice);
     }
 
     // Update with the greatest level
+    // TODO move this to AudioObjects
     qreal level = 0;
     for (size_t i = 0; i < frames; ++i) {
         float b = buffer[i];

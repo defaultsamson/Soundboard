@@ -1,5 +1,5 @@
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef LISTITEMBOARD_H
+#define LISTITEMBOARD_H
 
 #include "listitemsound.h"
 #include "listitem.h"
@@ -34,4 +34,4 @@ private:
     std::vector<ListItemSound*> sounds;
 };
 
-#endif // BOARD_H
+#endif // LISTITEMBOARD_H

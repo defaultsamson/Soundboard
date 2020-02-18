@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QList>
 
-#include "audioobject.h"
+#include "audioobjectfile.h"
 #include "../Widget/listitemsound.h"
 
 #include <portaudio.h>
@@ -97,8 +97,8 @@ public:
 
     void mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice);
 
-    void registerAudio(AudioObject*);
-    void unregisterAudio(AudioObject*);
+    void registerAudio(AudioObjectFile*);
+    void unregisterAudio(AudioObjectFile*);
 
     ~AudioEngine();
 
@@ -114,7 +114,7 @@ private:
     QList<DeviceInfoContainer*> _activeOutputs;
     QList<DeviceInfoContainer*> _activeInputs;
     QList<DeviceIndexInfo> _selectedDeviceIndexes;
-    QList<AudioObject*> _audioObjectRegistry;
+    QList<AudioObjectFile*> _audioObjectRegistry;
 
     DeviceInfoContainer* getDevice(int deviceIndex);
 

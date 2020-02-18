@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINAPP_H
+#define MAINAPP_H
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -140,4 +140,4 @@ private:
     void closeEvent(QCloseEvent* bar);
 };
 
-#endif // MAINWINDOW_H
+#endif // MAINAPP_H

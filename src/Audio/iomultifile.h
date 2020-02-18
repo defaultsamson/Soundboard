@@ -1,13 +1,12 @@
-#ifndef IOFILE_H
-#define IOFILE_H
+#ifndef IOMULTIFILE_H
+#define IOMULTIFILE_H
 
-#include "iodevice.h"
 #include <string>
 #include <QList>
 #include <sndfile.hh>
 #include <mutex>
 
-class IOMultiFile : public IODevice
+class IOMultiFile
 {
 public:
     IOMultiFile();
@@ -15,7 +14,7 @@ public:
 
     void write(const float* buffer, size_t n);
     size_t read(float* buffer, size_t n);
-    size_t mix(float* buffer, size_t n);
+    size_t mix(float* buffer, size_t n); // Like readiing, but doesn't overwrite what's already there
     void openFile(std::string filename);
     void clear();
 private:
@@ -23,4 +22,4 @@ private:
     std::mutex modifyLock;
 };
 
-#endif // IOFILE_H
+#endif // IOMULTIFILE_H

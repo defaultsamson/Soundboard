@@ -31,7 +31,9 @@ CONFIG(release, debug|release) {
 
 SOURCES += \
     src/Audio/audioengine.cpp \
-    src/Audio/iofile.cpp \
+    src/Audio/audioobjectfile.cpp \
+    src/Audio/audioobjectstream.cpp \
+    src/Audio/iomultifile.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
@@ -41,13 +43,14 @@ SOURCES += \
     src/Widget/listitem.cpp \
     src/Dialog/dialogsound.cpp \
     src/Widget/widgetaudio.cpp \
-    src/Audio/audioobject.cpp \
     src/mainapp.cpp
 
 HEADERS += \
     src/Audio/audioengine.h \
-    src/Audio/iodevice.h \
-    src/Audio/iofile.h \
+    src/Audio/audioobject.h \
+    src/Audio/audioobjectfile.h \
+    src/Audio/audioobjectstream.h \
+    src/Audio/iomultifile.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
@@ -58,7 +61,6 @@ HEADERS += \
     src/Widget/listitem.h \
     src/Dialog/dialogsound.h \
     src/Widget/widgetaudio.h \
-    src/Audio/audioobject.h \
     src/mainapp.h
 
 FORMS += \

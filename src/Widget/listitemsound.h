@@ -1,5 +1,5 @@
-#ifndef SOUND_H
-#define SOUND_H
+#ifndef LISTITEMSOUND_H
+#define LISTITEMSOUND_H
 
 #include "listitem.h"
 
@@ -8,7 +8,7 @@
 #include <QHotkey>
 #include <QFile>
 
-#include "../Audio/audioobject.h"
+#include "../Audio/audioobjectfile.h"
 
 class Main;
 class ListItemBoard;
@@ -28,11 +28,11 @@ public:
     void reg();
     void unreg() ;
     void trigger() override;
-    AudioObject* audio();
+    AudioObjectFile* audio();
 
 private:
     ListItemBoard* board;
-    AudioObject* _audio;
+    AudioObjectFile* _audio;
     QString _filename;
     int _volume;
     bool _filenameChanged;
@@ -40,4 +40,4 @@ private:
     void reload();
 };
 
-#endif // SOUND_H
+#endif // LISTITEMSOUND_H

@@ -1,39 +1,39 @@
-#include "audioobject.h"
+#include "audioobjectfile.h"
 
 #include <QString>
 #include <QFile>
 #include <portaudio.h>
 #include "audioengine.h"
-#include "iofile.h"
+#include "iomultifile.h"
 
-AudioObject::AudioObject()
+AudioObjectFile::AudioObjectFile()
 {
 
 }
-AudioObject::~AudioObject() {
+AudioObjectFile::~AudioObjectFile() {
     delete [] sideBuffer;
     delete [] bytesRead;
 }
 
-bool AudioObject::isPlaying() { return !isPaused() && !isStopped(); }
-bool AudioObject::isPaused() { return paused; }
-bool AudioObject::isStopped() { return stopped; }
+bool AudioObjectFile::isPlaying() { return !isPaused() && !isStopped(); }
+bool AudioObjectFile::isPaused() { return paused; }
+bool AudioObjectFile::isStopped() { return stopped; }
 
-void AudioObject::stop() {
+void AudioObjectFile::stop() {
     device0Finished = false;
     paused = false;
     stopped = true;
     _file.clear();
 }
 
-void AudioObject::pause() {
+void AudioObjectFile::pause() {
     if (!stopped) {
         paused = true;
         stopped = false;
     }
 }
 
-void AudioObject::play() {
+void AudioObjectFile::play() {
     if (!_hasFile) return;
     if (paused) {
         // Resume
@@ -44,7 +44,7 @@ void AudioObject::play() {
     }
 }
 
-void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channels*/, int deviceListIndex, float deviceVolume, bool singleDevice) {
+void AudioObjectFile::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channels*/, int deviceListIndex, float deviceVolume, bool singleDevice) {
     if (!_hasFile) { stop(); return; }
     // If it's paused or stopped, return
     if (paused || stopped) return;
@@ -118,7 +118,7 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
     }
 }
 
-void AudioObject::setFile(const QString &filename) {
+void AudioObjectFile::setFile(const QString &filename) {
     stop();
 
     // Set up the sideBuffer to hold as much data as a device's total requested frames (frames per buffer * channels), times the SIDE_BUFFER_MULTIPLIER
@@ -144,10 +144,10 @@ void AudioObject::setFile(const QString &filename) {
     file.close();
 }
 
-bool AudioObject::hasFile() {
+bool AudioObjectFile::hasFile() {
     return _hasFile;
 }
 
-void AudioObject::setVolume(const float volume) {
+void AudioObjectFile::setVolume(const float volume) {
     _volume = volume;
 }
