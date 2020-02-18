@@ -14,6 +14,7 @@ AudioEngine::AudioEngine(Main* main) : main(main) {
 }
 AudioEngine::~AudioEngine() {
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
+    delete _inputObject;
 }
 
 Device* AudioEngine::defaultOutput() {
@@ -136,6 +137,7 @@ const QList<Device*> AudioEngine::inputs() {
 
 void AudioEngine::init() {
     Pa_Initialize();
+    _inputObject = new AudioObjectInput();
     refreshDevices();
     _isInitialized = true;
 }
@@ -286,9 +288,16 @@ int AudioEngine::outputCallback(const void* /*inputBuffer*/, void *outputBuffer,
                               PaStreamCallbackFlags /*statusFlags*/,
                               void *userData) {
 
-    float *out = static_cast<float*>(outputBuffer);
-    CallbackInfo *info = static_cast<CallbackInfo*>(userData);
-    info->audio->mix(out, framesPerBuffer, CHANNELS, info->device->indexes()->deviceListIndex, info->device->volume(), info->audio->activeOutputs().size() == 1);
+    float* out = static_cast<float*>(outputBuffer);
+    CallbackInfo* info = static_cast<CallbackInfo*>(userData);
+    std::shared_ptr<DeviceIndexInfo> indexes = info->device->indexes();
+    info->audio->mix(out, framesPerBuffer, CHANNELS, indexes->deviceListIndex, info->device->volume(), info->audio->activeOutputs().size() == 1);
+
+    AudioObjectInput* input = info->audio->inputObject();
+    if ((input->isActiveOutput0() && indexes->displayIndex == 0)
+            || (input->isActiveOutput1() && indexes->displayIndex == 1)) {
+        info->audio->inputObject()->mix(out, framesPerBuffer, CHANNELS, indexes->deviceListIndex, info->device->volume(), info->audio->activeOutputs().size() == 1);
+    }
     return paContinue;
 }
 
@@ -298,8 +307,9 @@ int AudioEngine::inputCallback(const void* inputBuffer, void* /*outputBuffer*/,
                               PaStreamCallbackFlags /*statusFlags*/,
                               void *userData) {
 
-    const float *in = static_cast<const float*>(inputBuffer);
-    CallbackInfo *info = static_cast<CallbackInfo*>(userData);
+    const float* in = static_cast<const float*>(inputBuffer);
+    CallbackInfo* info = static_cast<CallbackInfo*>(userData);
+    info->audio->inputObject()->write(in, framesPerBuffer * CHANNELS);
     //info->audio->mix(in, framesPerBuffer, CHANNELS, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeOutputs().size() == 1);
     return paContinue;
 }

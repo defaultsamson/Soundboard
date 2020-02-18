@@ -9,7 +9,6 @@
 class IOMultiFile
 {
 public:
-    IOMultiFile();
     ~IOMultiFile();
 
     void write(const float* buffer, size_t n);

@@ -5,6 +5,7 @@
 #include <QList>
 
 #include "audioobject.h"
+#include "audioobjectinput.h"
 #include "../Widget/listitemsound.h"
 
 #include "device.h"
@@ -60,6 +61,8 @@ public:
     void registerAudio(AudioObject*);
     void unregisterAudio(AudioObject*);
 
+    AudioObjectInput* inputObject() { return _inputObject; }
+
     ~AudioEngine();
 
 private:
@@ -75,7 +78,7 @@ private:
     QList<Device*> _activeInputs;
     QList<std::shared_ptr<DeviceIndexInfo>> _selectedDeviceIndexes;
     QList<AudioObject*> _audioObjectRegistry;
-    AudioObject *_inputDevice;
+    AudioObjectInput* _inputObject = nullptr;
 
     Device* getDevice(int deviceIndex);
 

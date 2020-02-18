@@ -47,6 +47,8 @@ public:
     static QString OUTPUT_VOLUME1;
     static QString INPUT_VOLUME0;
     static QString TEST_VOLUME;
+    static QString INPUT_OUT0;
+    static QString INPUT_OUT1;
 
     explicit Main(QWidget* parent = nullptr);
     ~Main();

@@ -5,11 +5,6 @@
 #include <sndfile.hh>
 #include <iostream>
 
-IOMultiFile::IOMultiFile()
-{
-
-}
-
 IOMultiFile::~IOMultiFile() {
     clear();
 }

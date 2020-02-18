@@ -89,6 +89,8 @@ QString Main::OUTPUT_VOLUME0 = "output_volume0";
 QString Main::OUTPUT_VOLUME1 = "output_volume1";
 QString Main::INPUT_VOLUME0 = "input_volume0";
 QString Main::TEST_VOLUME = "test_volume";
+QString Main::INPUT_OUT0 = "input_out0";
+QString Main::INPUT_OUT1 = "input_out1";
 
 Main::Main(QWidget* parent) :
     QMainWindow(parent),

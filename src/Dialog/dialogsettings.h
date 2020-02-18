@@ -70,6 +70,11 @@ private slots:
     void on_deleteButtonDevice1_clicked();
     void on_deleteButtonDeviceInput_clicked();
 
+
+    void on_checkBoxInput0_clicked();
+
+    void on_checkBoxInput1_clicked();
+
 private:
     Ui::DialogSettings* ui;
     Main* main;

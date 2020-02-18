@@ -48,6 +48,9 @@ DialogSettings::DialogSettings(Main* main) :
     ui->spinBoxTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
     ui->sliderTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
 
+    ui->checkBoxInput0->setChecked(main->settings()->value(Main::INPUT_OUT0, false).toBool());
+    ui->checkBoxInput1->setChecked(main->settings()->value(Main::INPUT_OUT1, false).toBool());
+
     audio.setFile(Main::TEST_AUDIO);
     audio.setVolume(main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
     main->audio()->registerAudio(&audio);
@@ -220,6 +223,8 @@ void DialogSettings::refreshDeviceSelection() {
     ui->pushButtonPause->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonStop->setEnabled(inited && a->activeOutputs().size() > 0);
     ui->pushButtonRefresh->setEnabled(inited);
+    ui->checkBoxInput0->setEnabled(inited);
+    ui->checkBoxInput1->setEnabled(inited);
     if (!inited) {
         ui->comboBoxDriver0->clear();
         ui->comboBoxDriver0->setEnabled(false);
@@ -238,6 +243,18 @@ void DialogSettings::refreshDeviceSelection() {
         ui->deleteButtonDeviceInput->setEnabled(false);
         return;
     }
+
+    /*
+    if (a->getActiveDisplayOutput(0)) ui->spinBoxDevice0->setValue(a->getActiveDisplayOutput(0)->volumeInt());
+    if (a->getActiveDisplayOutput(0)) ui->sliderDevice0->setValue(a->getActiveDisplayOutput(0)->volumeInt());
+    if (a->getActiveDisplayOutput(1)) ui->spinBoxDevice1->setValue(a->getActiveDisplayOutput(1)->volumeInt());
+    if (a->getActiveDisplayOutput(1)) ui->sliderDevice1->setValue(a->getActiveDisplayOutput(1)->volumeInt());
+    if (a->getActiveDisplayInput(0)) ui->spinBoxInput->setValue(a->getActiveDisplayInput(0)->volumeInt());
+    if (a->getActiveDisplayInput(0)) ui->sliderInput->setValue(a->getActiveDisplayInput(0)->volumeInt());
+    */
+
+    ui->checkBoxInput0->setChecked(a->inputObject()->isActiveOutput0());
+    ui->checkBoxInput1->setChecked(a->inputObject()->isActiveOutput1());
 
     QList<AudioDisplayContainer> deviceDisplays;
     deviceDisplays.append(AudioDisplayContainer{ui->comboBoxDriver0, ui->comboBoxDevice0, ui->deleteButtonDevice0, _displayHost0, 0, false});
@@ -462,4 +479,18 @@ void DialogSettings::on_deleteButtonDevice1_clicked()
 void DialogSettings::on_deleteButtonDeviceInput_clicked()
 {
     deviceRemoved(0, true, &_displayHostInput);
+}
+
+void DialogSettings::on_checkBoxInput0_clicked()
+{
+    bool enabled = ui->checkBoxInput0->isChecked();
+    main->settings()->setValue(Main::INPUT_OUT0, enabled);
+    main->audio()->inputObject()->setOutput0(enabled);
+}
+
+void DialogSettings::on_checkBoxInput1_clicked()
+{
+    bool enabled = ui->checkBoxInput1->isChecked();
+    main->settings()->setValue(Main::INPUT_OUT1, enabled);
+    main->audio()->inputObject()->setOutput1(enabled);
 }

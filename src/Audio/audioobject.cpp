@@ -10,7 +10,7 @@ AudioObject::AudioObject() {
     sideBuffer = new float[SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS];
     // unneccessary? memset(sideBuffer, 0, SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS * sizeof(float));
 
-    // Set up a size_t for each buffer in sideBuffer, so we know how much data is in each section of sideBuffer
+    // Set up a size_t for each buffer in sideBuffer that represents how much data is in each section of sideBuffer
     bytesRead = new size_t[SIDE_BUFFER_MULTIPLIER];
     // unneccessary? memset(bytesRead, 0, SIDE_BUFFER_MULTIPLIER * sizeof(size_t));
 }
@@ -23,14 +23,13 @@ AudioObject::~AudioObject() {
 void AudioObject::stop() {
     stopped = true;
     device0Finished = false;
-    stopped = true;
     sideBufferWrite = 0;
     sideBufferRead = 0;
 }
 
 void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channels*/, int deviceListIndex, float deviceVolume, bool singleDevice) {
     if (stopped) return;
-    if (!doMix()) { stop(); return; }
+    if (!doMix()) return;
     // The 2nd device is still reading, if this is being called by the first device, return
     if (device0Finished && deviceListIndex == 0) return;
 
@@ -39,11 +38,11 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
     // The volume of the device and this audio object combined
     float finalVolume = _volume * deviceVolume;
 
-    // If it's the first device, then load up the sideBuffer
-    if (deviceListIndex == 0) {
+    // If it's the first device (or the only device), then read from this
+    if (deviceListIndex == 0 || singleDevice) {
         float readBuffer[frames];
 
-        // Read frames from the file to the readBuffer
+        // Read frames from this to the readBuffer
         size_t readCount = static_cast<size_t>(this->read(readBuffer, frames));
         if (readCount == 0) {
             return;

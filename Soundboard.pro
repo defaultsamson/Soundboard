@@ -33,7 +33,7 @@ SOURCES += \
     src/Audio/audioengine.cpp \
     src/Audio/audioobject.cpp \
     src/Audio/audioobjectfile.cpp \
-    src/Audio/audioobjectstream.cpp \
+    src/Audio/audioobjectinput.cpp \
     src/Audio/device.cpp \
     src/Audio/iomultifile.cpp \
     src/Dialog/dialogboard.cpp \
@@ -51,7 +51,7 @@ HEADERS += \
     src/Audio/audioengine.h \
     src/Audio/audioobject.h \
     src/Audio/audioobjectfile.h \
-    src/Audio/audioobjectstream.h \
+    src/Audio/audioobjectinput.h \
     src/Audio/device.h \
     src/Audio/iomultifile.h \
     src/Dialog/dialogboard.h \

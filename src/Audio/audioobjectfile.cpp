@@ -6,10 +6,6 @@
 #include "audioengine.h"
 #include "iomultifile.h"
 
-AudioObjectFile::~AudioObjectFile() {
-    _file.clear();
-}
-
 bool AudioObjectFile::isPlaying() { return !isPaused() && !isStopped(); }
 bool AudioObjectFile::isPaused() { return paused; }
 
