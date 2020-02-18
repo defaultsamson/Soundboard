@@ -31,6 +31,7 @@ CONFIG(release, debug|release) {
 
 SOURCES += \
     src/Audio/audioengine.cpp \
+    src/Audio/audioobject.cpp \
     src/Audio/audioobjectfile.cpp \
     src/Audio/audioobjectstream.cpp \
     src/Audio/device.cpp \
