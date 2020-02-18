@@ -12,7 +12,6 @@ public:
     void write(const float* buffer, size_t n);
     size_t read(float* buffer, size_t n);
     bool doMix();
-    void mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice);
 
     void setOutput0(bool active) { _output0 = active; }
     bool isActiveOutput0() { return _output0; }

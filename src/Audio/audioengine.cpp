@@ -296,7 +296,8 @@ int AudioEngine::outputCallback(const void* /*inputBuffer*/, void *outputBuffer,
     AudioObjectInput* input = info->audio->inputObject();
     if ((input->isActiveOutput0() && indexes->displayIndex == 0)
             || (input->isActiveOutput1() && indexes->displayIndex == 1)) {
-        info->audio->inputObject()->mix(out, framesPerBuffer, CHANNELS, indexes->deviceListIndex, info->device->volume(), info->audio->activeOutputs().size() == 1);
+        bool single = (input->isActiveOutput0() && !input->isActiveOutput1()) || (!input->isActiveOutput0() && input->isActiveOutput1());
+        info->audio->inputObject()->mix(out, framesPerBuffer, CHANNELS, indexes->deviceListIndex, info->device->volume(), single);
     }
     return paContinue;
 }
@@ -307,7 +308,9 @@ int AudioEngine::inputCallback(const void* inputBuffer, void* /*outputBuffer*/,
                               PaStreamCallbackFlags /*statusFlags*/,
                               void *userData) {
 
+
     const float* in = static_cast<const float*>(inputBuffer);
+    qDebug() << in[0];
     CallbackInfo* info = static_cast<CallbackInfo*>(userData);
     info->audio->inputObject()->write(in, framesPerBuffer * CHANNELS);
     //info->audio->mix(in, framesPerBuffer, CHANNELS, info->device->indexes.deviceListIndex, info->device->volume, info->audio->activeOutputs().size() == 1);
