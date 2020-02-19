@@ -51,6 +51,8 @@ public:
     static QString INPUT_OUT1;
     static QString TEST_FILE;
 
+
+
     explicit Main(QWidget* parent = nullptr);
     ~Main();
     void load();

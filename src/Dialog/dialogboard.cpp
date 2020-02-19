@@ -15,6 +15,8 @@ DialogBoard::DialogBoard(Main* main, ListItemBoard* board, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : board->text());
+    //qDebug() << "hasKey: " << board->hasKey();
+    //qDebug() << "key:    " << board->key();
     if (board->hasKey()) ui->lineEdiKeybind->setKey(board->key());
 
     // Disable the keybinds temporarily while the dialog is up

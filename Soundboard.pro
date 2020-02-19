@@ -39,6 +39,7 @@ SOURCES += \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
+    src/Hotkey/hotkeytrigger.cpp \
     src/Widget/listitemboard.cpp \
     src/Widget/listitemsound.cpp \
     src/Widget/widgetkeybind.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
     src/Dialog/dialogtestaudio.h \
+    src/Hotkey/hotkeytrigger.h \
     src/Widget/listitemboard.h \
     src/Widget/listitemsound.h \
     src/Widget/widgetkeybind.h \

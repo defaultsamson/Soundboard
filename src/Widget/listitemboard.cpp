@@ -98,18 +98,17 @@ void ListItemBoard::save(QJsonObject &json) {
 }
 
 void ListItemBoard::reg(bool regThis, bool regSounds) {
-    if (regThis) hotkey->setRegistered(true);
+    if (regThis) _hotkey->setRegistered(true);
     // Register all sounds' keybinds
     if (regSounds) for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->reg();
 }
 
 void ListItemBoard::unreg(bool unregThis) {
-    if (unregThis) hotkey->setRegistered(false);
+    if (unregThis) _hotkey->setRegistered(false);
     // Unregister all sounds' keybinds
     for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->unreg();
 }
 
 void ListItemBoard::trigger() {
-    ListItem::trigger();
     main->setCurrentBoard(this);
 }

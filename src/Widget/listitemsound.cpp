@@ -60,11 +60,11 @@ int ListItemSound::volume() {
 }
 
 void ListItemSound::reg() {
-    hotkey->setRegistered(true);
+    _hotkey->setRegistered(true);
 }
 
 void ListItemSound::unreg() {
-    hotkey->setRegistered(false);
+    _hotkey->setRegistered(false);
 }
 
 void ListItemSound::load(const QJsonObject &json) {
@@ -85,8 +85,6 @@ AudioObjectFile* ListItemSound::audio() {
 }
 
 void ListItemSound::trigger() {
-    ListItem::trigger();
     _audio->play();
     main->setCurrentSound(this);
-    // TODO give this an AudioObject
 }
