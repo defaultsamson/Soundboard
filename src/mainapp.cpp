@@ -668,6 +668,22 @@ void Main::save(bool saveAs) {
 
     QFile file(tempFileName);
 
+    // If overwriting an existing board without knowing it
+    if (file.exists() && !hasFile) {
+        QString title = "Overwrite board?\n";
+        title += tempFileName;
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Soundboard",
+                                                                    tr(title.toStdString().c_str()),
+                                                                    QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::No);
+        switch (resBtn) {
+        case QMessageBox::Yes:
+            break;
+        default:
+            return;
+        }
+    }
+
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning("Couldn't write to save file.");
         // TODO inform user the file failed to save
