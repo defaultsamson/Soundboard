@@ -46,6 +46,7 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
         // Read frames from this to the readBuffer
         size_t readCount = static_cast<size_t>(this->read(readBuffer, frames));
         if (readCount == 0) {
+            emit update(0);
             return;
         }
 
@@ -56,10 +57,21 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
             bytesRead[sideBufferWrite] = readCount;
         }
 
+        float maxLevel = 0;
         // Read the amount of bytes read from mixBuffer into buffer, and apply the volume
         for (size_t i = 0; i < readCount; i++){
-            buffer[i] += readBuffer[i] * finalVolume;
+            // Update with the greatest level
+            if (_updateVisualiser) {
+                float final = readBuffer[i] * finalVolume;
+                buffer[i] += final;
+
+                if (final < 0) final *= -1;
+                if (final > maxLevel) maxLevel = final;
+            } else {
+                buffer[i] += readBuffer[i] * finalVolume;
+            }
         }
+        emit update(maxLevel);
 
         if (!singleDevice) {
             sideBufferWrite++;
@@ -99,8 +111,4 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
             stop();
         }
     }
-}
-
-void AudioObject::setVolume(const float volume) {
-    _volume = volume;
 }

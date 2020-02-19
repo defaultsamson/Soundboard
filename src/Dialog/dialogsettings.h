@@ -89,8 +89,10 @@ private:
     void inputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost);
     void outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
-    void setDeviceVolume(int value, int devDisplayIndex);
+    void setOutputDeviceVolume(int value, int devDisplayIndex);
     void updateFileName(QString fn);
+
+    bool _connectedInputVisualizer = false;
 };
 
 #endif // DIALOGSETTINGS_H

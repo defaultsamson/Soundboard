@@ -51,12 +51,12 @@ DialogSettings::DialogSettings(Main* main) :
     QString testFile = main->settings()->value(Main::TEST_FILE, Main::DEFAULT_TEST_FILE).toString();
     audio.setFile(testFile);
     audio.setVolume(main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
+    audio.setUpdateVisualizer(true);
+    connect(&audio, &AudioObject::update, this, [&](float level) {
+        ui->outputBar->setLevel(static_cast<qreal>(level));
+    });
     main->audio()->registerAudio(&audio);
     if (audio.hasFile()) ui->lineEditTestFile->setText(testFile);
-
-    /*connect(&audio, &AudioObject::update, this, [&](qreal level) {
-        ui->outputBar->setLevel(level);
-    });*/
 
     refreshDeviceSelection();
 
@@ -71,6 +71,7 @@ DialogSettings::~DialogSettings()
 void DialogSettings::handleClose() {
     main->audio()->unregisterAudio(&audio);
     main->setAudioTestDialog(nullptr);
+    if (_connectedInputVisualizer) main->audio()->inputObject()->setUpdateVisualizer(false);
 }
 
 void DialogSettings::on_buttonBox_accepted()
@@ -259,6 +260,12 @@ void DialogSettings::refreshDeviceSelection() {
         ui->deleteButtonDevice1->setEnabled(false);
         ui->deleteButtonDeviceInput->setEnabled(false);
         return;
+    } else if (!_connectedInputVisualizer) {
+        _connectedInputVisualizer = true;
+        main->audio()->inputObject()->setUpdateVisualizer(true);
+        connect(main->audio()->inputObject(), &AudioObject::update, this, [&](float level) {
+            ui->inputBar->setLevel(static_cast<qreal>(level));
+        });
     }
 
     /*
@@ -416,17 +423,18 @@ void DialogSettings::on_pushButtonStop_clicked()
     audio.stop();
 }
 
-void DialogSettings::setDeviceVolume(int value, int devDisplayIndex) {
+void DialogSettings::setOutputDeviceVolume(int value, int devDisplayIndex) {
     Device* dev = main->audio()->getActiveDisplayOutput(devDisplayIndex);
     if (dev) dev->setVolume(value);
 }
+
 
 void DialogSettings::on_sliderDevice0_valueChanged(int value)
 {
     // Allow users to edit the number in the box past what the slider goes to
     if (!(value == ui->sliderDevice0->maximum() && ui->spinBoxDevice0->value() > value)) {
         ui->spinBoxDevice0->setValue(value);
-        setDeviceVolume(value, 0);
+        setOutputDeviceVolume(value, 0);
         main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
     }
 }
@@ -434,7 +442,7 @@ void DialogSettings::on_sliderDevice0_valueChanged(int value)
 void DialogSettings::on_spinBoxDevice0_valueChanged(int value)
 {
     ui->sliderDevice0->setValue(value);
-    setDeviceVolume(value, 0);
+    setOutputDeviceVolume(value, 0);
     main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
 }
 
@@ -443,7 +451,7 @@ void DialogSettings::on_sliderDevice1_valueChanged(int value)
     // Allow users to edit the number in the box past what the slider goes to
     if (!(value == ui->sliderDevice1->maximum() && ui->spinBoxDevice1->value() > value)) {
         ui->spinBoxDevice1->setValue(value);
-        setDeviceVolume(value, 1);
+        setOutputDeviceVolume(value, 1);
         main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
     }
 }
@@ -451,7 +459,7 @@ void DialogSettings::on_sliderDevice1_valueChanged(int value)
 void DialogSettings::on_spinBoxDevice1_valueChanged(int value)
 {
     ui->sliderDevice1->setValue(value);
-    setDeviceVolume(value, 1);
+    setOutputDeviceVolume(value, 1);
     main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
 }
 
@@ -460,7 +468,7 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
     // Allow users to edit the number in the box past what the slider goes to
     if (!(value == ui->sliderInput->maximum() && ui->spinBoxInput->value() > value)) {
         ui->spinBoxInput->setValue(value);
-        setDeviceVolume(value, 2);
+        main->audio()->inputObject()->setVolumeInt(value);
         main->settings()->setValue(Main::INPUT_VOLUME0, value);
     }
 }
@@ -468,7 +476,7 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
 void DialogSettings::on_spinBoxInput_valueChanged(int value)
 {
     ui->sliderInput->setValue(value);
-    setDeviceVolume(value, 2);
+    main->audio()->inputObject()->setVolumeInt(value);
     main->settings()->setValue(Main::INPUT_VOLUME0, value);
 }
 
@@ -477,7 +485,7 @@ void DialogSettings::on_sliderTest_valueChanged(int value)
     // Allow users to edit the number in the box past what the slider goes to
     if (!(value == ui->sliderTest->maximum() && ui->spinBoxTest->value() > value)) {
         ui->spinBoxTest->setValue(value);
-        audio.setVolume(value / static_cast<float>(100));
+        audio.setVolumeInt(value);
         main->settings()->setValue(Main::TEST_VOLUME, value);
     }
 }
@@ -485,7 +493,7 @@ void DialogSettings::on_sliderTest_valueChanged(int value)
 void DialogSettings::on_spinBoxTest_valueChanged(int value)
 {
     ui->sliderTest->setValue(value);
-    audio.setVolume(value / static_cast<float>(100));
+    audio.setVolumeInt(value);
     main->settings()->setValue(Main::TEST_VOLUME, value);
 }
 

@@ -290,7 +290,7 @@ void AudioEngine::refreshDevices() {
     }
     if (in0) {
         in0->indexes()->inputDisplayIndex = 0;
-        in0->setVolume(main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+        _inputObject->setVolumeInt(main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
         addActiveInput(in0);
     }
 

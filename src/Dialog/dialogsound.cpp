@@ -32,11 +32,10 @@ DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
     main->disableKeybinds();
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
 
-    /*
     connect(sound->audio(), &AudioObject::update, this, [&](qreal level) {
         ui->outputBar->setLevel(level);
     });
-    */
+    sound->audio()->setUpdateVisualizer(true);
 }
 
 DialogSound::~DialogSound()
@@ -120,6 +119,7 @@ void DialogSound::onClose() {
     sound->audio()->stop();
     // Re-enable the keybinds
     main->enableKeybinds();
+    sound->audio()->setUpdateVisualizer(false);
 }
 
 void DialogSound::on_pushButtonPlay_clicked()
