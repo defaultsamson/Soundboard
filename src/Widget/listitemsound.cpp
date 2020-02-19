@@ -9,8 +9,8 @@
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 
-ListItemSound::ListItemSound(Main* main, ListItemBoard* board) :
-    ListItem(main),
+ListItemSound::ListItemSound(Main* _main, ListItemBoard* board) :
+    ListItem(_main),
     board(board),
     _audio(new AudioObjectFile()),
     _filename(""),
@@ -19,12 +19,12 @@ ListItemSound::ListItemSound(Main* main, ListItemBoard* board) :
     _volumeChanged(false)
 {
     setText(NEW_SOUND);
-    main->audio()->registerAudio(_audio);
+    _main->audio()->registerAudio(_audio);
 }
 
 ListItemSound::~ListItemSound() {
     board->removeSound(this, false);
-    main->audio()->unregisterAudio(_audio);
+    _main->audio()->unregisterAudio(_audio);
     delete _audio;
 }
 
@@ -78,5 +78,5 @@ AudioObjectFile* ListItemSound::audio() {
 
 void ListItemSound::trigger() {
     _audio->play();
-    main->setCurrentSound(this);
+    _main->setCurrentSound(this);
 }

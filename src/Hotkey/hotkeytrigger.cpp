@@ -6,12 +6,12 @@
 #include "../Hotkey/hotkeypass.h"
 #include "../Hotkey/hotkeyutil.h"
 
-HotkeyTrigger::HotkeyTrigger(Main* main, std::function<void()> trigger)
+HotkeyTrigger::HotkeyTrigger(Main* _main, std::function<void()> trigger)
     : QObject(),
-      main(main),
+      _main(_main),
       _hasKey(false),
       _key(0),
-      _hotkey(new HotkeyPass(main)),
+      _hotkey(new HotkeyPass(_main)),
       _trigger(trigger)
 {
     // Sets up the keybind

@@ -13,7 +13,7 @@ class HotkeyTrigger : public QObject
     Q_OBJECT
 
 public:
-    HotkeyTrigger(Main* main, std::function<void()> trigger);
+    HotkeyTrigger(Main* _main, std::function<void()> trigger);
     ~HotkeyTrigger();
     bool hasKey() { return _hasKey; }
     quint32 key() { return _key; }
@@ -23,7 +23,7 @@ public:
     void unreg() { _hotkey->setRegistered(false); }
 
 protected:
-    Main* main;
+    Main* _main;
     bool _hasKey;
     quint32 _key;
     HotkeyPass *_hotkey;

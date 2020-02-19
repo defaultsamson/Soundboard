@@ -7,8 +7,8 @@
 #include <QHotkey>
 #include <functional>
 
-ListItem::ListItem(Main* main) :
-    HotkeyTrigger(main, [this]{ trigger(); })
+ListItem::ListItem(Main* _main) :
+    HotkeyTrigger(_main, [this]{ trigger(); })
 {
 }
 

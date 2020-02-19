@@ -6,10 +6,10 @@
 
 #include <QObject>
 
-DialogBoard::DialogBoard(Main* main, ListItemBoard* board, bool creatingNew) :
-    QDialog(main),
+DialogBoard::DialogBoard(Main* _main, ListItemBoard* board, bool creatingNew) :
+    QDialog(_main),
     ui(new Ui::DialogBoard),
-    main(main),
+    _main(_main),
     board(board),
     creatingNew(creatingNew)
 {
@@ -18,12 +18,12 @@ DialogBoard::DialogBoard(Main* main, ListItemBoard* board, bool creatingNew) :
     if (board->hasKey()) ui->keybindBoard->setKey(board->key());
 
     // Restore the geometry, if it was saved
-    if (main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
-        if (main->settings()->contains(Main::WINDOW_BOARD_GEOMETRY))
-            restoreGeometry(main->settings()->value(Main::WINDOW_BOARD_GEOMETRY).toByteArray());
+    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
+        if (_main->settings()->contains(Main::WINDOW_BOARD_GEOMETRY))
+            restoreGeometry(_main->settings()->value(Main::WINDOW_BOARD_GEOMETRY).toByteArray());
 
     // Disable the keybinds temporarily while the dialog is up
-    main->disableKeybinds();
+    _main->disableKeybinds();
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
 }
 
@@ -47,7 +47,7 @@ void DialogBoard::on_buttonBox_accepted()
             || board->text() != originalName
             || board->hasKey() != originalHasKey
             || board->key() != originalKey) {
-        main->setChanged();
+        _main->setChanged();
     }
 
     boardUpdated = true;
@@ -62,11 +62,11 @@ void DialogBoard::on_buttonBox_rejected()
 void DialogBoard::onClose() {
     // Remove the board if it's being created new and wasn't saved (e.g. hit "OK: on)
     if (creatingNew && !boardUpdated) {
-       main->removeBoard(board, true);
+       _main->removeBoard(board, true);
     }
     // Re-enable the keybinds
-    main->enableKeybinds();
+    _main->enableKeybinds();
 
     // Save the geometry
-    main->settings()->setValue(Main::WINDOW_BOARD_GEOMETRY, saveGeometry());
+    _main->settings()->setValue(Main::WINDOW_BOARD_GEOMETRY, saveGeometry());
 }

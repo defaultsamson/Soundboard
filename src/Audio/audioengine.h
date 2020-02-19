@@ -20,7 +20,7 @@ struct CallbackInfo {
 class AudioEngine
 {
 public:
-    AudioEngine(Main* main);
+    AudioEngine(Main* _main);
 
     static size_t FRAMES_PER_BUFFER;
     static size_t CHANNELS;
@@ -72,7 +72,7 @@ public:
     ~AudioEngine();
 
 private:
-    Main* main;
+    Main* _main;
     bool _isInitialized = false;
 
     Device* _defaultOutput = nullptr;

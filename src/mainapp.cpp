@@ -29,15 +29,15 @@
 class MyThread : public QThread
 {
 public:
-    MyThread(Main* main);
+    MyThread(Main* _main);
 protected:
     void run();
 private:
-    Main* main;
+    Main* _main;
 };        
 
-MyThread::MyThread(Main* main) : main(main) {
-    QObject::connect(this, SIGNAL(finished()), main, SLOT(updateMuteButton()));
+MyThread::MyThread(Main* _main) : _main(_main) {
+    QObject::connect(this, SIGNAL(finished()), _main, SLOT(updateMuteButton()));
 }
 
 void MyThread::run()
@@ -48,8 +48,8 @@ void MyThread::run()
         QFile::copy(":/audio/res/test.ogg", Main::DEFAULT_TEST_FILE);
     }
 
-    main->audio()->init();
-    if (main->getAudioTestDialog()) main->getAudioTestDialog()->audioEngineInit();
+    _main->audio()->init();
+    if (_main->getAudioTestDialog()) _main->getAudioTestDialog()->audioEngineInit();
 }
 
 void Main::setAudioTestDialog(DialogTestAudio *s) {
@@ -104,9 +104,9 @@ QString Main::HK_TOGGLE_MUTE_INPUT_HAS = "hk_toggle_mute_input_has";
 QString Main::HK_TOGGLE_MUTE_INPUT_KEY = "hk_toggle_mute_input_key";
 
 QString Main::REMEMBER_WINDOW_SIZES = "remember_window_sizes";
-QString Main::WINDOW_MAIN_GEOMETRY = "window_main_geometry";
-QString Main::WINDOW_MAIN_SPLITTER0 = "window_main_slider0";
-QString Main::WINDOW_MAIN_SPLITTER1 = "window_main_slider1";
+QString Main::WINDOW_MAIN_GEOMETRY = "window__main_geometry";
+QString Main::WINDOW_MAIN_SPLITTER0 = "window__main_slider0";
+QString Main::WINDOW_MAIN_SPLITTER1 = "window__main_slider1";
 QString Main::WINDOW_SETTINGS_GEOMETRY = "window_settings_geometry";
 QString Main::WINDOW_BOARD_GEOMETRY = "window_board_geometry";
 QString Main::WINDOW_SOUND_GEOMETRY = "window_sound_geometry";
@@ -759,7 +759,7 @@ void Main::closeEvent (QCloseEvent* event)
         event->accept();
     }
 
-    // Save the main window sizes
+    // Save the _main window sizes
     settings()->setValue(WINDOW_MAIN_GEOMETRY, saveGeometry());
     QList<int> sizes = ui->splitter->sizes();
     settings()->setValue(WINDOW_MAIN_SPLITTER0, sizes.at(0));

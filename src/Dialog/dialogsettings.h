@@ -30,7 +30,7 @@ class DialogSettings : public DialogTestAudio
     Q_OBJECT
 
 public:
-    explicit DialogSettings(Main *main);
+    explicit DialogSettings(Main* _main);
     ~DialogSettings();
 
     void refreshDeviceSelection();
@@ -84,7 +84,7 @@ private slots:
 
 private:
     Ui::DialogSettings* ui;
-    Main* main;
+    Main* _main;
     AudioObjectFile audio;
     HostInfoContainer* _displayHost0 = nullptr;
     HostInfoContainer* _displayHost1 = nullptr;

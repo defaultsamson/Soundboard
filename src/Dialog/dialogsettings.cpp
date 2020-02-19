@@ -15,25 +15,26 @@
 Q_DECLARE_METATYPE(HostInfoContainer*)
 Q_DECLARE_METATYPE(Device*)
 
-DialogSettings::DialogSettings(Main* main) :
-    DialogTestAudio(main),
+DialogSettings::DialogSettings(Main* _main) :
+    DialogTestAudio(_main),
     ui(new Ui::DialogSettings),
-    main(main)
+    _main(_main)
 {
     ui->setupUi(this);
 
-    ui->tabWidget->setCurrentIndex(main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
+    ui->tabWidget->setCurrentIndex(_main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
 
 #ifdef Q_OS_WIN
     ui->checkBoxDarkTheme->hide();
 #endif
-    ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
-    ui->checkBoxShowMuteButton->setChecked(main->settings()->value(Main::SHOW_MUTE_BUTTON, true).toBool());
-    ui->checkBoxWindowSize->setChecked(main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool());
+    ui->checkBoxDarkTheme->setChecked(_main->settings()->value(Main::DARK_THEME, false).toBool());
+    ui->checkBoxShowMuteButton->setChecked(_main->settings()->value(Main::SHOW_MUTE_BUTTON, true).toBool());
+    ui->checkBoxListDrivers->setChecked(_main->settings()->value(Main::SHOW_DRIVERS, false).toBool());
+    ui->checkBoxWindowSize->setChecked(_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool());
     // Restore the geometry, if it was saved
-    if (main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
-        if (main->settings()->contains(Main::WINDOW_SETTINGS_GEOMETRY))
-            restoreGeometry(main->settings()->value(Main::WINDOW_SETTINGS_GEOMETRY).toByteArray());
+    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
+        if (_main->settings()->contains(Main::WINDOW_SETTINGS_GEOMETRY))
+            restoreGeometry(_main->settings()->value(Main::WINDOW_SETTINGS_GEOMETRY).toByteArray());
 
     connect(ui->comboBoxDevice0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device0Changed);
     connect(ui->comboBoxDriver0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host0Changed);
@@ -42,51 +43,51 @@ DialogSettings::DialogSettings(Main* main) :
     connect(ui->comboBoxDeviceInput, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceInputChanged);
     connect(ui->comboBoxDriverInput, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostInputChanged);
 
-    ui->spinBoxDevice0->setValue(main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
-    ui->sliderDevice0->setValue(main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
-    ui->spinBoxDevice1->setValue(main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
-    ui->sliderDevice1->setValue(main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
-    ui->spinBoxInput->setValue(main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
-    ui->sliderInput->setValue(main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+    ui->spinBoxDevice0->setValue(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
+    ui->sliderDevice0->setValue(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
+    ui->spinBoxDevice1->setValue(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
+    ui->sliderDevice1->setValue(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
+    ui->spinBoxInput->setValue(_main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+    ui->sliderInput->setValue(_main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
 
-    ui->spinBoxTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
-    ui->sliderTest->setValue(main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    ui->spinBoxTest->setValue(_main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    ui->sliderTest->setValue(_main->settings()->value(Main::TEST_VOLUME, 100).toInt());
 
-    ui->checkBoxInput0->setChecked(main->settings()->value(Main::INPUT_OUT0, false).toBool());
-    ui->checkBoxInput1->setChecked(main->settings()->value(Main::INPUT_OUT1, false).toBool());
+    ui->checkBoxInput0->setChecked(_main->settings()->value(Main::INPUT_OUT0, false).toBool());
+    ui->checkBoxInput1->setChecked(_main->settings()->value(Main::INPUT_OUT1, false).toBool());
 
-    QString testFile = main->settings()->value(Main::TEST_FILE, Main::DEFAULT_TEST_FILE).toString();
+    QString testFile = _main->settings()->value(Main::TEST_FILE, Main::DEFAULT_TEST_FILE).toString();
     audio.setFile(testFile);
-    audio.setVolume(main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
+    audio.setVolume(_main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
     audio.setUpdateVisualizer(true);
     connect(&audio, &AudioObject::update, this, [&](float level) {
         ui->outputBar->setLevel(static_cast<qreal>(level));
     });
-    main->audio()->registerAudio(&audio);
+    _main->audio()->registerAudio(&audio);
     if (audio.hasFile()) ui->lineEditTestFile->setText(testFile);
 
     refreshDeviceSelection();
 
-    main->setAudioTestDialog(this);
-    main->disableKeybinds();
+    _main->setAudioTestDialog(this);
+    _main->disableKeybinds();
 
     // Load keybinds
-    main->hkEnableKeybinds->unreg();
-    if (main->hkEnableKeybinds->hasKey()) ui->keybindEnableKeybinds->setKey(main->hkEnableKeybinds->key());
-    main->hkDisableKeybinds->unreg();
-    if (main->hkDisableKeybinds->hasKey()) ui->keybindDisableKeybinds->setKey(main->hkDisableKeybinds->key());
-    main->hkStopSounds->unreg();
-    if (main->hkStopSounds->hasKey()) ui->keybindStopSounds->setKey(main->hkStopSounds->key());
-    main->hkPauseSounds->unreg();
-    if (main->hkPauseSounds->hasKey()) ui->keybindPauseSounds->setKey(main->hkPauseSounds->key());
-    main->hkResumeSounds->unreg();
-    if (main->hkResumeSounds->hasKey()) ui->keybindResumeSounds->setKey(main->hkResumeSounds->key());
-    main->hkMuteInput->unreg();
-    if (main->hkMuteInput->hasKey()) ui->keybindMuteInput->setKey(main->hkMuteInput->key());
-    main->hkUnmuteInput->unreg();
-    if (main->hkUnmuteInput->hasKey()) ui->keybindUnmuteInput->setKey(main->hkUnmuteInput->key());
-    main->hkToggleMuteInput->unreg();
-    if (main->hkToggleMuteInput->hasKey()) ui->keybindToggleMuteInput->setKey(main->hkToggleMuteInput->key());
+    _main->hkEnableKeybinds->unreg();
+    if (_main->hkEnableKeybinds->hasKey()) ui->keybindEnableKeybinds->setKey(_main->hkEnableKeybinds->key());
+    _main->hkDisableKeybinds->unreg();
+    if (_main->hkDisableKeybinds->hasKey()) ui->keybindDisableKeybinds->setKey(_main->hkDisableKeybinds->key());
+    _main->hkStopSounds->unreg();
+    if (_main->hkStopSounds->hasKey()) ui->keybindStopSounds->setKey(_main->hkStopSounds->key());
+    _main->hkPauseSounds->unreg();
+    if (_main->hkPauseSounds->hasKey()) ui->keybindPauseSounds->setKey(_main->hkPauseSounds->key());
+    _main->hkResumeSounds->unreg();
+    if (_main->hkResumeSounds->hasKey()) ui->keybindResumeSounds->setKey(_main->hkResumeSounds->key());
+    _main->hkMuteInput->unreg();
+    if (_main->hkMuteInput->hasKey()) ui->keybindMuteInput->setKey(_main->hkMuteInput->key());
+    _main->hkUnmuteInput->unreg();
+    if (_main->hkUnmuteInput->hasKey()) ui->keybindUnmuteInput->setKey(_main->hkUnmuteInput->key());
+    _main->hkToggleMuteInput->unreg();
+    if (_main->hkToggleMuteInput->hasKey()) ui->keybindToggleMuteInput->setKey(_main->hkToggleMuteInput->key());
 }
 
 DialogSettings::~DialogSettings()
@@ -95,111 +96,111 @@ DialogSettings::~DialogSettings()
 }
 
 void DialogSettings::handleClose() {
-    main->audio()->unregisterAudio(&audio);
-    main->setAudioTestDialog(nullptr);
-    main->enableKeybinds();
-    if (_inputObjectInited) main->audio()->inputObject()->setUpdateVisualizer(false);
+    _main->audio()->unregisterAudio(&audio);
+    _main->setAudioTestDialog(nullptr);
+    _main->enableKeybinds();
+    if (_inputObjectInited) _main->audio()->inputObject()->setUpdateVisualizer(false);
 
     // Save the geometry
-    main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
-    main->settings()->setValue(Main::WINDOW_SETTINGS_GEOMETRY, saveGeometry());
+    _main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
+    _main->settings()->setValue(Main::WINDOW_SETTINGS_GEOMETRY, saveGeometry());
 
-    main->updateMuteButton();
+    _main->updateMuteButton();
 
     // Save all global keybinds
     bool hasKey = ui->keybindEnableKeybinds->hasKey();
     quint32 key = ui->keybindEnableKeybinds->key();
-    main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_HAS, hasKey);
     if (hasKey) {
-        main->hkEnableKeybinds->setKey(ui->keybindEnableKeybinds->key());
-        main->hkEnableKeybinds->reg();
-        main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_KEY, key);
+        _main->hkEnableKeybinds->setKey(ui->keybindEnableKeybinds->key());
+        _main->hkEnableKeybinds->reg();
+        _main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_KEY, key);
     } else {
-        main->hkEnableKeybinds->unSetKey();
+        _main->hkEnableKeybinds->unSetKey();
     }
 
 
     hasKey = ui->keybindDisableKeybinds->hasKey();
     key = ui->keybindDisableKeybinds->key();
-    main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_HAS, hasKey);
     if (hasKey) {
-        main->hkDisableKeybinds->setKey(ui->keybindDisableKeybinds->key());
-        main->hkDisableKeybinds->reg();
-        main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_KEY, key);
+        _main->hkDisableKeybinds->setKey(ui->keybindDisableKeybinds->key());
+        _main->hkDisableKeybinds->reg();
+        _main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_KEY, key);
     } else {
-        main->hkDisableKeybinds->unSetKey();
+        _main->hkDisableKeybinds->unSetKey();
     }
 
 
     hasKey = ui->keybindStopSounds->hasKey();
     key = ui->keybindStopSounds->key();
-    main->settings()->setValue(Main::HK_STOP_SOUNDS_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_STOP_SOUNDS_HAS, hasKey);
     if (hasKey) {
-        main->hkStopSounds->setKey(ui->keybindStopSounds->key());
-        main->hkStopSounds->reg();
-        main->settings()->setValue(Main::HK_STOP_SOUNDS_KEY, key);
+        _main->hkStopSounds->setKey(ui->keybindStopSounds->key());
+        _main->hkStopSounds->reg();
+        _main->settings()->setValue(Main::HK_STOP_SOUNDS_KEY, key);
     } else {
-        main->hkStopSounds->unSetKey();
+        _main->hkStopSounds->unSetKey();
     }
 
 
     hasKey = ui->keybindPauseSounds->hasKey();
     key = ui->keybindPauseSounds->key();
-    main->settings()->setValue(Main::HK_PAUSE_SOUNDS_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_PAUSE_SOUNDS_HAS, hasKey);
     if (hasKey) {
-        main->hkPauseSounds->setKey(ui->keybindPauseSounds->key());
-        main->hkPauseSounds->reg();
-        main->settings()->setValue(Main::HK_PAUSE_SOUNDS_KEY, key);
+        _main->hkPauseSounds->setKey(ui->keybindPauseSounds->key());
+        _main->hkPauseSounds->reg();
+        _main->settings()->setValue(Main::HK_PAUSE_SOUNDS_KEY, key);
     } else {
-        main->hkPauseSounds->unSetKey();
+        _main->hkPauseSounds->unSetKey();
     }
 
 
     hasKey = ui->keybindResumeSounds->hasKey();
     key = ui->keybindResumeSounds->key();
-    main->settings()->setValue(Main::HK_RESUME_SOUNDS_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_RESUME_SOUNDS_HAS, hasKey);
     if (hasKey) {
-        main->hkResumeSounds->setKey(ui->keybindResumeSounds->key());
-        main->hkResumeSounds->reg();
-        main->settings()->setValue(Main::HK_RESUME_SOUNDS_KEY, key);
+        _main->hkResumeSounds->setKey(ui->keybindResumeSounds->key());
+        _main->hkResumeSounds->reg();
+        _main->settings()->setValue(Main::HK_RESUME_SOUNDS_KEY, key);
     } else {
-        main->hkResumeSounds->unSetKey();
+        _main->hkResumeSounds->unSetKey();
     }
 
 
     hasKey = ui->keybindMuteInput->hasKey();
     key = ui->keybindMuteInput->key();
-    main->settings()->setValue(Main::HK_MUTE_INPUT_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_MUTE_INPUT_HAS, hasKey);
     if (hasKey) {
-        main->hkMuteInput->setKey(ui->keybindMuteInput->key());
-        main->hkMuteInput->reg();
-        main->settings()->setValue(Main::HK_MUTE_INPUT_KEY, key);
+        _main->hkMuteInput->setKey(ui->keybindMuteInput->key());
+        _main->hkMuteInput->reg();
+        _main->settings()->setValue(Main::HK_MUTE_INPUT_KEY, key);
     } else {
-        main->hkMuteInput->unSetKey();
+        _main->hkMuteInput->unSetKey();
     }
 
 
     hasKey = ui->keybindUnmuteInput->hasKey();
     key = ui->keybindUnmuteInput->key();
-    main->settings()->setValue(Main::HK_UNMUTE_INPUT_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_UNMUTE_INPUT_HAS, hasKey);
     if (hasKey) {
-        main->hkUnmuteInput->setKey(ui->keybindUnmuteInput->key());
-        main->hkUnmuteInput->reg();
-        main->settings()->setValue(Main::HK_UNMUTE_INPUT_KEY, key);
+        _main->hkUnmuteInput->setKey(ui->keybindUnmuteInput->key());
+        _main->hkUnmuteInput->reg();
+        _main->settings()->setValue(Main::HK_UNMUTE_INPUT_KEY, key);
     } else {
-        main->hkUnmuteInput->unSetKey();
+        _main->hkUnmuteInput->unSetKey();
     }
 
 
     hasKey = ui->keybindToggleMuteInput->hasKey();
     key = ui->keybindToggleMuteInput->key();
-    main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_HAS, hasKey);
+    _main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_HAS, hasKey);
     if (hasKey) {
-        main->hkToggleMuteInput->setKey(ui->keybindToggleMuteInput->key());
-        main->hkToggleMuteInput->reg();
-        main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_KEY, key);
+        _main->hkToggleMuteInput->setKey(ui->keybindToggleMuteInput->key());
+        _main->hkToggleMuteInput->reg();
+        _main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_KEY, key);
     } else {
-        main->hkToggleMuteInput->unSetKey();
+        _main->hkToggleMuteInput->unSetKey();
     }
 }
 
@@ -270,13 +271,13 @@ void DialogSettings::outputChanged(QComboBox* selector, int selectorIndex, int d
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
     Device* dev = qvar.value<Device*>();
-    if (main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
+    if (_main->audio()->activeOutputs().contains(dev)) return; // If it's already active, ignore
     dev->indexes()->outputDisplayIndex = deviceDisplayIndex;
 
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
-    main->audio()->addActiveOutput(dev);
-    main->audio()->updateSavedDevices();
+    _main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
+    _main->audio()->addActiveOutput(dev);
+    _main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
@@ -286,13 +287,13 @@ void DialogSettings::inputChanged(QComboBox* selector, int selectorIndex, int de
     if (qvar.type() == QVariant::Invalid) return; // This only happens when it says "Select device..."
 
     Device* dev = qvar.value<Device*>();
-    if (main->audio()->activeInputs().contains(dev)) return; // If it's already active, ignore
+    if (_main->audio()->activeInputs().contains(dev)) return; // If it's already active, ignore
     dev->indexes()->inputDisplayIndex = deviceDisplayIndex;
 
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
-    main->audio()->addActiveInput(dev);
-    main->audio()->updateSavedDevices();
+    _main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
+    _main->audio()->addActiveInput(dev);
+    _main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
@@ -300,27 +301,27 @@ void DialogSettings::inputChanged(QComboBox* selector, int selectorIndex, int de
 void DialogSettings::outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost)
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
-    main->audio()->updateSavedDevices();
+    _main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
+    _main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
 void DialogSettings::inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost)
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
-    main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
-    main->audio()->updateSavedDevices();
+    _main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
+    _main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
 
 void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 {
-    main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
+    _main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
 }
 
 void DialogSettings::on_pushButtonRefresh_clicked() {
-    main->audio()->refreshDevices();
+    _main->audio()->refreshDevices();
     _displayHost1 = nullptr; // Forces a refresh of the list of hosts and devices
     refreshDeviceSelection();
 }
@@ -330,9 +331,9 @@ void DialogSettings::audioEngineInit() {
 }
 
 void DialogSettings::refreshDeviceSelection() {
-    AudioEngine* a = main->audio();
+    AudioEngine* a = _main->audio();
 
-    if (main->settings()->value(Main::SHOW_DRIVERS, false).toBool()) {
+    if (_main->settings()->value(Main::SHOW_DRIVERS, false).toBool()) {
         ui->labelDriverDevice0->show();
         ui->comboBoxDriver0->show();
         ui->labelDriverDevice1->show();
@@ -346,7 +347,7 @@ void DialogSettings::refreshDeviceSelection() {
         ui->comboBoxDriver1->hide();
         ui->labelDriverDeviceInput->hide();
         ui->comboBoxDriverInput->hide();
-        HostInfoContainer* host = main->audio()->defaultHost() ? main->audio()->defaultHost() : nullptr;
+        HostInfoContainer* host = _main->audio()->defaultHost() ? _main->audio()->defaultHost() : nullptr;
         _displayHost0 = host;
         _displayHost1 = host;
         _displayHostInput = host;
@@ -382,8 +383,8 @@ void DialogSettings::refreshDeviceSelection() {
         return;
     } else if (!_inputObjectInited) {
         _inputObjectInited = true;
-        main->audio()->inputObject()->setUpdateVisualizer(true);
-        connect(main->audio()->inputObject(), &AudioObject::update, this, [&](float level) {
+        _main->audio()->inputObject()->setUpdateVisualizer(true);
+        connect(_main->audio()->inputObject(), &AudioObject::update, this, [&](float level) {
             ui->inputBar->setLevel(static_cast<qreal>(level));
         });
         updateMuteButton();
@@ -415,7 +416,7 @@ void DialogSettings::refreshDeviceSelection() {
         devices->clear();
         drivers->setEnabled(true);
         devices->setEnabled(true);
-        display.deleteButton->setEnabled(true);
+        display.deleteButton->setEnabled(false);
 
         QList<Device*>* displayedDevices = display.isInput ? displayedInputs : displayedOutputs;
 
@@ -427,8 +428,9 @@ void DialogSettings::refreshDeviceSelection() {
             // If the device hasn't already been added somewhere, and the display indexes match
             if (!displayedDevices->contains(dev) && display.deviceDisplayIndex == (display.isInput ? dev->indexes()->inputDisplayIndex : dev->indexes()->outputDisplayIndex)) {
                 displayedDevices->append(dev);
+                display.deleteButton->setEnabled(true);
 
-                // If the active device is run by the displayed host (and if there is infact a display host)
+                // If the active device is in this displayIndex but not run by the displayed host
                 if (display.displayHost && display.displayHost != dev->host()) {
                     // Act as though it's being displayed, even though the displayHost will be displayed.
                     // This is to prevent the next device display from showing this device when it's active
@@ -456,7 +458,6 @@ void DialogSettings::refreshDeviceSelection() {
         if (!displayHost) {
             drivers->addItem("Select driver...", QVariant(QVariant::Invalid));
             devices->setEnabled(false);
-            display.deleteButton->setEnabled(false);
             // Display the available drivers
             for (HostInfoContainer* host : a->hosts()) {
                 drivers->addItem(host->name, QVariant::fromValue(host));
@@ -469,7 +470,6 @@ void DialogSettings::refreshDeviceSelection() {
 
             if (notActiveDriver) {
                 devices->addItem("Select device...", QVariant(QVariant::Invalid));
-                display.deleteButton->setEnabled(false);
             }
 
             // Then add the default device
@@ -521,7 +521,7 @@ void DialogSettings::refreshDeviceSelection() {
 
 void DialogSettings::on_tabWidget_currentChanged(int index)
 {
-    main->settings()->setValue(Main::SETTINGS_TAB, index);
+    _main->settings()->setValue(Main::SETTINGS_TAB, index);
 }
 
 void DialogSettings::closeEvent(QCloseEvent* bar) {
@@ -545,7 +545,7 @@ void DialogSettings::on_pushButtonStop_clicked()
 }
 
 void DialogSettings::setOutputDeviceVolume(int value, int devDisplayIndex) {
-    Device* dev = main->audio()->getActiveDisplayOutput(devDisplayIndex);
+    Device* dev = _main->audio()->getActiveDisplayOutput(devDisplayIndex);
     if (dev) dev->setVolume(value);
 }
 
@@ -556,7 +556,7 @@ void DialogSettings::on_sliderDevice0_valueChanged(int value)
     if (!(value == ui->sliderDevice0->maximum() && ui->spinBoxDevice0->value() > value)) {
         ui->spinBoxDevice0->setValue(value);
         setOutputDeviceVolume(value, 0);
-        main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
+        _main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
     }
 }
 
@@ -564,7 +564,7 @@ void DialogSettings::on_spinBoxDevice0_valueChanged(int value)
 {
     ui->sliderDevice0->setValue(value);
     setOutputDeviceVolume(value, 0);
-    main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
+    _main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
 }
 
 void DialogSettings::on_sliderDevice1_valueChanged(int value)
@@ -573,7 +573,7 @@ void DialogSettings::on_sliderDevice1_valueChanged(int value)
     if (!(value == ui->sliderDevice1->maximum() && ui->spinBoxDevice1->value() > value)) {
         ui->spinBoxDevice1->setValue(value);
         setOutputDeviceVolume(value, 1);
-        main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
+        _main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
     }
 }
 
@@ -581,7 +581,7 @@ void DialogSettings::on_spinBoxDevice1_valueChanged(int value)
 {
     ui->sliderDevice1->setValue(value);
     setOutputDeviceVolume(value, 1);
-    main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
+    _main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
 }
 
 void DialogSettings::on_sliderInput_valueChanged(int value)
@@ -589,16 +589,16 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
     // Allow users to edit the number in the box past what the slider goes to
     if (!(value == ui->sliderInput->maximum() && ui->spinBoxInput->value() > value)) {
         ui->spinBoxInput->setValue(value);
-        if (_inputObjectInited) main->audio()->inputObject()->setVolumeInt(value);
-        main->settings()->setValue(Main::INPUT_VOLUME0, value);
+        if (_inputObjectInited) _main->audio()->inputObject()->setVolumeInt(value);
+        _main->settings()->setValue(Main::INPUT_VOLUME0, value);
     }
 }
 
 void DialogSettings::on_spinBoxInput_valueChanged(int value)
 {
     ui->sliderInput->setValue(value);
-    if (_inputObjectInited) main->audio()->inputObject()->setVolumeInt(value);
-    main->settings()->setValue(Main::INPUT_VOLUME0, value);
+    if (_inputObjectInited) _main->audio()->inputObject()->setVolumeInt(value);
+    _main->settings()->setValue(Main::INPUT_VOLUME0, value);
 }
 
 void DialogSettings::on_sliderTest_valueChanged(int value)
@@ -607,7 +607,7 @@ void DialogSettings::on_sliderTest_valueChanged(int value)
     if (!(value == ui->sliderTest->maximum() && ui->spinBoxTest->value() > value)) {
         ui->spinBoxTest->setValue(value);
         audio.setVolumeInt(value);
-        main->settings()->setValue(Main::TEST_VOLUME, value);
+        _main->settings()->setValue(Main::TEST_VOLUME, value);
     }
 }
 
@@ -615,7 +615,7 @@ void DialogSettings::on_spinBoxTest_valueChanged(int value)
 {
     ui->sliderTest->setValue(value);
     audio.setVolumeInt(value);
-    main->settings()->setValue(Main::TEST_VOLUME, value);
+    _main->settings()->setValue(Main::TEST_VOLUME, value);
 }
 
 void DialogSettings::on_deleteButtonDevice0_clicked()
@@ -631,21 +631,21 @@ void DialogSettings::on_deleteButtonDevice1_clicked()
 void DialogSettings::on_deleteButtonDeviceInput_clicked()
 {
     inputRemoved(0, &_displayHostInput);
-    if (_inputObjectInited) main->audio()->inputObject()->stop();
+    if (_inputObjectInited) _main->audio()->inputObject()->stop();
 }
 
 void DialogSettings::on_checkBoxInput0_clicked()
 {
     bool enabled = ui->checkBoxInput0->isChecked();
-    main->settings()->setValue(Main::INPUT_OUT0, enabled);
-    if (_inputObjectInited) main->audio()->inputObject()->setOutput0(enabled);
+    _main->settings()->setValue(Main::INPUT_OUT0, enabled);
+    if (_inputObjectInited) _main->audio()->inputObject()->setOutput0(enabled);
 }
 
 void DialogSettings::on_checkBoxInput1_clicked()
 {
     bool enabled = ui->checkBoxInput1->isChecked();
-    main->settings()->setValue(Main::INPUT_OUT1, enabled);
-    if (_inputObjectInited) main->audio()->inputObject()->setOutput1(enabled);
+    _main->settings()->setValue(Main::INPUT_OUT1, enabled);
+    if (_inputObjectInited) _main->audio()->inputObject()->setOutput1(enabled);
 }
 
 void DialogSettings::on_pushButtonTestFile_clicked()
@@ -665,33 +665,33 @@ void DialogSettings::updateFileName(QString fn) {
     audio.setFile(fn);
     ui->lineEditTestFile->setText(fn);
     refreshDeviceSelection();
-    main->settings()->setValue(Main::TEST_FILE, fn);
+    _main->settings()->setValue(Main::TEST_FILE, fn);
 }
 
 void DialogSettings::on_muteButton_clicked()
 {
     if (!_inputObjectInited) return;
     // Toggles the mute button
-    main->audio()->inputObject()->setMute(!main->audio()->inputObject()->isMuted());
+    _main->audio()->inputObject()->setMute(!_main->audio()->inputObject()->isMuted());
     updateMuteButton();
 }
 
 void DialogSettings::updateMuteButton() {
     if (!_inputObjectInited) return;
-    bool muted = main->audio()->inputObject()->isMuted();
+    bool muted = _main->audio()->inputObject()->isMuted();
     ui->muteButton->setIcon(QIcon(muted ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
-    main->settings()->setValue(Main::INPUT_MUTED, muted);
+    _main->settings()->setValue(Main::INPUT_MUTED, muted);
 }
 
 void DialogSettings::on_checkBoxShowMuteButton_clicked()
 {
-    main->settings()->setValue(Main::SHOW_MUTE_BUTTON, ui->checkBoxShowMuteButton->isChecked());
+    _main->settings()->setValue(Main::SHOW_MUTE_BUTTON, ui->checkBoxShowMuteButton->isChecked());
 }
 
 void DialogSettings::on_checkBoxListDrivers_clicked(){
 
     bool enable = ui->checkBoxListDrivers->isChecked();
-    bool hasDefaultHost = main->audio()->defaultHost();
+    bool hasDefaultHost = _main->audio()->defaultHost();
 
     QString message;
     if (enable) {
@@ -725,7 +725,7 @@ void DialogSettings::on_checkBoxListDrivers_clicked(){
 
     switch (resBtn) {
     case QMessageBox::Yes:
-        main->settings()->setValue(Main::SHOW_DRIVERS, enable);
+        _main->settings()->setValue(Main::SHOW_DRIVERS, enable);
 
         if (enable) {
             // Show all drivers, and remove all displayHosts that don't have an
@@ -736,18 +736,18 @@ void DialogSettings::on_checkBoxListDrivers_clicked(){
         } else {
             // Revert to only default drivers
             if (hasDefaultHost) {
-                for (Device* dev : main->audio()->activeOutputs())
+                for (Device* dev : _main->audio()->activeOutputs())
                     // If the device isn't under the default host, remove it
-                    if (dev->host() != main->audio()->defaultHost())
-                        main->audio()->removeActiveDevice(dev, true, true);
+                    if (dev->host() != _main->audio()->defaultHost())
+                        _main->audio()->removeActiveDevice(dev, true, true);
 
-                for (Device* dev : main->audio()->activeInputs())
+                for (Device* dev : _main->audio()->activeInputs())
                     // If the device isn't under the default host, remove it
-                    if (dev->host() != main->audio()->defaultHost())
-                        main->audio()->removeActiveDevice(dev, true, true);
+                    if (dev->host() != _main->audio()->defaultHost())
+                        _main->audio()->removeActiveDevice(dev, true, true);
             }
 
-            main->audio()->updateSavedDevices();
+            _main->audio()->updateSavedDevices();
         }
 
         refreshDeviceSelection();
