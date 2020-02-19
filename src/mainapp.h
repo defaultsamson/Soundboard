@@ -114,6 +114,7 @@ public:
     HotkeyTrigger* hkToggleMuteInput;
 
     void restoreSizes();
+    void updateButtonBar();
     void showAudioEngineText(bool show);
 
 private slots:
@@ -151,6 +152,8 @@ private slots:
 
     void rowChanged(int row);
 
+    void on_splitter_splitterMoved(int pos, int index);
+
 public slots:
     void enableKeybinds();
     void disableKeybinds();
@@ -178,6 +181,8 @@ private:
     void addSound();
     ListItemSound* currentSound();
     void updateTitle();
+    void updateButtonBar(int pos);
+    void resizeEvent(QResizeEvent* event);
     QMessageBox::StandardButton unsavedChangedDialogue();
     void closeEvent(QCloseEvent* bar);
 };

@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
     Main w;
     w.show();
     w.restoreSizes();
+    w.updateButtonBar();
 
     // Initializes audio engine on separate thread so that the UI starts super fast
     MyThread t(w);
@@ -825,4 +826,67 @@ void Main::rowChanged(int row) {
     ui->buttonPlay->setEnabled(soundSelected);
     ui->buttonPause->setEnabled(soundSelected);
     ui->buttonStop->setEnabled(soundSelected);
+}
+
+void Main::on_splitter_splitterMoved(int pos, int /*index*/)
+{
+    updateButtonBar(pos);
+}
+
+void Main::updateButtonBar() {
+    updateButtonBar(ui->splitter->sizes().at(0));
+}
+
+void Main::updateButtonBar(int pos) {
+    int width = ui->splitter->width();
+    int handleWidth = ui->splitter->handleWidth();
+    if (pos >= width - handleWidth) pos = width;
+
+    // Far left
+    if (pos == 0) {
+        ui->boardButtons->hide();
+        ui->spacerLeft->changeSize(0, 0, QSizePolicy::Fixed);
+        ui->spacerMidLeft->changeSize(0, 0, QSizePolicy::Fixed);
+        ui->soundButtons->show();
+        ui->spacerRight->changeSize(0, 0, QSizePolicy::Expanding);
+        ui->spacerMidRight->changeSize(0, 0, QSizePolicy::Expanding);
+
+        // Far right
+    } else if (pos == ui->splitter->width()) {
+        ui->boardButtons->show();
+        ui->spacerLeft->changeSize(0, 0, QSizePolicy::Expanding);
+        ui->spacerMidLeft->changeSize(0, 0, QSizePolicy::Expanding);
+        ui->soundButtons->hide();
+        ui->spacerRight->changeSize(0, 0, QSizePolicy::Fixed);
+        ui->spacerMidRight->changeSize(0, 0, QSizePolicy::Fixed);
+
+        // Center around the middle line
+    } else {
+        ui->boardButtons->show();
+        ui->soundButtons->show();
+
+        int middle = pos - (handleWidth / 2);
+        int halfMuteButtonWidth = ui->muteButton->width() / 2;
+
+        int muteButtonLeft = middle;
+        int leftSpacerWidths = (muteButtonLeft - ui->boardButtons->width()) / 2;
+        bool aboveZero = leftSpacerWidths > 0;
+
+        ui->spacerLeft->changeSize(aboveZero ? leftSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+        ui->spacerMidLeft->changeSize(aboveZero ? leftSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+
+        int muteButtonRight = (leftSpacerWidths * 2) + ui->boardButtons->width() + halfMuteButtonWidth;
+        int rightSpacerWidths = (width - muteButtonRight - ui->soundButtons->width()) / 2;
+        aboveZero = rightSpacerWidths > 0;
+        ui->spacerRight->changeSize(aboveZero ? rightSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+        ui->spacerMidRight->changeSize(aboveZero ? rightSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+    }
+
+    // Update the appearance
+    ui->buttonBar->layout()->update();
+}
+
+void Main::resizeEvent(QResizeEvent* event) {
+    QMainWindow::resizeEvent(event);
+    updateButtonBar();
 }
