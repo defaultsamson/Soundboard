@@ -468,7 +468,7 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
     // Allow users to edit the number in the box past what the slider goes to
     if (!(value == ui->sliderInput->maximum() && ui->spinBoxInput->value() > value)) {
         ui->spinBoxInput->setValue(value);
-        main->audio()->inputObject()->setVolumeInt(value);
+        if (_connectedInputVisualizer) main->audio()->inputObject()->setVolumeInt(value);
         main->settings()->setValue(Main::INPUT_VOLUME0, value);
     }
 }
@@ -476,7 +476,7 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
 void DialogSettings::on_spinBoxInput_valueChanged(int value)
 {
     ui->sliderInput->setValue(value);
-    main->audio()->inputObject()->setVolumeInt(value);
+    if (_connectedInputVisualizer) main->audio()->inputObject()->setVolumeInt(value);
     main->settings()->setValue(Main::INPUT_VOLUME0, value);
 }
 
@@ -516,14 +516,14 @@ void DialogSettings::on_checkBoxInput0_clicked()
 {
     bool enabled = ui->checkBoxInput0->isChecked();
     main->settings()->setValue(Main::INPUT_OUT0, enabled);
-    main->audio()->inputObject()->setOutput0(enabled);
+    if (_connectedInputVisualizer) main->audio()->inputObject()->setOutput0(enabled);
 }
 
 void DialogSettings::on_checkBoxInput1_clicked()
 {
     bool enabled = ui->checkBoxInput1->isChecked();
     main->settings()->setValue(Main::INPUT_OUT1, enabled);
-    main->audio()->inputObject()->setOutput1(enabled);
+    if (_connectedInputVisualizer) main->audio()->inputObject()->setOutput1(enabled);
 }
 
 void DialogSettings::on_pushButtonTestFile_clicked()
