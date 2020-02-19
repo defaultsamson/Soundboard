@@ -17,7 +17,7 @@ class DialogSound : public DialogTestAudio
     Q_OBJECT
 
 public:
-    explicit DialogSound(Main *main, ListItemSound *sound, bool creatingNew = false);
+    explicit DialogSound(Main* main, ListItemSound* sound, bool creatingNew = false);
     ~DialogSound();
     void audioEngineInit();
 
@@ -35,9 +35,9 @@ private slots:
     void on_lineEditFile_textEdited(const QString &arg1);
 
 private:
-    Ui::DialogSound *ui;
-    Main *main;
-    ListItemSound *sound;
+    Ui::DialogSound* ui;
+    Main* main;
+    ListItemSound* sound;
     bool creatingNew;
     bool soundUpdated;
 
@@ -45,8 +45,7 @@ private:
     int originalVolume;
 
     void updateTestButtons();
-    void testFileName(QString fn);
-    bool validFile = true;
+    void updateFileName(QString fn);
 };
 
 #endif // DIALOGSOUND_H

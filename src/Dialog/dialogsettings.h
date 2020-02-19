@@ -3,7 +3,8 @@
 
 #include <QDialog>
 #include <QComboBox>
-#include "../Audio/audioobject.h"
+#include <QPushButton>
+#include "../Audio/audioobjectfile.h"
 #include "../Audio/audioengine.h"
 #include "dialogtestaudio.h"
 
@@ -18,8 +19,10 @@ class DialogSettings;
 struct AudioDisplayContainer {
     QComboBox *drivers;
     QComboBox *devices;
+    QPushButton *deleteButton;
     HostInfoContainer* displayHost;
     int deviceDisplayIndex;
+    bool isInput;
 };
 
 class DialogSettings : public DialogTestAudio
@@ -38,10 +41,14 @@ public:
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+
     void host0Changed(int index);
     void device0Changed(int index);
     void host1Changed(int index);
     void device1Changed(int index);
+    void hostInputChanged(int index);
+    void deviceInputChanged(int index);
+
     void on_checkBoxDarkTheme_stateChanged(int arg1);
     void on_pushButtonRefresh_clicked();
     void on_tabWidget_currentChanged(int index);
@@ -55,19 +62,37 @@ private slots:
     void on_spinBoxDevice1_valueChanged(int arg1);
     void on_sliderInput_valueChanged(int value);
     void on_spinBoxInput_valueChanged(int arg1);
+
     void on_sliderTest_valueChanged(int value);
     void on_spinBoxTest_valueChanged(int arg1);
 
+    void on_deleteButtonDevice0_clicked();
+    void on_deleteButtonDevice1_clicked();
+    void on_deleteButtonDeviceInput_clicked();
+
+    void on_checkBoxInput0_clicked();
+    void on_checkBoxInput1_clicked();
+
+    void on_pushButtonTestFile_clicked();
+    void on_lineEditTestFile_textEdited(const QString &arg1);
+
 private:
-    Ui::DialogSettings *ui;
-    Main *main;
-    AudioObject audio;
-    HostInfoContainer *_displayHost0 = nullptr;
-    HostInfoContainer *_displayHost1 = nullptr;
-    void closeEvent(QCloseEvent *bar);
+    Ui::DialogSettings* ui;
+    Main* main;
+    AudioObjectFile audio;
+    HostInfoContainer* _displayHost0 = nullptr;
+    HostInfoContainer* _displayHost1 = nullptr;
+    HostInfoContainer* _displayHostInput = nullptr;
+    void closeEvent(QCloseEvent* bar);
     void handleClose();
-    void deviceChanged(QComboBox *selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer **displayHost);
-    void setDeviceVolume(int value, int devDisplayIndex);
+    void outputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost);
+    void inputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost);
+    void outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
+    void inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
+    void setOutputDeviceVolume(int value, int devDisplayIndex);
+    void updateFileName(QString fn);
+
+    bool _connectedInputVisualizer = false;
 };
 
 #endif // DIALOGSETTINGS_H

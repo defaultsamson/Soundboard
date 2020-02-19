@@ -5,106 +5,84 @@
 #include <QList>
 
 #include "audioobject.h"
+#include "audioobjectinput.h"
 #include "../Widget/listitemsound.h"
 
-#include <portaudio.h>
-
-// Forward declarations
-struct HostInfoContainer;
-struct DeviceInfoContainer;
-class AudioEngine;
+#include "device.h"
+#include <memory>
 
 struct CallbackInfo {
-    AudioEngine *audio;
-    DeviceInfoContainer *device;
+    AudioEngine* audio;
+    Device* device;
 };
 
-struct DeviceIndexInfo {
-    PaDeviceIndex deviceIndex;
-    int displayIndex;
-    int deviceListIndex;
-};
-
-struct DeviceInfoContainer {
-    HostInfoContainer *host;
-    const PaDeviceInfo *info;
-    PaStream *stream;
-    size_t channels;
-    DeviceIndexInfo indexes;
-    int volumeInt;
-    float volume;
-};
-
-struct HostInfoContainer {
-    PaHostApiIndex index;
-    const char* name;
-    QList <DeviceInfoContainer*> *devices;
-
-    ~HostInfoContainer() {
-        if (devices) {
-            for (int i = 0; i < devices->size(); i++) delete devices->at(i);
-            delete devices;
-        }
-    }
-};
-
-
-class AudioEngine : public QObject
+class AudioEngine
 {
-    Q_OBJECT
-
 public:
-    AudioEngine(Main *main);
+    AudioEngine(Main* main);
 
     static size_t FRAMES_PER_BUFFER;
     static size_t CHANNELS;
 
-    HostInfoContainer *defaultHost();
-    DeviceInfoContainer *defaultDevice();
+    Device* defaultOutput();
+    Device* defaultInput();
 
-    void addActiveDevice(DeviceInfoContainer*);
-    void removeActiveDevice(DeviceInfoContainer*);
-    void removeActiveDisplayDevice(int deviceDisplayIndex);
-    DeviceInfoContainer* getActiveDisplayDevice(int deviceDisplayIndex);
-    const QList<DeviceInfoContainer*> activeDevices();
+    void addActiveOutput(Device*);
+    void removeActiveOutput(Device*);
+    void addActiveInput(Device*);
+    void removeActiveInput(Device*);
+
+    void removeActiveDisplayOutput(int deviceDisplayIndex);
+    Device* getActiveDisplayOutput(int deviceDisplayIndex);
+    const QList<Device*> activeOutputs();
+
+    void removeActiveDisplayInput(int deviceDisplayIndex);
+    Device* getActiveDisplayInput(int deviceDisplayIndex);
+    const QList<Device*> activeInputs();
 
     const QList<HostInfoContainer*> hosts();
-    const QList<DeviceInfoContainer*> devices();
+    const QList<Device*> outputs();
+    const QList<Device*> inputs();
 
     void refreshDevices();
 
     void init();
     bool isInitialized();
 
-    static int readCallback(const void *inputBuffer, void *outputBuffer,
+    static int audioCallback(const void* inputBuffer, void* outputBuffer,
                             unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags,
-                            void *userData);
+                            void* userData);
 
-    void mix(float* buffer, size_t frames, int deviceListIndex, float deviceVolume, bool singleDevice);
+    void mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice);
 
-    void registerAudio(AudioObject *);
-    void unregisterAudio(AudioObject *);
+    void registerAudio(AudioObject*);
+    void unregisterAudio(AudioObject*);
+
+    AudioObjectInput* inputObject() { return _inputObject; }
 
     ~AudioEngine();
 
 private:
-    Main *main;
+    Main* main;
     bool _isInitialized = false;
 
-    HostInfoContainer *_defaultHost = nullptr;
-    DeviceInfoContainer *_defaultDevice = nullptr;
+    Device* _defaultOutput = nullptr;
+    Device* _defaultInput = nullptr;
     QList<HostInfoContainer*> _hosts;
-    QList<DeviceInfoContainer*> _devices;
-    QList<DeviceInfoContainer*> _activeDevices;
-    QList<DeviceIndexInfo> _selectedDeviceIndexes;
-    QList<AudioObject *> _audioObjectRegistry;
+    QList<Device*> _outputs;
+    QList<Device*> _inputs;
+    QList<Device*> _activeOutputs;
+    QList<Device*> _activeInputs;
+    QList<std::shared_ptr<DeviceIndexInfo>> _selectedOutputIndexes;
+    QList<std::shared_ptr<DeviceIndexInfo>> _selectedInputIndexes;
+    QList<AudioObject*> _audioObjectRegistry;
+    AudioObjectInput* _inputObject = nullptr;
 
-    DeviceInfoContainer *getDevice(int deviceIndex);
-
-signals:
-    void update(qreal m_level);
+    Device* getDevice(int deviceIndex);
+    void addActiveDevice(Device*, bool startInput, bool startOutput);
+    void removeActiveDevice(Device*, bool stopInput, bool stopOutput);
 };
 
 #endif // AUDIOENGINE_H

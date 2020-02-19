@@ -23,49 +23,8 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
-     <widget class="QWidget" name="tab">
-      <attribute name="title">
-       <string>General</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <widget class="QCheckBox" name="checkBoxDarkTheme">
-         <property name="text">
-          <string>Dark Theme</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxFocusVisuals">
-         <property name="text">
-          <string>Update visuals when window not focussed</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxTrayMinimize">
-         <property name="text">
-          <string>Minimize to tray (TODO)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>Audio</string>
@@ -113,9 +72,9 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>-354</y>
+               <y>0</y>
                <width>462</width>
-               <height>672</height>
+               <height>706</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -189,7 +148,7 @@
                        <number>0</number>
                       </property>
                       <property name="topMargin">
-                       <number>2</number>
+                       <number>0</number>
                       </property>
                       <property name="rightMargin">
                        <number>0</number>
@@ -198,10 +157,47 @@
                        <number>0</number>
                       </property>
                       <item>
-                       <widget class="QComboBox" name="comboBoxDriver0"/>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBoxOutputDevice0"/>
+                       <layout class="QHBoxLayout" name="horizontalLayout_18">
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_22">
+                          <item>
+                           <widget class="QComboBox" name="comboBoxDriver0"/>
+                          </item>
+                          <item>
+                           <widget class="QComboBox" name="comboBoxDevice0"/>
+                          </item>
+                         </layout>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="deleteButtonDevice0">
+                          <property name="minimumSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string/>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="../../res.qrc">
+                            <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+                          </property>
+                          <property name="iconSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
                       </item>
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -308,7 +304,7 @@
                        <number>0</number>
                       </property>
                       <property name="topMargin">
-                       <number>2</number>
+                       <number>0</number>
                       </property>
                       <property name="rightMargin">
                        <number>0</number>
@@ -317,10 +313,47 @@
                        <number>0</number>
                       </property>
                       <item>
-                       <widget class="QComboBox" name="comboBoxDriver1"/>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBoxOutputDevice1"/>
+                       <layout class="QHBoxLayout" name="horizontalLayout_17">
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_17">
+                          <item>
+                           <widget class="QComboBox" name="comboBoxDriver1"/>
+                          </item>
+                          <item>
+                           <widget class="QComboBox" name="comboBoxDevice1"/>
+                          </item>
+                         </layout>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="deleteButtonDevice1">
+                          <property name="minimumSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string/>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="../../res.qrc">
+                            <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+                          </property>
+                          <property name="iconSize">
+                           <size>
+                            <width>30</width>
+                            <height>30</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
                       </item>
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -367,45 +400,31 @@
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_14">
+                  <layout class="QHBoxLayout" name="horizontalLayout_16">
                    <item>
-                    <widget class="QWidget" name="widget_10" native="true">
-                     <layout class="QVBoxLayout" name="verticalLayout_17">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QLabel" name="label_13">
-                        <property name="text">
-                         <string>Driver</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_12">
-                        <property name="text">
-                         <string>Device</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_6">
-                        <property name="text">
-                         <string>Volume</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
+                    <layout class="QVBoxLayout" name="verticalLayout_20">
+                     <item>
+                      <widget class="QLabel" name="label_13">
+                       <property name="text">
+                        <string>Driver</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_12">
+                       <property name="text">
+                        <string>Device</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_6">
+                       <property name="text">
+                        <string>Volume</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                    <item>
                     <spacer name="horizontalSpacer_10">
@@ -424,55 +443,78 @@
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QWidget" name="widget_9" native="true">
-                     <layout class="QVBoxLayout" name="verticalLayout_15">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>2</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QComboBox" name="comboBoxDriverInput"/>
-                      </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBoxDeviceInput"/>
-                      </item>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_3">
-                        <item>
-                         <widget class="QSlider" name="sliderInput">
-                          <property name="maximum">
-                           <number>200</number>
-                          </property>
-                          <property name="value">
-                           <number>100</number>
-                          </property>
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QSpinBox" name="spinBoxInput">
-                          <property name="maximum">
-                           <number>10000</number>
-                          </property>
-                          <property name="value">
-                           <number>100</number>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
-                    </widget>
+                    <layout class="QVBoxLayout" name="verticalLayout_21">
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_14">
+                       <item>
+                        <layout class="QVBoxLayout" name="verticalLayout_15">
+                         <item>
+                          <widget class="QComboBox" name="comboBoxDriverInput"/>
+                         </item>
+                         <item>
+                          <widget class="QComboBox" name="comboBoxDeviceInput"/>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="deleteButtonDeviceInput">
+                         <property name="minimumSize">
+                          <size>
+                           <width>30</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>30</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="text">
+                          <string/>
+                         </property>
+                         <property name="icon">
+                          <iconset resource="../../res.qrc">
+                           <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+                         </property>
+                         <property name="iconSize">
+                          <size>
+                           <width>30</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_3">
+                       <item>
+                        <widget class="QSlider" name="sliderInput">
+                         <property name="maximum">
+                          <number>200</number>
+                         </property>
+                         <property name="value">
+                          <number>100</number>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QSpinBox" name="spinBoxInput">
+                         <property name="maximum">
+                          <number>10000</number>
+                         </property>
+                         <property name="value">
+                          <number>100</number>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
                    </item>
                   </layout>
                  </item>
@@ -526,6 +568,22 @@
                     </spacer>
                    </item>
                   </layout>
+                 </item>
+                 <item>
+                  <widget class="WidgetAudio" name="inputBar" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -707,6 +765,12 @@
                   <layout class="QHBoxLayout" name="horizontalLayout_5">
                    <item>
                     <widget class="WidgetAudio" name="outputBar" native="true">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
                      <property name="maximumSize">
                       <size>
                        <width>16777215</width>
@@ -972,6 +1036,40 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>Other</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_23">
+       <item>
+        <widget class="QCheckBox" name="checkBoxDarkTheme">
+         <property name="text">
+          <string>Dark Theme</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxTrayMinimize">
+         <property name="text">
+          <string>Minimize to tray (TODO)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>241</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -1011,7 +1109,7 @@
       <item>
        <widget class="QDialogButtonBox" name="buttonBox">
         <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+         <set>QDialogButtonBox::Ok</set>
         </property>
         <property name="centerButtons">
          <bool>true</bool>

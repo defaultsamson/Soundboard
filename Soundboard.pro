@@ -24,11 +24,18 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 CONFIG += c++11
 
-# This enables the X11 library to be used. Handles keypresses
-# LIBS += -lX11
+# This uses the -O3 compiler instead of -O2
+CONFIG(release, debug|release) {
+    CONFIG += optimize_full
+}
 
 SOURCES += \
     src/Audio/audioengine.cpp \
+    src/Audio/audioobject.cpp \
+    src/Audio/audioobjectfile.cpp \
+    src/Audio/audioobjectinput.cpp \
+    src/Audio/device.cpp \
+    src/Audio/iomultifile.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
@@ -38,11 +45,15 @@ SOURCES += \
     src/Widget/listitem.cpp \
     src/Dialog/dialogsound.cpp \
     src/Widget/widgetaudio.cpp \
-    src/Audio/audioobject.cpp \
     src/mainapp.cpp
 
 HEADERS += \
     src/Audio/audioengine.h \
+    src/Audio/audioobject.h \
+    src/Audio/audioobjectfile.h \
+    src/Audio/audioobjectinput.h \
+    src/Audio/device.h \
+    src/Audio/iomultifile.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
@@ -53,7 +64,6 @@ HEADERS += \
     src/Widget/listitem.h \
     src/Dialog/dialogsound.h \
     src/Widget/widgetaudio.h \
-    src/Audio/audioobject.h \
     src/mainapp.h
 
 FORMS += \
@@ -86,9 +96,9 @@ QDEP_DEPENDS += Skycoder42/QHotkey
 
 # Portaudio
 unix:!macx: LIBS += -lportaudio -lrt -lm -lasound -ljack
-win32: LIBS += -L$$PWD/../../../../../Qt/5.14.0/mingw73_64/lib/ -lportaudio
-win32: INCLUDEPATH += $$PWD/../../../../../Qt/5.14.0/mingw73_64/include
-win32: DEPENDPATH += $$PWD/../../../../../Qt/5.14.0/mingw73_64/include
+win32: LIBS += -L$$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/lib/ -lportaudio
+win32: INCLUDEPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
+win32: DEPENDPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
 
 #libsndfile
 unix:!macx: LIBS += -lsndfile #-lmpg123 -lmp3lame

@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QFileDialog>
 
-DialogSound::DialogSound(Main *main, ListItemSound *sound, bool creatingNew) :
+DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
     DialogTestAudio(main),
     ui(new Ui::DialogSound),
     main(main),
@@ -32,9 +32,10 @@ DialogSound::DialogSound(Main *main, ListItemSound *sound, bool creatingNew) :
     main->disableKeybinds();
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
 
-    connect(main->audio(), &AudioEngine::update, this, [&](qreal level) {
+    connect(sound->audio(), &AudioObject::update, this, [&](qreal level) {
         ui->outputBar->setLevel(level);
     });
+    sound->audio()->setUpdateVisualizer(true);
 }
 
 DialogSound::~DialogSound()
@@ -92,25 +93,18 @@ void DialogSound::on_spinBoxVolume_valueChanged(int value)
 void DialogSound::on_pushButtonFile_clicked()
 {
     QString fn = QFileDialog::getOpenFileName(this, tr("Load Audio File"), QString(), tr("(*.wav *.ogg *.flac)"));
-    testFileName(fn);
+    if (fn.isNull()) return;
+    updateFileName(fn);
 }
 
 void DialogSound::on_lineEditFile_textEdited(const QString &fn) {
-    testFileName(fn);
+    updateFileName(fn);
 }
 
-void DialogSound::testFileName(QString fn) {
+void DialogSound::updateFileName(QString fn) {
     // test to see if the file exists and is readable
-    QFile file(fn);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open audio file.");
-        validFile = false;
-    } else {
-        ui->lineEditFile->setText(fn);
-        sound->setFileName(fn);
-        validFile = true;
-    }
-    file.close();
+    sound->setFileName(fn);
+    ui->lineEditFile->setText(fn);
     updateTestButtons();
 }
 
@@ -125,6 +119,7 @@ void DialogSound::onClose() {
     sound->audio()->stop();
     // Re-enable the keybinds
     main->enableKeybinds();
+    sound->audio()->setUpdateVisualizer(false);
 }
 
 void DialogSound::on_pushButtonPlay_clicked()
@@ -147,7 +142,7 @@ void DialogSound::audioEngineInit() {
 }
 
 void DialogSound::updateTestButtons() {
-    bool enabled = main->audio()->isInitialized() && validFile && sound->audio()->hasFile();
+    bool enabled = main->audio()->isInitialized() && sound->audio()->hasFile();
 
     ui->pushButtonPlay->setEnabled(enabled);
     ui->pushButtonPause->setEnabled(enabled);

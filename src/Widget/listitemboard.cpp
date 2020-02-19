@@ -12,7 +12,7 @@
 
 QString ListItemBoard::NEW_BOARD = "New Board";
 
-ListItemBoard::ListItemBoard(Main *main) :
+ListItemBoard::ListItemBoard(Main* main) :
     ListItem(main)
 {
     setText(NEW_BOARD);
@@ -29,7 +29,7 @@ ListItemBoard::~ListItemBoard() {
     }
 }
 
-void ListItemBoard::addSound(ListItemSound *sound) {
+void ListItemBoard::addSound(ListItemSound* sound) {
     sounds.push_back(sound);
 }
 
@@ -39,9 +39,9 @@ void ListItemBoard::removeSound(int n, bool deleteSound) {
     sounds.erase(sounds.begin() + n);
 }
 
-void ListItemBoard::removeSound(ListItemSound *sound, bool deleteSound) {
+void ListItemBoard::removeSound(ListItemSound* sound, bool deleteSound) {
     int n = -1;
-    std::vector<ListItemSound *>::iterator iter = std::find(sounds.begin(), sounds.end(), sound);
+    std::vector<ListItemSound*>::iterator iter = std::find(sounds.begin(), sounds.end(), sound);
     if(iter != sounds.end())
     {
         n = static_cast<int>(std::distance(sounds.begin(), iter));
@@ -64,7 +64,7 @@ int ListItemBoard::soundsCount() {
     return static_cast<int>(sounds.size());
 }
 
-void ListItemBoard::populateList(QListWidget *list) {
+void ListItemBoard::populateList(QListWidget* list) {
     // Removes items from list
     for (int i = list->count() - 1; i >= 0; --i) list->takeItem(i);
     // Adds items to list
@@ -78,7 +78,7 @@ void ListItemBoard::load(const QJsonObject &json) {
 
     // Loads all the sounds
     for (int i = 0; i < arr.size(); ++i) {
-        ListItemSound *sound = new ListItemSound(main, this);
+        ListItemSound* sound = new ListItemSound(main, this);
         sound->load(arr[i].toObject());
         addSound(sound);
     }

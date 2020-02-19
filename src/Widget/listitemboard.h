@@ -1,5 +1,5 @@
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef LISTITEMBOARD_H
+#define LISTITEMBOARD_H
 
 #include "listitemsound.h"
 #include "listitem.h"
@@ -16,14 +16,14 @@ class ListItemBoard : public ListItem
 {
 public:
     static QString NEW_BOARD;
-    ListItemBoard(Main *main);
+    ListItemBoard(Main* main);
     ~ListItemBoard() override;
-    void addSound(ListItemSound *sound);
+    void addSound(ListItemSound* sound);
     void removeSound(int n, bool deleteSound = true);
-    void removeSound(ListItemSound *sound, bool deleteSound = true);
+    void removeSound(ListItemSound* sound, bool deleteSound = true);
     int soundsCount();
     void moveSound(size_t from, size_t to);
-    void populateList(QListWidget *list);
+    void populateList(QListWidget* list);
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) override;
     void reg(bool regThis, bool regSounds);
@@ -34,4 +34,4 @@ private:
     std::vector<ListItemSound*> sounds;
 };
 
-#endif // BOARD_H
+#endif // LISTITEMBOARD_H

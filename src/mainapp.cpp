@@ -38,9 +38,9 @@ private:
 void MyThread::run()
 {
     // Set up testing audio
-    QFile testFile(Main::TEST_AUDIO);
+    QFile testFile(Main::DEFAULT_TEST_FILE);
     if (!testFile.exists()) {
-        QFile::copy(":/audio/res/test.ogg", Main::TEST_AUDIO);
+        QFile::copy(":/audio/res/test.ogg", Main::DEFAULT_TEST_FILE);
     }
 
     main.audio()->init();
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 QString Main::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/Soundboard/";
 QString Main::SETTINGS_FILE = "settings.ini";
 QString Main::DEFAULT_SOUNDBOARD = "default.json";
-QString Main::TEST_AUDIO = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/test.ogg";
+QString Main::DEFAULT_TEST_FILE = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/test.ogg";
 
 QString Main::DARK_THEME = "dark_theme";
 bool Main::DARK_THEME_DEFAULT = false;
@@ -80,11 +80,20 @@ QString Main::HAS_ACTIVE_BOARD = "has_active_board";
 bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
 QString Main::SETTINGS_TAB = "settings_tab";
 
-QString Main::EXPLICIT_NO_DEVICES = "explicit_no_devices";
-QString Main::DEVICE_INDEX0 = "device_index0";
-QString Main::DEVICE_INDEX1 = "device_index1";
+QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
+QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
+QString Main::OUTPUT_INDEX0 = "output_index0";
+QString Main::OUTPUT_INDEX1 = "output_index1";
+QString Main::INPUT_INDEX0 = "input_index0";
+QString Main::OUTPUT_VOLUME0 = "output_volume0";
+QString Main::OUTPUT_VOLUME1 = "output_volume1";
+QString Main::INPUT_VOLUME0 = "input_volume0";
+QString Main::TEST_VOLUME = "test_volume";
+QString Main::INPUT_OUT0 = "input_out0";
+QString Main::INPUT_OUT1 = "input_out1";
+QString Main::TEST_FILE = "test_file";
 
-Main::Main(QWidget *parent) :
+Main::Main(QWidget* parent) :
     QMainWindow(parent),
     ui(new Ui::MainApp),
     _audio(new AudioEngine(this)),
@@ -141,6 +150,9 @@ Main::~Main()
 {
     clear();
     delete ui;
+    delete _audio;
+    delete _settings;
+
 }
 
 // https://stackoverflow.com/questions/31383519/qt-rightclick-on-qlistwidget-opens-contextmenu-and-delete-item
@@ -288,19 +300,19 @@ void Main::on_actionUpdate_triggered()
 // ******************* BGN LIST ACTIONS *******************
 
 // Board item changed
-void Main::on_listBoards_currentItemChanged(QListWidgetItem *current, QListWidgetItem * /* previous */)
+void Main::on_listBoards_currentItemChanged(QListWidgetItem* current, QListWidgetItem* /* previous */)
 {
     setCurrentBoard(static_cast<ListItemBoard*>(current));
 }
 
 // Board item double clicked, enter edit mode
-void Main::on_listBoards_itemActivated(QListWidgetItem *item)
+void Main::on_listBoards_itemActivated(QListWidgetItem* item)
 {
     editBoard(static_cast<ListItemBoard*>(item));
 }
 
 // Sound item double clicked, enter edit mode
-void Main::on_listSounds_itemActivated(QListWidgetItem *item)
+void Main::on_listSounds_itemActivated(QListWidgetItem* item)
 {
     editSound(static_cast<ListItemSound*>(item));
 }
@@ -312,7 +324,7 @@ void Main::onSoundMoved(const QModelIndex &/*parent*/, int start, int /*end*/, c
     if (start >= 0 && row >= 0) currentBoard->moveSound(static_cast<size_t>(start), static_cast<size_t>(row));
 }
 
-void Main::on_listSounds_itemClicked(QListWidgetItem */*item*/) {
+void Main::on_listSounds_itemClicked(QListWidgetItem* /*item*/) {
     ui->buttonEditSound->setEnabled(true);
     ui->buttonRemoveSound->setEnabled(true);
     ui->buttonPlay->setEnabled(true);
@@ -320,7 +332,7 @@ void Main::on_listSounds_itemClicked(QListWidgetItem */*item*/) {
     ui->buttonStop->setEnabled(true);
 }
 
-void Main::on_listBoards_itemClicked(QListWidgetItem */*item*/) {
+void Main::on_listBoards_itemClicked(QListWidgetItem* /*item*/) {
     ui->buttonEditBoard->setEnabled(true);
     ui->buttonRemoveBoard->setEnabled(true);
 }
@@ -366,7 +378,7 @@ void Main::on_buttonEditSound_clicked()
 // ******************* BGN BOARD FUNCTIONS *******************
 
 void Main::addBoard() {
-    ListItemBoard *board = new ListItemBoard(this);
+    ListItemBoard* board = new ListItemBoard(this);
     ui->listBoards->addItem(board);
     setCurrentBoard(board);
     editBoard(board, true);
@@ -374,7 +386,7 @@ void Main::addBoard() {
 
 void Main::addSound() {
     if (!currentBoard) return;
-    ListItemSound *sound = new ListItemSound(this, currentBoard);
+    ListItemSound* sound = new ListItemSound(this, currentBoard);
     currentBoard->addSound(sound);
     displayBoard(currentBoard);
     setCurrentSound(sound);
@@ -386,7 +398,7 @@ void Main::addSound() {
     editSound(sound, true);
 }
 
-void Main::removeBoard(ListItemBoard *board, bool wasNew) {
+void Main::removeBoard(ListItemBoard* board, bool wasNew) {
     removeBoard(ui->listBoards->row(board), wasNew);
 }
 
@@ -396,7 +408,7 @@ void Main::removeBoard(int row, bool wasNew) {
     if (!wasNew) setChanged();
 }
 
-ListItemBoard *Main::getBoard(int row) {
+ListItemBoard* Main::getBoard(int row) {
     return row >= 0 ? static_cast<ListItemBoard*>(ui->listBoards->item(row)) : nullptr;
 }
 
@@ -404,13 +416,13 @@ void Main::editBoard(bool createNew) {
     editBoard(currentBoard, createNew);
 }
 
-void Main::editBoard(ListItemBoard *board, bool createNew) {
+void Main::editBoard(ListItemBoard* board, bool createNew) {
     if (!board) return;
     DialogBoard w(this, board, createNew);
     w.exec();
 }
 
-void Main::displayBoard(ListItemBoard *board) {
+void Main::displayBoard(ListItemBoard* board) {
     // TODO not do if settings don't want to update visuals
     if (board != ui->listBoards->currentItem()) {
         ui->listBoards->setCurrentItem(board);
@@ -430,7 +442,7 @@ void Main::setCurrentBoard(int row) {
     setCurrentBoard(getBoard(row));
 }
 
-void Main::setCurrentBoard(ListItemBoard *board) {
+void Main::setCurrentBoard(ListItemBoard* board) {
     if (currentBoard == board) return;
     if (currentBoard) {
         currentBoard->unreg(false);
@@ -461,13 +473,13 @@ void Main::setCurrentSound(int row) {
     setCurrentSound(getSound(row));
 }
 
-void Main::setCurrentSound(ListItemSound *sound) {
+void Main::setCurrentSound(ListItemSound* sound) {
     // TODO don't do display if the settings say not to
     ui->listSounds->setCurrentItem(sound);
     // TODO play audio
 }
 
-void Main::removeSound(ListItemSound *sound, bool wasNew) {
+void Main::removeSound(ListItemSound* sound, bool wasNew) {
     removeSound(ui->listSounds->row(sound), wasNew);
 }
 
@@ -478,7 +490,7 @@ void Main::removeSound(int row, bool wasNew) {
     if (!wasNew) setChanged();
 }
 
-ListItemSound *Main::getSound(int row) {
+ListItemSound* Main::getSound(int row) {
     return row >= 0 ? static_cast<ListItemSound*>(ui->listSounds->item(row)) : nullptr;
 }
 
@@ -486,7 +498,7 @@ void Main::editSound(bool createNew) {
     editSound(currentSound(), createNew);
 }
 
-void Main::editSound(ListItemSound *sound, bool createNew) {
+void Main::editSound(ListItemSound* sound, bool createNew) {
     if (!sound) return;
     DialogSound w(this, sound, createNew);
     w.exec();
@@ -527,7 +539,7 @@ void Main::load(const QString fn) {
 
     // Loads all the boards
     for (int i = 0; i < arr.size(); ++i) {
-        ListItemBoard *board = new ListItemBoard(this);
+        ListItemBoard* board = new ListItemBoard(this);
         board->load(arr[i].toObject());
         ui->listBoards->addItem(board);
         // Set the first board as the current board
@@ -627,7 +639,7 @@ QMessageBox::StandardButton Main::unsavedChangedDialogue() {
                                   QMessageBox::Save);
 }
 
-void Main::closeEvent (QCloseEvent *event)
+void Main::closeEvent (QCloseEvent* event)
 {
     if (_changed) {
         QMessageBox::StandardButton resBtn = Main::unsavedChangedDialogue();

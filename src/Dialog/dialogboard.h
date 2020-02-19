@@ -16,7 +16,7 @@ class DialogBoard : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogBoard(Main *main, ListItemBoard *board, bool creatingNew = false);
+    explicit DialogBoard(Main* main, ListItemBoard* board, bool creatingNew = false);
     ~DialogBoard();
 
 private slots:
@@ -25,9 +25,9 @@ private slots:
     void onClose();
 
 private:
-    Ui::DialogBoard *ui;
-    Main *main;
-    ListItemBoard *board;
+    Ui::DialogBoard* ui;
+    Main* main;
+    ListItemBoard* board;
     bool creatingNew;
     bool boardUpdated = false;
 };

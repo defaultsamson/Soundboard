@@ -2,14 +2,14 @@
 
 #include <QPainter>
 
-WidgetAudio::WidgetAudio(QWidget *parent)
+WidgetAudio::WidgetAudio(QWidget* parent)
     : QWidget(parent)
 {
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
 }
 
-void WidgetAudio::paintEvent(QPaintEvent * /* event */)
+void WidgetAudio::paintEvent(QPaintEvent* /* event */)
 {
     QPainter painter(this);
 

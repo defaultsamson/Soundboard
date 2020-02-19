@@ -7,7 +7,7 @@
 #include <QString>
 #include "../Hotkey/hotkeyutil.h"
 
-WidgetKeybind::WidgetKeybind(QWidget *parent) :
+WidgetKeybind::WidgetKeybind(QWidget* parent) :
     QLineEdit(parent),
     _key(0),
     _hasKey(false)
@@ -35,7 +35,7 @@ bool WidgetKeybind::hasKey() {
     return _hasKey;
 }
 
-void WidgetKeybind::focusInEvent(QFocusEvent *e) {
+void WidgetKeybind::focusInEvent(QFocusEvent* e) {
     QLineEdit::focusInEvent(e);
     clearFocus();
     DialogKeybind w(parentWidget(), this);
