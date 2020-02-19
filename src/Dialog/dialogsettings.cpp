@@ -22,11 +22,17 @@ DialogSettings::DialogSettings(Main* main) :
 {
     ui->setupUi(this);
 
+    ui->tabWidget->setCurrentIndex(main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
+
 #ifdef Q_OS_WIN
     ui->checkBoxDarkTheme->hide();
 #endif
     ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
-    ui->tabWidget->setCurrentIndex(main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
+    ui->checkBoxWindowSize->setChecked(main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool());
+    // Restore the geometry, if it was saved
+    if (main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
+        if (main->settings()->contains(Main::WINDOW_SETTINGS_GEOMETRY))
+            restoreGeometry(main->settings()->value(Main::WINDOW_SETTINGS_GEOMETRY).toByteArray());
 
     connect(ui->comboBoxDevice0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device0Changed);
     connect(ui->comboBoxDriver0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host0Changed);
@@ -92,6 +98,10 @@ void DialogSettings::handleClose() {
     main->setAudioTestDialog(nullptr);
     main->enableKeybinds();
     if (_connectedInputVisualizer) main->audio()->inputObject()->setUpdateVisualizer(false);
+
+    // Save the geometry
+    main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
+    main->settings()->setValue(Main::WINDOW_SETTINGS_GEOMETRY, saveGeometry());
 
     // Save all global keybinds
     bool hasKey = ui->keybindEnableKeybinds->hasKey();

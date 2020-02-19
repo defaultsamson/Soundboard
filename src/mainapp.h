@@ -56,6 +56,14 @@ public:
     static QString HK_TOGGLE_MUTE_INPUT_HAS;
     static QString HK_TOGGLE_MUTE_INPUT_KEY;
 
+    static QString REMEMBER_WINDOW_SIZES;
+    static QString WINDOW_MAIN_GEOMETRY;
+    static QString WINDOW_MAIN_SPLITTER0;
+    static QString WINDOW_MAIN_SPLITTER1;
+    static QString WINDOW_SETTINGS_GEOMETRY;
+    static QString WINDOW_BOARD_GEOMETRY;
+    static QString WINDOW_SOUND_GEOMETRY;
+
     static QString EXPLICIT_NO_OUTPUT_DEVICES;
     static QString EXPLICIT_NO_INPUT_DEVICES;
     static QString OUTPUT_INDEX0;
@@ -103,6 +111,8 @@ public:
     HotkeyTrigger* hkMuteInput;
     HotkeyTrigger* hkUnmuteInput;
     HotkeyTrigger* hkToggleMuteInput;
+
+    void restoreSizes();
 
 private slots:
     void on_actionNew_triggered();

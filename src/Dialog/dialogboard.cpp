@@ -15,9 +15,12 @@ DialogBoard::DialogBoard(Main* main, ListItemBoard* board, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : board->text());
-    //qDebug() << "hasKey: " << board->hasKey();
-    //qDebug() << "key:    " << board->key();
     if (board->hasKey()) ui->lineEdiKeybind->setKey(board->key());
+
+    // Restore the geometry, if it was saved
+    if (main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
+        if (main->settings()->contains(Main::WINDOW_BOARD_GEOMETRY))
+            restoreGeometry(main->settings()->value(Main::WINDOW_BOARD_GEOMETRY).toByteArray());
 
     // Disable the keybinds temporarily while the dialog is up
     main->disableKeybinds();
@@ -61,4 +64,7 @@ void DialogBoard::onClose() {
     }
     // Re-enable the keybinds
     main->enableKeybinds();
+
+    // Save the geometry
+    main->settings()->setValue(Main::WINDOW_BOARD_GEOMETRY, saveGeometry());
 }

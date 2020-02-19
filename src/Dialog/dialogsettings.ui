@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -1113,9 +1113,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBoxTrayMinimize">
+        <widget class="QCheckBox" name="checkBoxWindowSize">
          <property name="text">
-          <string>Minimize to tray (TODO)</string>
+          <string>Remember window size after closing</string>
          </property>
         </widget>
        </item>

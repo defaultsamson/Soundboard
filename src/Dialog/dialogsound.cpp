@@ -28,6 +28,11 @@ DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
 
     updateTestButtons();
 
+    // Restore the geometry, if it was saved
+    if (main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
+        if (main->settings()->contains(Main::WINDOW_SOUND_GEOMETRY))
+            restoreGeometry(main->settings()->value(Main::WINDOW_SOUND_GEOMETRY).toByteArray());
+
     // Disable the keybinds temporarily while the dialog is up
     main->disableKeybinds();
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
@@ -120,6 +125,9 @@ void DialogSound::onClose() {
     // Re-enable the keybinds
     main->enableKeybinds();
     sound->audio()->setUpdateVisualizer(false);
+
+    // Save the geometry
+    main->settings()->setValue(Main::WINDOW_SOUND_GEOMETRY, saveGeometry());
 }
 
 void DialogSound::on_pushButtonPlay_clicked()

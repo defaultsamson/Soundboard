@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Main w;
     w.show();
+    w.restoreSizes();
 
     // Initializes audio engine on separate thread so that the UI starts super fast
     MyThread t(w);
@@ -98,6 +99,14 @@ QString Main::HK_UNMUTE_INPUT_KEY = "hk_unmute_input_key";
 QString Main::HK_TOGGLE_MUTE_INPUT_HAS = "hk_toggle_mute_input_has";
 QString Main::HK_TOGGLE_MUTE_INPUT_KEY = "hk_toggle_mute_input_key";
 
+QString Main::REMEMBER_WINDOW_SIZES = "remember_window_sizes";
+QString Main::WINDOW_MAIN_GEOMETRY = "window_main_geometry";
+QString Main::WINDOW_MAIN_SPLITTER0 = "window_main_slider0";
+QString Main::WINDOW_MAIN_SPLITTER1 = "window_main_slider1";
+QString Main::WINDOW_SETTINGS_GEOMETRY = "window_settings_geometry";
+QString Main::WINDOW_BOARD_GEOMETRY = "window_board_geometry";
+QString Main::WINDOW_SOUND_GEOMETRY = "window_sound_geometry";
+
 QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
 QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
 QString Main::OUTPUT_INDEX0 = "output_index0";
@@ -110,6 +119,26 @@ QString Main::TEST_VOLUME = "test_volume";
 QString Main::INPUT_OUT0 = "input_out0";
 QString Main::INPUT_OUT1 = "input_out1";
 QString Main::TEST_FILE = "test_file";
+
+void Main::restoreSizes() {
+    // Restores the window geometry
+    if (settings()->value(REMEMBER_WINDOW_SIZES, true).toBool()) {
+        if (settings()->contains(WINDOW_MAIN_GEOMETRY)) restoreGeometry(settings()->value(WINDOW_MAIN_GEOMETRY).toByteArray());
+
+        if (settings()->contains(WINDOW_MAIN_SPLITTER0) && settings()->contains(WINDOW_MAIN_SPLITTER1)) {
+            QList<int> sizes;
+            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER0).toInt());
+            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER1).toInt());
+            ui->splitter->setSizes(sizes);
+        }
+    } else {
+        // Makes the "sounds" and "boards" sections equal width
+        QList<int> sizes;
+        sizes.append(ui->splitter->width() / 2);
+        sizes.append(ui->splitter->width() / 2);
+        ui->splitter->setSizes(sizes);
+    }
+}
 
 Main::Main(QWidget* parent) :
     QMainWindow(parent),
@@ -719,10 +748,17 @@ void Main::closeEvent (QCloseEvent* event)
             break;
         default:
             event->ignore();
+            return;
         }
     } else {
         event->accept();
     }
+
+    // Save the main window sizes
+    settings()->setValue(WINDOW_MAIN_GEOMETRY, saveGeometry());
+    QList<int> sizes = ui->splitter->sizes();
+    settings()->setValue(WINDOW_MAIN_SPLITTER0, sizes.at(0));
+    settings()->setValue(WINDOW_MAIN_SPLITTER1, sizes.at(1));
 }
 
 void Main::setChanged(bool changed) {
