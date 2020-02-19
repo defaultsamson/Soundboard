@@ -6,6 +6,8 @@
         <file>res/pause.png</file>
         <file>res/play.png</file>
         <file>res/stop.png</file>
+        <file>res/mic_off.png</file>
+        <file>res/mic_on.png</file>
     </qresource>
     <qresource prefix="/audio">
         <file>res/test.ogg</file>

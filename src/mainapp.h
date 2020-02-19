@@ -75,6 +75,7 @@ public:
     static QString TEST_VOLUME;
     static QString INPUT_OUT0;
     static QString INPUT_OUT1;
+    static QString INPUT_MUTED;
     static QString TEST_FILE;
 
     explicit Main(QWidget* parent = nullptr);
@@ -113,6 +114,7 @@ public:
     HotkeyTrigger* hkToggleMuteInput;
 
     void restoreSizes();
+    void showAudioEngineText(bool show);
 
 private slots:
     void on_actionNew_triggered();

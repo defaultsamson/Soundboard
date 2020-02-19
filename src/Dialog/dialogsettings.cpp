@@ -97,7 +97,7 @@ void DialogSettings::handleClose() {
     main->audio()->unregisterAudio(&audio);
     main->setAudioTestDialog(nullptr);
     main->enableKeybinds();
-    if (_connectedInputVisualizer) main->audio()->inputObject()->setUpdateVisualizer(false);
+    if (_inputObjectInited) main->audio()->inputObject()->setUpdateVisualizer(false);
 
     // Save the geometry
     main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
@@ -369,6 +369,7 @@ void DialogSettings::refreshDeviceSelection() {
     ui->pushButtonRefresh->setEnabled(inited);
     ui->checkBoxInput0->setEnabled(inited);
     ui->checkBoxInput1->setEnabled(inited);
+    ui->muteButton->setEnabled(inited && a->activeInputs().size() > 0);
     if (!inited) {
         ui->comboBoxDriver0->clear();
         ui->comboBoxDriver0->setEnabled(false);
@@ -386,12 +387,13 @@ void DialogSettings::refreshDeviceSelection() {
         ui->deleteButtonDevice1->setEnabled(false);
         ui->deleteButtonDeviceInput->setEnabled(false);
         return;
-    } else if (!_connectedInputVisualizer) {
-        _connectedInputVisualizer = true;
+    } else if (!_inputObjectInited) {
+        _inputObjectInited = true;
         main->audio()->inputObject()->setUpdateVisualizer(true);
         connect(main->audio()->inputObject(), &AudioObject::update, this, [&](float level) {
             ui->inputBar->setLevel(static_cast<qreal>(level));
         });
+        updateMuteButton();
     }
 
     /*
@@ -594,7 +596,7 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
     // Allow users to edit the number in the box past what the slider goes to
     if (!(value == ui->sliderInput->maximum() && ui->spinBoxInput->value() > value)) {
         ui->spinBoxInput->setValue(value);
-        if (_connectedInputVisualizer) main->audio()->inputObject()->setVolumeInt(value);
+        if (_inputObjectInited) main->audio()->inputObject()->setVolumeInt(value);
         main->settings()->setValue(Main::INPUT_VOLUME0, value);
     }
 }
@@ -602,7 +604,7 @@ void DialogSettings::on_sliderInput_valueChanged(int value)
 void DialogSettings::on_spinBoxInput_valueChanged(int value)
 {
     ui->sliderInput->setValue(value);
-    if (_connectedInputVisualizer) main->audio()->inputObject()->setVolumeInt(value);
+    if (_inputObjectInited) main->audio()->inputObject()->setVolumeInt(value);
     main->settings()->setValue(Main::INPUT_VOLUME0, value);
 }
 
@@ -642,14 +644,14 @@ void DialogSettings::on_checkBoxInput0_clicked()
 {
     bool enabled = ui->checkBoxInput0->isChecked();
     main->settings()->setValue(Main::INPUT_OUT0, enabled);
-    if (_connectedInputVisualizer) main->audio()->inputObject()->setOutput0(enabled);
+    if (_inputObjectInited) main->audio()->inputObject()->setOutput0(enabled);
 }
 
 void DialogSettings::on_checkBoxInput1_clicked()
 {
     bool enabled = ui->checkBoxInput1->isChecked();
     main->settings()->setValue(Main::INPUT_OUT1, enabled);
-    if (_connectedInputVisualizer) main->audio()->inputObject()->setOutput1(enabled);
+    if (_inputObjectInited) main->audio()->inputObject()->setOutput1(enabled);
 }
 
 void DialogSettings::on_pushButtonTestFile_clicked()
@@ -664,11 +666,25 @@ void DialogSettings::on_lineEditTestFile_textEdited(const QString &text)
     updateFileName(text);
 }
 
-
 void DialogSettings::updateFileName(QString fn) {
     // test to see if the file exists and is readable
     audio.setFile(fn);
     ui->lineEditTestFile->setText(fn);
     refreshDeviceSelection();
     main->settings()->setValue(Main::TEST_FILE, fn);
+}
+
+void DialogSettings::on_muteButton_clicked()
+{
+    if (!_inputObjectInited) return;
+    // Toggles the mute button
+    main->audio()->inputObject()->setMute(!main->audio()->inputObject()->isMuted());
+    updateMuteButton();
+}
+
+void DialogSettings::updateMuteButton() {
+    if (!_inputObjectInited) return;
+    bool muted = main->audio()->inputObject()->isMuted();
+    ui->muteButton->setIcon(QIcon(muted ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
+    main->settings()->setValue(Main::INPUT_MUTED, muted);
 }

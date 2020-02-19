@@ -76,6 +76,8 @@ private slots:
     void on_pushButtonTestFile_clicked();
     void on_lineEditTestFile_textEdited(const QString &arg1);
 
+    void on_muteButton_clicked();
+
 private:
     Ui::DialogSettings* ui;
     Main* main;
@@ -91,8 +93,8 @@ private:
     void inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void setOutputDeviceVolume(int value, int devDisplayIndex);
     void updateFileName(QString fn);
-
-    bool _connectedInputVisualizer = false;
+    void updateMuteButton();
+    bool _inputObjectInited = false;
 };
 
 #endif // DIALOGSETTINGS_H

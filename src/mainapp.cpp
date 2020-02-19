@@ -118,6 +118,7 @@ QString Main::INPUT_VOLUME0 = "input_volume0";
 QString Main::TEST_VOLUME = "test_volume";
 QString Main::INPUT_OUT0 = "input_out0";
 QString Main::INPUT_OUT1 = "input_out1";
+QString Main::INPUT_MUTED = "input_muted";
 QString Main::TEST_FILE = "test_file";
 
 void Main::restoreSizes() {
@@ -138,6 +139,11 @@ void Main::restoreSizes() {
         sizes.append(ui->splitter->width() / 2);
         ui->splitter->setSizes(sizes);
     }
+}
+
+void Main::showAudioEngineText(bool show) {
+    if (show) ui->labelAudioEngine->show();
+    else ui->labelAudioEngine->hide();
 }
 
 Main::Main(QWidget* parent) :
@@ -775,6 +781,7 @@ void Main::closeEvent (QCloseEvent* event)
     QList<int> sizes = ui->splitter->sizes();
     settings()->setValue(WINDOW_MAIN_SPLITTER0, sizes.at(0));
     settings()->setValue(WINDOW_MAIN_SPLITTER1, sizes.at(1));
+    settings()->setValue(INPUT_MUTED, _audio->inputObject()->isMuted());
 }
 
 void Main::setChanged(bool changed) {

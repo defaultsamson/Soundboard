@@ -192,6 +192,7 @@ const QList<Device*> AudioEngine::inputs() {
 }
 
 void AudioEngine::init() {
+    main->showAudioEngineText(true);
 #ifdef Q_OS_LINUX
     PaJack_SetClientName("Soundboard");
 #endif
@@ -208,6 +209,7 @@ bool AudioEngine::isInitialized() {
 }
 
 void AudioEngine::refreshDevices() {
+    main->showAudioEngineText(true);
 
     int devices = Pa_GetDeviceCount();
     std::cout << "Refreshing devices... [" << devices << "]" << std::endl;
@@ -276,6 +278,7 @@ void AudioEngine::refreshDevices() {
     Device* out0 = getDevice(main->settings()->value(Main::OUTPUT_INDEX0, -1).toInt());
     Device* out1 = getDevice(main->settings()->value(Main::OUTPUT_INDEX1, -1).toInt());
     Device* in0 = getDevice(main->settings()->value(Main::INPUT_INDEX0, -1).toInt());
+    _inputObject->setMute(main->settings()->value(Main::INPUT_MUTED, false).toBool());
 
     // There's a saved device, load it
     if (out0) {
@@ -305,6 +308,8 @@ void AudioEngine::refreshDevices() {
         _defaultInput->indexes()->inputDisplayIndex = 0;
         addActiveInput(_defaultInput);
     }
+
+    main->showAudioEngineText(false);
 }
 
 Device* AudioEngine::getDevice(int deviceIndex) {
