@@ -57,11 +57,7 @@
     </widget>
    </item>
    <item>
-    <widget class="WidgetKeybind" name="lineEdiKeybind">
-     <property name="text">
-      <string>PushButton</string>
-     </property>
-    </widget>
+    <widget class="WidgetKeybind" name="keybindBoard"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

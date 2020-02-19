@@ -15,7 +15,7 @@ DialogBoard::DialogBoard(Main* main, ListItemBoard* board, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : board->text());
-    if (board->hasKey()) ui->lineEdiKeybind->setKey(board->key());
+    if (board->hasKey()) ui->keybindBoard->setKey(board->key());
 
     // Restore the geometry, if it was saved
     if (main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
@@ -35,15 +35,17 @@ DialogBoard::~DialogBoard()
 void DialogBoard::on_buttonBox_accepted()
 {
     QString originalName = board->text();
+    quint32 originalHasKey = board->hasKey();
     quint32 originalKey = board->key();
 
     board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
-    if (ui->lineEdiKeybind->hasKey()) board->setKey(ui->lineEdiKeybind->key());
+    if (ui->keybindBoard->hasKey()) board->setKey(ui->keybindBoard->key());
     else board->unSetKey();
 
     // If anything's ACTUALLY changed, then tell the program
     if (creatingNew
             || board->text() != originalName
+            || board->hasKey() != originalHasKey
             || board->key() != originalKey) {
         main->setChanged();
     }

@@ -12,8 +12,8 @@ WidgetKeybind::WidgetKeybind(QWidget* parent) :
     _key(0),
     _hasKey(false)
 {
-    setText("Click here to set key");
     QObject::connect(this, &QPushButton::clicked, this, &WidgetKeybind::clickReciever);
+    setText("Click here to set key");
 }
 
 void WidgetKeybind::setKey(quint32 key) {

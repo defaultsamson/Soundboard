@@ -18,7 +18,7 @@ DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : sound->text());
-    if (sound->hasKey()) ui->lineEdiKeybind->setKey(sound->key());
+    if (sound->hasKey()) ui->keybindSound->setKey(sound->key());
     ui->lineEditFile->setText(sound->filename());
     ui->spinBoxVolume->setValue(sound->volume());
     ui->sliderVolume->setValue(sound->volume());
@@ -51,13 +51,14 @@ DialogSound::~DialogSound()
 void DialogSound::on_buttonBox_accepted()
 {
     QString originalName = sound->text();
+    quint32 originalHasKey = sound->hasKey();
     quint32 originalKey = sound->key();
     // QString originalFilename = sound->filename();
     // int originalVolume = sound->volume();
 
     // Updates the values to the board
     sound->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemSound::NEW_SOUND);
-    if (ui->lineEdiKeybind->hasKey()) sound->setKey(ui->lineEdiKeybind->key());
+    if (ui->keybindSound->hasKey()) sound->setKey(ui->keybindSound->key());
     else sound->unSetKey();
     sound->setFileName(ui->lineEditFile->text());
     sound->setVolume(ui->spinBoxVolume->value());
@@ -65,6 +66,7 @@ void DialogSound::on_buttonBox_accepted()
     // If anything's ACTUALLY changed, then tell the program
     if (creatingNew
             || sound->text() != originalName
+            || sound->hasKey() != originalHasKey
             || sound->key() != originalKey
             || sound->filename() != originalFileName
             || sound->volume() != originalVolume) {
@@ -115,16 +117,22 @@ void DialogSound::updateFileName(QString fn) {
 
 void DialogSound::onClose() {
     // Remove the board if it's being created new and wasn't saved (e.g. hit "OK: on)
+    bool removed = false;
     if (creatingNew && !soundUpdated) {
        main->removeSound(sound, true);
+       removed = true;
     } else if (!creatingNew && !soundUpdated) {
         sound->setFileName(originalFileName);
         sound->setVolume(originalVolume);
     }
-    sound->audio()->stop();
+
+    if (!removed) {
+        sound->audio()->stop();
+        sound->audio()->setUpdateVisualizer(false);
+    }
+
     // Re-enable the keybinds
     main->enableKeybinds();
-    sound->audio()->setUpdateVisualizer(false);
 
     // Save the geometry
     main->settings()->setValue(Main::WINDOW_SOUND_GEOMETRY, saveGeometry());
