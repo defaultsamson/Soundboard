@@ -77,6 +77,7 @@ public:
     static QString INPUT_OUT1;
     static QString INPUT_MUTED;
     static QString SHOW_MUTE_BUTTON;
+    static QString SHOW_DRIVERS;
     static QString TEST_FILE;
 
     explicit Main(QWidget* parent = nullptr);

@@ -216,6 +216,7 @@ void AudioEngine::refreshDevices() {
 
     _defaultOutput = nullptr;
     _defaultInput = nullptr;
+    _defaultHost = nullptr;
     for (auto dev : _activeOutputs) Pa_CloseStream(dev->stream);
     for (auto dev : _activeInputs) Pa_CloseStream(dev->stream);
     _activeOutputs.clear();
@@ -271,6 +272,9 @@ void AudioEngine::refreshDevices() {
             };
             dev->setHost(hostCon);
             _hosts.append(hostCon);
+
+            if (Pa_GetDefaultHostApi() == device->hostApi)
+                _defaultHost = hostCon;
         }
     }
 
@@ -377,4 +381,17 @@ int AudioEngine::audioCallback(const void* inputBuffer, void *outputBuffer,
         }
     }
     return paContinue;
+}
+
+void AudioEngine::updateSavedDevices() {
+    Device* dev;
+    dev = getActiveDisplayOutput(0);
+    main->settings()->setValue(Main::OUTPUT_INDEX0, dev ? dev->indexes()->deviceIndex : -1);
+    dev = getActiveDisplayOutput(1);
+    main->settings()->setValue(Main::OUTPUT_INDEX1, dev ? dev->indexes()->deviceIndex : -1);
+    dev = getActiveDisplayInput(0);
+    main->settings()->setValue(Main::INPUT_INDEX0, dev ? dev->indexes()->deviceIndex : -1);
+
+    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, _activeOutputs.count() == 0);
+    main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, _activeInputs.count() == 0);
 }

@@ -37,7 +37,7 @@ private:
 };        
 
 MyThread::MyThread(Main* main) : main(main) {
-    QObject::connect(this, SIGNAL(finished()), main, SLOT(updateShowMuteButton()));
+    QObject::connect(this, SIGNAL(finished()), main, SLOT(updateMuteButton()));
 }
 
 void MyThread::run()
@@ -124,6 +124,7 @@ QString Main::INPUT_OUT0 = "input_out0";
 QString Main::INPUT_OUT1 = "input_out1";
 QString Main::INPUT_MUTED = "input_muted";
 QString Main::SHOW_MUTE_BUTTON = "show_mute_button";
+QString Main::SHOW_DRIVERS = "show_drivers";
 QString Main::TEST_FILE = "test_file";
 
 Main::Main(QWidget* parent) :
@@ -901,7 +902,7 @@ void Main::showAudioEngineText(bool show) {
 
 void Main::updateMuteButton() {
     // If it wants to show, and there's an ACTIVE input device
-    if (_audio->inputs().size() > 0
+    if (_audio->activeInputs().size() > 0
             && _audio->inputObject()
             && ((_audio->inputObject()->isActiveOutput0() && _audio->getActiveDisplayOutput(0))
                 || (_audio->inputObject()->isActiveOutput1() && _audio->getActiveDisplayOutput(1)))

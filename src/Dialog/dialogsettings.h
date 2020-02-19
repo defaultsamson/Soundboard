@@ -80,6 +80,8 @@ private slots:
 
     void on_checkBoxShowMuteButton_clicked();
 
+    void on_checkBoxListDrivers_clicked();
+
 private:
     Ui::DialogSettings* ui;
     Main* main;

@@ -276,16 +276,7 @@ void DialogSettings::outputChanged(QComboBox* selector, int selectorIndex, int d
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
     main->audio()->addActiveOutput(dev);
-
-    switch (deviceDisplayIndex) {
-    case 0:
-        main->settings()->setValue(Main::OUTPUT_INDEX0, dev->indexes()->deviceIndex);
-        break;
-    case 1:
-        main->settings()->setValue(Main::OUTPUT_INDEX1, dev->indexes()->deviceIndex);
-        break;
-    }
-    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+    main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
@@ -301,13 +292,7 @@ void DialogSettings::inputChanged(QComboBox* selector, int selectorIndex, int de
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
     main->audio()->addActiveInput(dev);
-
-    switch (deviceDisplayIndex) {
-    case 0:
-        main->settings()->setValue(Main::INPUT_INDEX0, dev->indexes()->deviceIndex);
-        break;
-    }
-    main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
+    main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
@@ -316,16 +301,7 @@ void DialogSettings::outputRemoved(int deviceDisplayIndex, HostInfoContainer** d
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     main->audio()->removeActiveDisplayOutput(deviceDisplayIndex);
-
-    switch (deviceDisplayIndex) {
-    case 0:
-        main->settings()->setValue(Main::OUTPUT_INDEX0, -1);
-        break;
-    case 1:
-        main->settings()->setValue(Main::OUTPUT_INDEX1, -1);
-        break;
-    }
-    main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, main->audio()->activeOutputs().count() == 0);
+    main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
@@ -333,13 +309,7 @@ void DialogSettings::inputRemoved(int deviceDisplayIndex, HostInfoContainer** di
 {
     *displayHost = nullptr; // The selected device now decides the display host, not this ptr, so set it null
     main->audio()->removeActiveDisplayInput(deviceDisplayIndex);
-
-    switch (deviceDisplayIndex) {
-    case 0:
-        main->settings()->setValue(Main::INPUT_INDEX0, -1);
-        break;
-    }
-    main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, main->audio()->activeInputs().count() == 0);
+    main->audio()->updateSavedDevices();
 
     refreshDeviceSelection();
 }
@@ -361,6 +331,26 @@ void DialogSettings::audioEngineInit() {
 
 void DialogSettings::refreshDeviceSelection() {
     AudioEngine* a = main->audio();
+
+    if (main->settings()->value(Main::SHOW_DRIVERS, false).toBool()) {
+        ui->labelDriverDevice0->show();
+        ui->comboBoxDriver0->show();
+        ui->labelDriverDevice1->show();
+        ui->comboBoxDriver1->show();
+        ui->labelDriverDeviceInput->show();
+        ui->comboBoxDriverInput->show();
+    } else {
+        ui->labelDriverDevice0->hide();
+        ui->comboBoxDriver0->hide();
+        ui->labelDriverDevice1->hide();
+        ui->comboBoxDriver1->hide();
+        ui->labelDriverDeviceInput->hide();
+        ui->comboBoxDriverInput->hide();
+        HostInfoContainer* host = main->audio()->defaultHost() ? main->audio()->defaultHost() : nullptr;
+        _displayHost0 = host;
+        _displayHost1 = host;
+        _displayHostInput = host;
+    }
 
     bool inited = a->isInitialized();
     ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
@@ -641,6 +631,7 @@ void DialogSettings::on_deleteButtonDevice1_clicked()
 void DialogSettings::on_deleteButtonDeviceInput_clicked()
 {
     inputRemoved(0, &_displayHostInput);
+    if (_inputObjectInited) main->audio()->inputObject()->stop();
 }
 
 void DialogSettings::on_checkBoxInput0_clicked()
@@ -695,4 +686,74 @@ void DialogSettings::updateMuteButton() {
 void DialogSettings::on_checkBoxShowMuteButton_clicked()
 {
     main->settings()->setValue(Main::SHOW_MUTE_BUTTON, ui->checkBoxShowMuteButton->isChecked());
+}
+
+void DialogSettings::on_checkBoxListDrivers_clicked(){
+
+    bool enable = ui->checkBoxListDrivers->isChecked();
+    bool hasDefaultHost = main->audio()->defaultHost();
+
+    QString message;
+    if (enable) {
+        if (hasDefaultHost) {
+            message = tr("The default device driver is already active.\n"
+                         "Enabling other drivers may cause instability.\n"
+                         "Are you sure you'd like to enable the other drivers?");
+        } else {
+            message = tr("There was no default driver detected. Enabling\n"
+                         "other drivers may cause instability, but may help\n"
+                         "to find a working device. Are you sure you'd\n"
+                         "like to enable the other drivers?");
+        }
+    } else {
+        if (hasDefaultHost) {
+            message = tr("This will revert all devices back to the default\n"
+                         "driver. Are you sure you'd like to disable the\n"
+                         "other drivers?");
+        } else {
+            message = tr("This will revert all devices back to the default\n"
+                         "driver, which wasn't detected. Are you sure you'd\n"
+                         "like to disable the other drivers?");
+        }
+    }
+
+    QMessageBox::StandardButton resBtn =
+            QMessageBox::question(this, "Soundboard",
+                                  message,
+                                  QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                  QMessageBox::No);
+
+    switch (resBtn) {
+    case QMessageBox::Yes:
+        main->settings()->setValue(Main::SHOW_DRIVERS, enable);
+
+        if (enable) {
+            // Show all drivers, and remove all displayHosts that don't have an
+            // active driver, by disabling all the displayHosts
+            _displayHost0 = nullptr;
+            _displayHost1 = nullptr;
+            _displayHostInput = nullptr;
+        } else {
+            // Revert to only default drivers
+            if (hasDefaultHost) {
+                for (Device* dev : main->audio()->activeOutputs())
+                    // If the device isn't under the default host, remove it
+                    if (dev->host() != main->audio()->defaultHost())
+                        main->audio()->removeActiveDevice(dev, true, true);
+
+                for (Device* dev : main->audio()->activeInputs())
+                    // If the device isn't under the default host, remove it
+                    if (dev->host() != main->audio()->defaultHost())
+                        main->audio()->removeActiveDevice(dev, true, true);
+            }
+
+            main->audio()->updateSavedDevices();
+        }
+
+        refreshDeviceSelection();
+        break;
+    default:
+        ui->checkBoxListDrivers->setChecked(!enable);
+        return;
+    }
 }

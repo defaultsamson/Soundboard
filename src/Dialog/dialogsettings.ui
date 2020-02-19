@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -72,7 +72,7 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>0</y>
+               <y>-104</y>
                <width>462</width>
                <height>718</height>
               </rect>
@@ -102,7 +102,7 @@
                        <number>0</number>
                       </property>
                       <item>
-                       <widget class="QLabel" name="label_10">
+                       <widget class="QLabel" name="labelDriverDevice0">
                         <property name="text">
                          <string>Driver</string>
                         </property>
@@ -255,7 +255,7 @@
                        <number>0</number>
                       </property>
                       <item>
-                       <widget class="QLabel" name="label_11">
+                       <widget class="QLabel" name="labelDriverDevice1">
                         <property name="text">
                          <string>Driver</string>
                         </property>
@@ -398,7 +398,7 @@
                    <item>
                     <layout class="QVBoxLayout" name="verticalLayout_20">
                      <item>
-                      <widget class="QLabel" name="label_13">
+                      <widget class="QLabel" name="labelDriverDeviceInput">
                        <property name="text">
                         <string>Driver</string>
                        </property>
@@ -1161,6 +1161,13 @@
         <widget class="QCheckBox" name="checkBoxWindowSize">
          <property name="text">
           <string>Remember window size after closing</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxListDrivers">
+         <property name="text">
+          <string>List device drivers in Audio tab</string>
          </property>
         </widget>
        </item>

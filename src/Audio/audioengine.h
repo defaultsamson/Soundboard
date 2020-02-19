@@ -25,6 +25,7 @@ public:
     static size_t FRAMES_PER_BUFFER;
     static size_t CHANNELS;
 
+    HostInfoContainer* defaultHost() { return _defaultHost; }
     Device* defaultOutput();
     Device* defaultInput();
 
@@ -32,6 +33,8 @@ public:
     void removeActiveOutput(Device*);
     void addActiveInput(Device*);
     void removeActiveInput(Device*);
+    void addActiveDevice(Device*, bool startInput, bool startOutput);
+    void removeActiveDevice(Device*, bool stopInput, bool stopOutput);
 
     void removeActiveDisplayOutput(int deviceDisplayIndex);
     Device* getActiveDisplayOutput(int deviceDisplayIndex);
@@ -64,6 +67,8 @@ public:
 
     AudioObjectInput* inputObject() { return _inputObject; }
 
+    void updateSavedDevices();
+
     ~AudioEngine();
 
 private:
@@ -72,6 +77,7 @@ private:
 
     Device* _defaultOutput = nullptr;
     Device* _defaultInput = nullptr;
+    HostInfoContainer* _defaultHost = nullptr;
     QList<HostInfoContainer*> _hosts;
     QList<Device*> _outputs;
     QList<Device*> _inputs;
@@ -83,8 +89,6 @@ private:
     AudioObjectInput* _inputObject = nullptr;
 
     Device* getDevice(int deviceIndex);
-    void addActiveDevice(Device*, bool startInput, bool startOutput);
-    void removeActiveDevice(Device*, bool stopInput, bool stopOutput);
 };
 
 #endif // AUDIOENGINE_H
