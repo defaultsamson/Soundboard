@@ -28,6 +28,7 @@ DialogSettings::DialogSettings(Main* main) :
     ui->checkBoxDarkTheme->hide();
 #endif
     ui->checkBoxDarkTheme->setChecked(main->settings()->value(Main::DARK_THEME, false).toBool());
+    ui->checkBoxShowMuteButton->setChecked(main->settings()->value(Main::SHOW_MUTE_BUTTON, true).toBool());
     ui->checkBoxWindowSize->setChecked(main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool());
     // Restore the geometry, if it was saved
     if (main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
@@ -102,6 +103,8 @@ void DialogSettings::handleClose() {
     // Save the geometry
     main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
     main->settings()->setValue(Main::WINDOW_SETTINGS_GEOMETRY, saveGeometry());
+
+    main->updateShowMuteButton();
 
     // Save all global keybinds
     bool hasKey = ui->keybindEnableKeybinds->hasKey();
@@ -687,4 +690,9 @@ void DialogSettings::updateMuteButton() {
     bool muted = main->audio()->inputObject()->isMuted();
     ui->muteButton->setIcon(QIcon(muted ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
     main->settings()->setValue(Main::INPUT_MUTED, muted);
+}
+
+void DialogSettings::on_checkBoxShowMuteButton_clicked()
+{
+    main->settings()->setValue(Main::SHOW_MUTE_BUTTON, ui->checkBoxShowMuteButton->isChecked());
 }

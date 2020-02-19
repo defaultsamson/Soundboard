@@ -29,12 +29,16 @@
 class MyThread : public QThread
 {
 public:
-    MyThread(Main &main) : main(main) {}
+    MyThread(Main* main);
 protected:
     void run();
 private:
-    Main &main;
+    Main* main;
 };        
+
+MyThread::MyThread(Main* main) : main(main) {
+    QObject::connect(this, SIGNAL(finished()), main, SLOT(updateShowMuteButton()));
+}
 
 void MyThread::run()
 {
@@ -44,8 +48,8 @@ void MyThread::run()
         QFile::copy(":/audio/res/test.ogg", Main::DEFAULT_TEST_FILE);
     }
 
-    main.audio()->init();
-    if (main.getAudioTestDialog()) main.getAudioTestDialog()->audioEngineInit();
+    main->audio()->init();
+    if (main->getAudioTestDialog()) main->getAudioTestDialog()->audioEngineInit();
 }
 
 void Main::setAudioTestDialog(DialogTestAudio *s) {
@@ -64,7 +68,7 @@ int main(int argc, char *argv[])
     w.updateButtonBar();
 
     // Initializes audio engine on separate thread so that the UI starts super fast
-    MyThread t(w);
+    MyThread t(&w);
     t.start();
 
     return a.exec();
@@ -120,6 +124,7 @@ QString Main::TEST_VOLUME = "test_volume";
 QString Main::INPUT_OUT0 = "input_out0";
 QString Main::INPUT_OUT1 = "input_out1";
 QString Main::INPUT_MUTED = "input_muted";
+QString Main::SHOW_MUTE_BUTTON = "show_mute_button";
 QString Main::TEST_FILE = "test_file";
 
 void Main::restoreSizes() {
@@ -240,6 +245,8 @@ Main::Main(QWidget* parent) :
         hkToggleMuteInput->setKey(static_cast<quint32>(settings()->value(HK_TOGGLE_MUTE_INPUT_KEY, 0).toInt()));
         hkToggleMuteInput->reg();
     }
+
+    updateShowMuteButton();
 }
 
 Main::~Main()
@@ -838,6 +845,7 @@ void Main::updateButtonBar() {
 }
 
 void Main::updateButtonBar(int pos) {
+
     int width = ui->splitter->width();
     int handleWidth = ui->splitter->handleWidth();
     if (pos >= width - handleWidth) pos = width;
@@ -889,4 +897,15 @@ void Main::updateButtonBar(int pos) {
 void Main::resizeEvent(QResizeEvent* event) {
     QMainWindow::resizeEvent(event);
     updateButtonBar();
+}
+
+void Main::updateShowMuteButton() {
+    // If it wants to show, and there's an ACTIVE input device
+    if (_audio->inputs().size() > 0
+            && _audio->inputObject()
+            && ((_audio->inputObject()->isActiveOutput0() && _audio->getActiveDisplayOutput(0))
+                || (_audio->inputObject()->isActiveOutput1() && _audio->getActiveDisplayOutput(1)))
+            && settings()->value(SHOW_MUTE_BUTTON, true).toBool())
+        ui->muteButton->show();
+    else ui->muteButton->hide();
 }

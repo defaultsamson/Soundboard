@@ -76,6 +76,7 @@ public:
     static QString INPUT_OUT0;
     static QString INPUT_OUT1;
     static QString INPUT_MUTED;
+    static QString SHOW_MUTE_BUTTON;
     static QString TEST_FILE;
 
     explicit Main(QWidget* parent = nullptr);
@@ -157,6 +158,7 @@ private slots:
 public slots:
     void enableKeybinds();
     void disableKeybinds();
+    void updateShowMuteButton();
 
 private:
     Ui::MainApp* ui;
