@@ -16,6 +16,7 @@ void AudioObjectFile::stop() {
 
 void AudioObjectFile::pause() {
     if (!stopped) {
+        emit update(0);
         paused = true;
         stopped = false;
     }
