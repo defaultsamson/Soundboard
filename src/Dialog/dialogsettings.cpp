@@ -104,7 +104,7 @@ void DialogSettings::handleClose() {
     main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
     main->settings()->setValue(Main::WINDOW_SETTINGS_GEOMETRY, saveGeometry());
 
-    main->updateShowMuteButton();
+    main->updateMuteButton();
 
     // Save all global keybinds
     bool hasKey = ui->keybindEnableKeybinds->hasKey();

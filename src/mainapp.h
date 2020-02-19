@@ -155,10 +155,12 @@ private slots:
 
     void on_splitter_splitterMoved(int pos, int index);
 
+    void on_muteButton_clicked();
+
 public slots:
     void enableKeybinds();
     void disableKeybinds();
-    void updateShowMuteButton();
+    void updateMuteButton();
 
 private:
     Ui::MainApp* ui;

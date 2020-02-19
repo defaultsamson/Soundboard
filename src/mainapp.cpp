@@ -65,7 +65,6 @@ int main(int argc, char *argv[])
     Main w;
     w.show();
     w.restoreSizes();
-    w.updateButtonBar();
 
     // Initializes audio engine on separate thread so that the UI starts super fast
     MyThread t(&w);
@@ -126,31 +125,6 @@ QString Main::INPUT_OUT1 = "input_out1";
 QString Main::INPUT_MUTED = "input_muted";
 QString Main::SHOW_MUTE_BUTTON = "show_mute_button";
 QString Main::TEST_FILE = "test_file";
-
-void Main::restoreSizes() {
-    // Restores the window geometry
-    if (settings()->value(REMEMBER_WINDOW_SIZES, true).toBool()) {
-        if (settings()->contains(WINDOW_MAIN_GEOMETRY)) restoreGeometry(settings()->value(WINDOW_MAIN_GEOMETRY).toByteArray());
-
-        if (settings()->contains(WINDOW_MAIN_SPLITTER0) && settings()->contains(WINDOW_MAIN_SPLITTER1)) {
-            QList<int> sizes;
-            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER0).toInt());
-            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER1).toInt());
-            ui->splitter->setSizes(sizes);
-        }
-    } else {
-        // Makes the "sounds" and "boards" sections equal width
-        QList<int> sizes;
-        sizes.append(ui->splitter->width() / 2);
-        sizes.append(ui->splitter->width() / 2);
-        ui->splitter->setSizes(sizes);
-    }
-}
-
-void Main::showAudioEngineText(bool show) {
-    if (show) ui->labelAudioEngine->show();
-    else ui->labelAudioEngine->hide();
-}
 
 Main::Main(QWidget* parent) :
     QMainWindow(parent),
@@ -230,23 +204,23 @@ Main::Main(QWidget* parent) :
         hkResumeSounds->setKey(static_cast<quint32>(settings()->value(HK_RESUME_SOUNDS_KEY, 0).toInt()));
         hkResumeSounds->reg();
     }
-    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(true); });
+    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(true); updateMuteButton(); });
     if (settings()->value(HK_MUTE_INPUT_HAS, false).toBool()) {
         hkMuteInput->setKey(static_cast<quint32>(settings()->value(HK_MUTE_INPUT_KEY, 0).toInt()));
         hkMuteInput->reg();
     }
-    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(false); });
+    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(false); updateMuteButton(); });
     if (settings()->value(HK_UNMUTE_INPUT_HAS, false).toBool()) {
         hkUnmuteInput->setKey(static_cast<quint32>(settings()->value(HK_UNMUTE_INPUT_KEY, 0).toInt()));
         hkUnmuteInput->reg();
     }
-    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(!_audio->inputObject()->isMuted()); });
+    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(!_audio->inputObject()->isMuted()); updateMuteButton(); });
     if (settings()->value(HK_TOGGLE_MUTE_INPUT_HAS, false).toBool()) {
         hkToggleMuteInput->setKey(static_cast<quint32>(settings()->value(HK_TOGGLE_MUTE_INPUT_KEY, 0).toInt()));
         hkToggleMuteInput->reg();
     }
 
-    updateShowMuteButton();
+    updateMuteButton();
 }
 
 Main::~Main()
@@ -899,13 +873,50 @@ void Main::resizeEvent(QResizeEvent* event) {
     updateButtonBar();
 }
 
-void Main::updateShowMuteButton() {
+void Main::restoreSizes() {
+    // Restores the window geometry
+    if (settings()->value(REMEMBER_WINDOW_SIZES, true).toBool()) {
+        if (settings()->contains(WINDOW_MAIN_GEOMETRY)) restoreGeometry(settings()->value(WINDOW_MAIN_GEOMETRY).toByteArray());
+
+        if (settings()->contains(WINDOW_MAIN_SPLITTER0) && settings()->contains(WINDOW_MAIN_SPLITTER1)) {
+            QList<int> sizes;
+            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER0).toInt());
+            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER1).toInt());
+            ui->splitter->setSizes(sizes);
+        }
+    } else {
+        // Makes the "sounds" and "boards" sections equal width
+        QList<int> sizes;
+        sizes.append(ui->splitter->width() / 2);
+        sizes.append(ui->splitter->width() / 2);
+        ui->splitter->setSizes(sizes);
+    }
+    updateButtonBar();
+}
+
+void Main::showAudioEngineText(bool show) {
+    if (show) ui->labelAudioEngine->show();
+    else ui->labelAudioEngine->hide();
+}
+
+void Main::updateMuteButton() {
     // If it wants to show, and there's an ACTIVE input device
     if (_audio->inputs().size() > 0
             && _audio->inputObject()
             && ((_audio->inputObject()->isActiveOutput0() && _audio->getActiveDisplayOutput(0))
                 || (_audio->inputObject()->isActiveOutput1() && _audio->getActiveDisplayOutput(1)))
             && settings()->value(SHOW_MUTE_BUTTON, true).toBool())
+    {
         ui->muteButton->show();
+        ui->muteButton->setIcon(QIcon(_audio->inputObject()->isMuted() ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
+    }
     else ui->muteButton->hide();
+}
+
+void Main::on_muteButton_clicked()
+{
+    if (_audio->inputObject()) {
+        _audio->inputObject()->setMute(!_audio->inputObject()->isMuted());
+        updateMuteButton();
+    }
 }
