@@ -8,6 +8,7 @@
 #include "Dialog/dialogsound.h"
 #include "Dialog/dialogsettings.h"
 #include "Dialog/dialogtestaudio.h"
+#include "Hotkey/hotkeytrigger.h"
 
 #include <QApplication>
 #include <QDesktopServices>
@@ -80,6 +81,23 @@ QString Main::HAS_ACTIVE_BOARD = "has_active_board";
 bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
 QString Main::SETTINGS_TAB = "settings_tab";
 
+QString Main::HK_ENABLE_KEYBINDS_HAS = "hk_enable_keybinds_has";
+QString Main::HK_ENABLE_KEYBINDS_KEY = "hk_enable_keybinds_key";
+QString Main::HK_DISABLE_KEYBINDS_HAS = "hk_disable_keybinds_has";
+QString Main::HK_DISABLE_KEYBINDS_KEY = "hk_disable_keybinds_key";
+QString Main::HK_STOP_SOUNDS_HAS = "hk_stop_sounds_has";
+QString Main::HK_STOP_SOUNDS_KEY = "hk_stop_sounds_key";
+QString Main::HK_PAUSE_SOUNDS_HAS = "hk_pause_sounds_has";
+QString Main::HK_PAUSE_SOUNDS_KEY = "hk_pause_sounds_key";
+QString Main::HK_RESUME_SOUNDS_HAS = "hk_resume_sounds_has";
+QString Main::HK_RESUME_SOUNDS_KEY = "hk_resume_sounds_key";
+QString Main::HK_MUTE_INPUT_HAS = "hk_mute_input_has";
+QString Main::HK_MUTE_INPUT_KEY = "hk_mute_input_key";
+QString Main::HK_UNMUTE_INPUT_HAS = "hk_unmute_input_has";
+QString Main::HK_UNMUTE_INPUT_KEY = "hk_unmute_input_key";
+QString Main::HK_TOGGLE_MUTE_INPUT_HAS = "hk_toggle_mute_input_has";
+QString Main::HK_TOGGLE_MUTE_INPUT_KEY = "hk_toggle_mute_input_key";
+
 QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
 QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
 QString Main::OUTPUT_INDEX0 = "output_index0";
@@ -144,6 +162,48 @@ Main::Main(QWidget* parent) :
     }
 
     connect(ui->listSounds, &QListWidget::currentRowChanged, this, &Main::rowChanged);
+
+    // Loads global keybinds & their behaviour
+    hkEnableKeybinds = new HotkeyTrigger(this, [this]{ enableKeybinds(); });
+    if (settings()->value(HK_ENABLE_KEYBINDS_HAS, false).toBool()) {
+        hkEnableKeybinds->setKey(static_cast<quint32>(settings()->value(HK_ENABLE_KEYBINDS_KEY, 0).toInt()));
+        hkEnableKeybinds->reg();
+    }
+    hkDisableKeybinds = new HotkeyTrigger(this, [this]{ disableKeybinds(); });
+    if (settings()->value(HK_DISABLE_KEYBINDS_HAS, false).toBool()) {
+        hkDisableKeybinds->setKey(static_cast<quint32>(settings()->value(HK_DISABLE_KEYBINDS_KEY, 0).toInt()));
+        hkDisableKeybinds->reg();
+    }
+    hkStopSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->stop(); });
+    if (settings()->value(HK_STOP_SOUNDS_HAS, false).toBool()) {
+        hkStopSounds->setKey(static_cast<quint32>(settings()->value(HK_STOP_SOUNDS_KEY, 0).toInt()));
+        hkStopSounds->reg();
+    }
+    hkPauseSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->pause(); });
+    if (settings()->value(HK_PAUSE_SOUNDS_HAS, false).toBool()) {
+        hkPauseSounds->setKey(static_cast<quint32>(settings()->value(HK_PAUSE_SOUNDS_KEY, 0).toInt()));
+        hkPauseSounds->reg();
+    }
+    hkResumeSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) if (sound->isPaused()) sound->play(); });
+    if (settings()->value(HK_RESUME_SOUNDS_HAS, false).toBool()) {
+        hkResumeSounds->setKey(static_cast<quint32>(settings()->value(HK_RESUME_SOUNDS_KEY, 0).toInt()));
+        hkResumeSounds->reg();
+    }
+    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(true); });
+    if (settings()->value(HK_MUTE_INPUT_HAS, false).toBool()) {
+        hkMuteInput->setKey(static_cast<quint32>(settings()->value(HK_MUTE_INPUT_KEY, 0).toInt()));
+        hkMuteInput->reg();
+    }
+    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(false); });
+    if (settings()->value(HK_UNMUTE_INPUT_HAS, false).toBool()) {
+        hkUnmuteInput->setKey(static_cast<quint32>(settings()->value(HK_UNMUTE_INPUT_KEY, 0).toInt()));
+        hkUnmuteInput->reg();
+    }
+    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(!_audio->inputObject()->isMuted()); });
+    if (settings()->value(HK_TOGGLE_MUTE_INPUT_HAS, false).toBool()) {
+        hkToggleMuteInput->setKey(static_cast<quint32>(settings()->value(HK_TOGGLE_MUTE_INPUT_KEY, 0).toInt()));
+        hkToggleMuteInput->reg();
+    }
 }
 
 Main::~Main()
@@ -153,6 +213,14 @@ Main::~Main()
     delete _audio;
     delete _settings;
 
+    delete hkEnableKeybinds;
+    delete hkDisableKeybinds;
+    delete hkStopSounds;
+    delete hkPauseSounds;
+    delete hkResumeSounds;
+    delete hkMuteInput;
+    delete hkUnmuteInput;
+    delete hkToggleMuteInput;
 }
 
 // https://stackoverflow.com/questions/31383519/qt-rightclick-on-qlistwidget-opens-contextmenu-and-delete-item

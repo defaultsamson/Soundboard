@@ -15,6 +15,7 @@
 #include "Widget/listitem.h"
 #include "Widget/listitemboard.h"
 #include "Widget/listitemsound.h"
+#include "Hotkey/hotkeytrigger.h"
 
 namespace Ui {
 class MainApp;
@@ -38,6 +39,23 @@ public:
     static bool HAS_ACTIVE_BOARD_DEFAULT;
     static QString SETTINGS_TAB;
 
+    static QString HK_ENABLE_KEYBINDS_HAS;
+    static QString HK_ENABLE_KEYBINDS_KEY;
+    static QString HK_DISABLE_KEYBINDS_HAS;
+    static QString HK_DISABLE_KEYBINDS_KEY;
+    static QString HK_STOP_SOUNDS_HAS;
+    static QString HK_STOP_SOUNDS_KEY;
+    static QString HK_PAUSE_SOUNDS_HAS;
+    static QString HK_PAUSE_SOUNDS_KEY;
+    static QString HK_RESUME_SOUNDS_HAS;
+    static QString HK_RESUME_SOUNDS_KEY;
+    static QString HK_MUTE_INPUT_HAS;
+    static QString HK_MUTE_INPUT_KEY;
+    static QString HK_UNMUTE_INPUT_HAS;
+    static QString HK_UNMUTE_INPUT_KEY;
+    static QString HK_TOGGLE_MUTE_INPUT_HAS;
+    static QString HK_TOGGLE_MUTE_INPUT_KEY;
+
     static QString EXPLICIT_NO_OUTPUT_DEVICES;
     static QString EXPLICIT_NO_INPUT_DEVICES;
     static QString OUTPUT_INDEX0;
@@ -50,8 +68,6 @@ public:
     static QString INPUT_OUT0;
     static QString INPUT_OUT1;
     static QString TEST_FILE;
-
-
 
     explicit Main(QWidget* parent = nullptr);
     ~Main();
@@ -78,6 +94,15 @@ public:
     DialogTestAudio* getAudioTestDialog();
 
     void setChanged(bool changed = true);
+
+    HotkeyTrigger* hkEnableKeybinds;
+    HotkeyTrigger* hkDisableKeybinds;
+    HotkeyTrigger* hkStopSounds;
+    HotkeyTrigger* hkPauseSounds;
+    HotkeyTrigger* hkResumeSounds;
+    HotkeyTrigger* hkMuteInput;
+    HotkeyTrigger* hkUnmuteInput;
+    HotkeyTrigger* hkToggleMuteInput;
 
 private slots:
     void on_actionNew_triggered();

@@ -79,5 +79,5 @@ size_t AudioObjectInput::read(float* buffer, size_t n) {
 }
 
 bool AudioObjectInput::doMix() {
-    return true;
+    return !_isMuted;
 }

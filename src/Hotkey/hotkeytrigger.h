@@ -19,6 +19,8 @@ public:
     quint32 key() { return _key; }
     void unSetKey() { _hasKey = false; }
     void setKey(quint32 key);
+    void reg() { if (_hasKey) _hotkey->setRegistered(true); }
+    void unreg() { _hotkey->setRegistered(false); }
 
 protected:
     Main* main;

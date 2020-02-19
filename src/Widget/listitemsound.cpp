@@ -59,14 +59,6 @@ int ListItemSound::volume() {
     return _volume;
 }
 
-void ListItemSound::reg() {
-    _hotkey->setRegistered(true);
-}
-
-void ListItemSound::unreg() {
-    _hotkey->setRegistered(false);
-}
-
 void ListItemSound::load(const QJsonObject &json) {
     ListItem::load(json);
     setFileName(json["filename"].toString());

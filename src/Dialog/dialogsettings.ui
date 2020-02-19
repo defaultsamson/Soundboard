@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -912,6 +912,13 @@
              </widget>
             </item>
             <item>
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="labelStop">
               <property name="text">
                <string>Stop All Sounds</string>
@@ -929,6 +936,34 @@
              <widget class="QLabel" name="label_2">
               <property name="text">
                <string>Resume All Sounds</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Mute Input</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>Unmute Input</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>Toggle Mute Input</string>
               </property>
              </widget>
             </item>
@@ -953,6 +988,12 @@
          </item>
          <item>
           <widget class="QWidget" name="widget_2" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <property name="leftMargin">
              <number>0</number>
@@ -967,7 +1008,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="WidgetKeybind" name="lineEditEnableKeybinds">
+             <widget class="WidgetKeybind" name="keybindEnableKeybinds">
               <property name="cursor">
                <cursorShape>ArrowCursor</cursorShape>
               </property>
@@ -977,7 +1018,7 @@
              </widget>
             </item>
             <item>
-             <widget class="WidgetKeybind" name="lineEditDisableKeybinds">
+             <widget class="WidgetKeybind" name="keybindDisableKeybinds">
               <property name="cursor">
                <cursorShape>ArrowCursor</cursorShape>
               </property>
@@ -987,7 +1028,14 @@
              </widget>
             </item>
             <item>
-             <widget class="WidgetKeybind" name="lineEditStop">
+             <widget class="Line" name="line_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="WidgetKeybind" name="keybindStopSounds">
               <property name="cursor">
                <cursorShape>ArrowCursor</cursorShape>
               </property>
@@ -997,7 +1045,7 @@
              </widget>
             </item>
             <item>
-             <widget class="WidgetKeybind" name="lineEditPause">
+             <widget class="WidgetKeybind" name="keybindPauseSounds">
               <property name="cursor">
                <cursorShape>ArrowCursor</cursorShape>
               </property>
@@ -1007,7 +1055,7 @@
              </widget>
             </item>
             <item>
-             <widget class="WidgetKeybind" name="lineEditResume">
+             <widget class="WidgetKeybind" name="keybindResumeSounds">
               <property name="cursor">
                <cursorShape>ArrowCursor</cursorShape>
               </property>
@@ -1015,6 +1063,22 @@
                <enum>Qt::ClickFocus</enum>
               </property>
              </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="WidgetKeybind" name="keybindMuteInput"/>
+            </item>
+            <item>
+             <widget class="WidgetKeybind" name="keybindUnmuteInput"/>
+            </item>
+            <item>
+             <widget class="WidgetKeybind" name="keybindToggleMuteInput"/>
             </item>
            </layout>
           </widget>
@@ -1136,15 +1200,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WidgetKeybind</class>
-   <extends>QLineEdit</extends>
-   <header>src/Widget/widgetkeybind.h</header>
-  </customwidget>
-  <customwidget>
    <class>WidgetAudio</class>
    <extends>QWidget</extends>
    <header>src/Widget/widgetaudio.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetKeybind</class>
+   <extends>QPushButton</extends>
+   <header>src/Widget/widgetkeybind.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -25,8 +25,6 @@ public:
     int volume();
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) override;
-    void reg();
-    void unreg() ;
     void trigger() override;
     AudioObjectFile* audio();
 

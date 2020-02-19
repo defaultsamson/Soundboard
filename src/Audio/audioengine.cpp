@@ -319,10 +319,10 @@ Device* AudioEngine::getDevice(int deviceIndex) {
     return nullptr;
 }
 
-void AudioEngine::registerAudio(AudioObject* obj) {
+void AudioEngine::registerAudio(AudioObjectFile* obj) {
     if (!_audioObjectRegistry.contains(obj)) _audioObjectRegistry.append(obj);
 }
-void AudioEngine::unregisterAudio(AudioObject* obj) {
+void AudioEngine::unregisterAudio(AudioObjectFile* obj) {
     if (_audioObjectRegistry.contains(obj)) _audioObjectRegistry.removeOne(obj);
 }
 

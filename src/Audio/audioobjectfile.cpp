@@ -49,6 +49,12 @@ void AudioObjectFile::setFile(const QString &filename) {
 
     _filename = filename.toStdString();
 
+    if (filename.isNull() || filename.isEmpty()) {
+        _hasFile = false;
+        return;
+    }
+
+    // Do a te to see if thefileis readable
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open audio file.");

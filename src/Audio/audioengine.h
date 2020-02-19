@@ -6,6 +6,7 @@
 
 #include "audioobject.h"
 #include "audioobjectinput.h"
+#include "audioobjectfile.h"
 #include "../Widget/listitemsound.h"
 
 #include "device.h"
@@ -57,8 +58,9 @@ public:
 
     void mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice);
 
-    void registerAudio(AudioObject*);
-    void unregisterAudio(AudioObject*);
+    void registerAudio(AudioObjectFile*);
+    void unregisterAudio(AudioObjectFile*);
+    const QList<AudioObjectFile*> audioRegistry() { return _audioObjectRegistry; }
 
     AudioObjectInput* inputObject() { return _inputObject; }
 
@@ -77,7 +79,7 @@ private:
     QList<Device*> _activeInputs;
     QList<std::shared_ptr<DeviceIndexInfo>> _selectedOutputIndexes;
     QList<std::shared_ptr<DeviceIndexInfo>> _selectedInputIndexes;
-    QList<AudioObject*> _audioObjectRegistry;
+    QList<AudioObjectFile*> _audioObjectRegistry;
     AudioObjectInput* _inputObject = nullptr;
 
     Device* getDevice(int deviceIndex);

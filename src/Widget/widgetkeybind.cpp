@@ -2,17 +2,18 @@
 #include "../Dialog/dialogkeybind.h"
 
 #include <QKeySequence>
-#include <QLineEdit>
+#include <QPushButton>
 #include <QWidget>
 #include <QString>
 #include "../Hotkey/hotkeyutil.h"
 
 WidgetKeybind::WidgetKeybind(QWidget* parent) :
-    QLineEdit(parent),
+    QPushButton(parent),
     _key(0),
     _hasKey(false)
 {
-    setPlaceholderText("Click here to set key");
+    setText("Click here to set key");
+    QObject::connect(this, &QPushButton::clicked, this, &WidgetKeybind::clickReciever);
 }
 
 void WidgetKeybind::setKey(quint32 key) {
@@ -24,7 +25,7 @@ void WidgetKeybind::setKey(quint32 key) {
 void WidgetKeybind::unSetKey() {
     _key = 0;
     _hasKey = false;
-    setText("");
+    setText("Click here to set key");
 }
 
 quint32 WidgetKeybind::key() {
@@ -35,9 +36,7 @@ bool WidgetKeybind::hasKey() {
     return _hasKey;
 }
 
-void WidgetKeybind::focusInEvent(QFocusEvent* e) {
-    QLineEdit::focusInEvent(e);
-    clearFocus();
+void WidgetKeybind::clickReciever() {
     DialogKeybind w(parentWidget(), this);
     w.exec();
 }

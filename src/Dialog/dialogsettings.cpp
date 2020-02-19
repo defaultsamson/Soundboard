@@ -61,6 +61,25 @@ DialogSettings::DialogSettings(Main* main) :
     refreshDeviceSelection();
 
     main->setAudioTestDialog(this);
+    main->disableKeybinds();
+
+    // Load keybinds
+    main->hkEnableKeybinds->unreg();
+    if (main->hkEnableKeybinds->hasKey()) ui->keybindEnableKeybinds->setKey(main->hkEnableKeybinds->key());
+    main->hkDisableKeybinds->unreg();
+    if (main->hkDisableKeybinds->hasKey()) ui->keybindDisableKeybinds->setKey(main->hkDisableKeybinds->key());
+    main->hkStopSounds->unreg();
+    if (main->hkStopSounds->hasKey()) ui->keybindStopSounds->setKey(main->hkStopSounds->key());
+    main->hkPauseSounds->unreg();
+    if (main->hkPauseSounds->hasKey()) ui->keybindPauseSounds->setKey(main->hkPauseSounds->key());
+    main->hkResumeSounds->unreg();
+    if (main->hkResumeSounds->hasKey()) ui->keybindResumeSounds->setKey(main->hkResumeSounds->key());
+    main->hkMuteInput->unreg();
+    if (main->hkMuteInput->hasKey()) ui->keybindMuteInput->setKey(main->hkMuteInput->key());
+    main->hkUnmuteInput->unreg();
+    if (main->hkUnmuteInput->hasKey()) ui->keybindUnmuteInput->setKey(main->hkUnmuteInput->key());
+    main->hkToggleMuteInput->unreg();
+    if (main->hkToggleMuteInput->hasKey()) ui->keybindToggleMuteInput->setKey(main->hkToggleMuteInput->key());
 }
 
 DialogSettings::~DialogSettings()
@@ -71,7 +90,104 @@ DialogSettings::~DialogSettings()
 void DialogSettings::handleClose() {
     main->audio()->unregisterAudio(&audio);
     main->setAudioTestDialog(nullptr);
+    main->enableKeybinds();
     if (_connectedInputVisualizer) main->audio()->inputObject()->setUpdateVisualizer(false);
+
+    // Save all global keybinds
+    bool hasKey = ui->keybindEnableKeybinds->hasKey();
+    quint32 key = ui->keybindEnableKeybinds->key();
+    main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_HAS, hasKey);
+    if (hasKey) {
+        main->hkEnableKeybinds->setKey(ui->keybindEnableKeybinds->key());
+        main->hkEnableKeybinds->reg();
+        main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_KEY, key);
+    } else {
+        main->hkEnableKeybinds->unSetKey();
+    }
+
+
+    hasKey = ui->keybindDisableKeybinds->hasKey();
+    key = ui->keybindDisableKeybinds->key();
+    main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_HAS, hasKey);
+    if (hasKey) {
+        main->hkDisableKeybinds->setKey(ui->keybindDisableKeybinds->key());
+        main->hkDisableKeybinds->reg();
+        main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_KEY, key);
+    } else {
+        main->hkDisableKeybinds->unSetKey();
+    }
+
+
+    hasKey = ui->keybindStopSounds->hasKey();
+    key = ui->keybindStopSounds->key();
+    main->settings()->setValue(Main::HK_STOP_SOUNDS_HAS, hasKey);
+    if (hasKey) {
+        main->hkStopSounds->setKey(ui->keybindStopSounds->key());
+        main->hkStopSounds->reg();
+        main->settings()->setValue(Main::HK_STOP_SOUNDS_KEY, key);
+    } else {
+        main->hkStopSounds->unSetKey();
+    }
+
+
+    hasKey = ui->keybindPauseSounds->hasKey();
+    key = ui->keybindPauseSounds->key();
+    main->settings()->setValue(Main::HK_PAUSE_SOUNDS_HAS, hasKey);
+    if (hasKey) {
+        main->hkPauseSounds->setKey(ui->keybindPauseSounds->key());
+        main->hkPauseSounds->reg();
+        main->settings()->setValue(Main::HK_PAUSE_SOUNDS_KEY, key);
+    } else {
+        main->hkPauseSounds->unSetKey();
+    }
+
+
+    hasKey = ui->keybindResumeSounds->hasKey();
+    key = ui->keybindResumeSounds->key();
+    main->settings()->setValue(Main::HK_RESUME_SOUNDS_HAS, hasKey);
+    if (hasKey) {
+        main->hkResumeSounds->setKey(ui->keybindResumeSounds->key());
+        main->hkResumeSounds->reg();
+        main->settings()->setValue(Main::HK_RESUME_SOUNDS_KEY, key);
+    } else {
+        main->hkResumeSounds->unSetKey();
+    }
+
+
+    hasKey = ui->keybindMuteInput->hasKey();
+    key = ui->keybindMuteInput->key();
+    main->settings()->setValue(Main::HK_MUTE_INPUT_HAS, hasKey);
+    if (hasKey) {
+        main->hkMuteInput->setKey(ui->keybindMuteInput->key());
+        main->hkMuteInput->reg();
+        main->settings()->setValue(Main::HK_MUTE_INPUT_KEY, key);
+    } else {
+        main->hkMuteInput->unSetKey();
+    }
+
+
+    hasKey = ui->keybindUnmuteInput->hasKey();
+    key = ui->keybindUnmuteInput->key();
+    main->settings()->setValue(Main::HK_UNMUTE_INPUT_HAS, hasKey);
+    if (hasKey) {
+        main->hkUnmuteInput->setKey(ui->keybindUnmuteInput->key());
+        main->hkUnmuteInput->reg();
+        main->settings()->setValue(Main::HK_UNMUTE_INPUT_KEY, key);
+    } else {
+        main->hkUnmuteInput->unSetKey();
+    }
+
+
+    hasKey = ui->keybindToggleMuteInput->hasKey();
+    key = ui->keybindToggleMuteInput->key();
+    main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_HAS, hasKey);
+    if (hasKey) {
+        main->hkToggleMuteInput->setKey(ui->keybindToggleMuteInput->key());
+        main->hkToggleMuteInput->reg();
+        main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_KEY, key);
+    } else {
+        main->hkToggleMuteInput->unSetKey();
+    }
 }
 
 void DialogSettings::on_buttonBox_accepted()

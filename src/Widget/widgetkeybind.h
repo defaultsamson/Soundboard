@@ -1,10 +1,10 @@
 #ifndef KEYBINDWIDGET_H
 #define KEYBINDWIDGET_H
 
-#include <QLineEdit>
+#include <QPushButton>
 #include <QFocusEvent>
 
-class WidgetKeybind : public QLineEdit
+class WidgetKeybind : public QPushButton
 {
 public:
     WidgetKeybind(QWidget* parent = nullptr);
@@ -13,12 +13,12 @@ public:
     bool hasKey();
     void unSetKey();
 
-protected:
-    void focusInEvent(QFocusEvent*) override;
-
 private:
     quint32 _key;
     bool _hasKey;
+
+private slots:
+    void clickReciever();
 };
 
 #endif // KEYBINDWIDGET_H
