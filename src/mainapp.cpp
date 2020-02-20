@@ -11,6 +11,7 @@
 #include "Hotkey/hotkeytrigger.h"
 
 #include <QApplication>
+#include <SingleApplication>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QJsonArray>
@@ -61,10 +62,28 @@ DialogTestAudio *Main::getAudioTestDialog() {
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    // From https://stackoverflow.com/questions/5006547/qt-best-practice-for-a-single-instance-app-protection
+    // RunGuard guard("soundboard_totally_random_but_unique_key");
+    // if (!guard.tryToRun()) return 0;
+
+    SingleApplication a(argc, argv);
+    if (a.isSecondary()) {
+        a.exit(0);
+        return a.exec();
+    }
+
     Main w;
     w.show();
     w.restoreSizes();
+
+    // window is a QWindow instance
+    QObject::connect(
+        &a,
+        &SingleApplication::instanceStarted,
+        &w,
+        [&]{ w.raise(); w.activateWindow(); }
+    );
+
 
     // Initializes audio engine on separate thread so that the UI starts super fast
     MyThread t(&w);

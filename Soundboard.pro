@@ -93,8 +93,13 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-QDEP_DEPENDS += Skycoder42/QHotkey
+#QHotkey dependency
+QDEP_DEPENDS += Skycoder42/QHotkey@master
+#SingleApplication dependency
+DEFINES += QAPPLICATION_CLASS=QApplication
+QDEP_DEPENDS += qwertysam/SingleApplication@master # Original is itay-grudev/SingleApplication, just waiting for pull request
 !load(qdep):error("Failed to load qdep feature, try running: qdep prfgen --qmake ~/Qt/$${QT_VERSION}/gcc_64/bin/qmake")
+
 
 # Portaudio
 unix:!macx: LIBS += -lportaudio -lrt -lm -lasound -ljack
