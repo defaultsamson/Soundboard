@@ -29,7 +29,7 @@ void AudioObjectFile::play() {
         paused = false;
     } else {
         stopped = false;
-        _file.openFile(_filename);
+        _file.startRead();
     }
 }
 
@@ -54,7 +54,7 @@ void AudioObjectFile::setFile(const QString &filename) {
         return;
     }
 
-    // Do a te to see if thefileis readable
+    // Check to see if the file is readable
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open audio file.");
@@ -63,6 +63,9 @@ void AudioObjectFile::setFile(const QString &filename) {
         _hasFile = true;
     }
     file.close();
+
+    // If there's a new file being opened
+    if (_hasFile) _file.setFile(_filename);
 }
 
 bool AudioObjectFile::hasFile() {
