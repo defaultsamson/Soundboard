@@ -16,7 +16,7 @@ class ListItemBoard : public ListItem
 {
 public:
     static QString NEW_BOARD;
-    ListItemBoard(Main* main);
+    ListItemBoard(Main* _main);
     ~ListItemBoard() override;
     void addSound(ListItemSound* sound);
     void removeSound(int n, bool deleteSound = true);

@@ -17,7 +17,7 @@ class ListItemSound : public ListItem
 {
 public:
     static QString NEW_SOUND;
-    ListItemSound(Main* main, ListItemBoard* board);
+    ListItemSound(Main* _main, ListItemBoard* board);
     ~ListItemSound() override;
     void setFileName(QString name);
     QString filename();
@@ -25,8 +25,6 @@ public:
     int volume();
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) override;
-    void reg();
-    void unreg() ;
     void trigger() override;
     AudioObjectFile* audio();
 

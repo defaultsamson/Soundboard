@@ -1,5 +1,6 @@
 @ECHO OFF
 
+IF "%1"=="clean" goto :clean
 IF "%1"=="" goto :help
 IF "%2"=="" goto :help
 IF NOT "%3"=="" IF "%4"=="" goto :help
@@ -10,7 +11,7 @@ set EXEC=%1
 :: Sets up the directory structure for binarycreator
 set PACK=installer\packaged\pack
 set DATA=%PACK%\data
-mkdir %PACK%\data
+mkdir %DATA%
 mkdir %PACK%\meta
 copy installer\auto_uninstall.qs %PACK%\meta
 copy installer\installscript.qs %PACK%\meta
@@ -67,6 +68,12 @@ goto :end
 
 :help
 echo "windows.bat <soundboard executable> <windowsdeployqt.exe> [binarycreator.exe] [installerbase.exe]"
+goto :end
+
+:clean
+rmdir /s /q %DATA%
+echo Cleaned!
+goto :end
 
 :end
 pause

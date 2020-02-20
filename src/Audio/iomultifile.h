@@ -14,11 +14,15 @@ public:
     void write(const float* buffer, size_t n);
     size_t read(float* buffer, size_t n);
     size_t mix(float* buffer, size_t n); // Like readiing, but doesn't overwrite what's already there
-    void openFile(std::string filename);
+    void setFile(std::string filename);
     void clear();
+    void startRead();
 private:
     QList<SndfileHandle*> _openFiles;
     std::mutex modifyLock;
+    std::string _filename;
+    int _channels = 0;
+    bool mono = false;
 };
 
 #endif // IOMULTIFILE_H

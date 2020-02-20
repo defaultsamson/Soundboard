@@ -17,7 +17,7 @@ class DialogSound : public DialogTestAudio
     Q_OBJECT
 
 public:
-    explicit DialogSound(Main* main, ListItemSound* sound, bool creatingNew = false);
+    explicit DialogSound(Main* _main, ListItemSound* sound, bool creatingNew = false);
     ~DialogSound();
     void audioEngineInit();
 
@@ -36,7 +36,7 @@ private slots:
 
 private:
     Ui::DialogSound* ui;
-    Main* main;
+    Main* _main;
     ListItemSound* sound;
     bool creatingNew;
     bool soundUpdated;

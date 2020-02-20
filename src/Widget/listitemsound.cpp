@@ -9,8 +9,8 @@
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 
-ListItemSound::ListItemSound(Main* main, ListItemBoard* board) :
-    ListItem(main),
+ListItemSound::ListItemSound(Main* _main, ListItemBoard* board) :
+    ListItem(_main),
     board(board),
     _audio(new AudioObjectFile()),
     _filename(""),
@@ -19,12 +19,12 @@ ListItemSound::ListItemSound(Main* main, ListItemBoard* board) :
     _volumeChanged(false)
 {
     setText(NEW_SOUND);
-    main->audio()->registerAudio(_audio);
+    _main->audio()->registerAudio(_audio);
 }
 
 ListItemSound::~ListItemSound() {
     board->removeSound(this, false);
-    main->audio()->unregisterAudio(_audio);
+    _main->audio()->unregisterAudio(_audio);
     delete _audio;
 }
 
@@ -59,14 +59,6 @@ int ListItemSound::volume() {
     return _volume;
 }
 
-void ListItemSound::reg() {
-    hotkey->setRegistered(true);
-}
-
-void ListItemSound::unreg() {
-    hotkey->setRegistered(false);
-}
-
 void ListItemSound::load(const QJsonObject &json) {
     ListItem::load(json);
     setFileName(json["filename"].toString());
@@ -85,8 +77,6 @@ AudioObjectFile* ListItemSound::audio() {
 }
 
 void ListItemSound::trigger() {
-    ListItem::trigger();
     _audio->play();
-    main->setCurrentSound(this);
-    // TODO give this an AudioObject
+    _main->setCurrentSound(this);
 }

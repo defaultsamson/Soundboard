@@ -57,20 +57,7 @@
     </widget>
    </item>
    <item>
-    <widget class="WidgetKeybind" name="lineEdiKeybind">
-     <property name="cursor">
-      <cursorShape>ArrowCursor</cursorShape>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::ClickFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="clearButtonEnabled">
-      <bool>false</bool>
-     </property>
-    </widget>
+    <widget class="WidgetKeybind" name="keybindBoard"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -87,7 +74,7 @@
  <customwidgets>
   <customwidget>
    <class>WidgetKeybind</class>
-   <extends>QLineEdit</extends>
+   <extends>QPushButton</extends>
    <header>src/Widget/widgetkeybind.h</header>
   </customwidget>
  </customwidgets>

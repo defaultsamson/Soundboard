@@ -30,7 +30,7 @@ class DialogSettings : public DialogTestAudio
     Q_OBJECT
 
 public:
-    explicit DialogSettings(Main *main);
+    explicit DialogSettings(Main* _main);
     ~DialogSettings();
 
     void refreshDeviceSelection();
@@ -76,9 +76,15 @@ private slots:
     void on_pushButtonTestFile_clicked();
     void on_lineEditTestFile_textEdited(const QString &arg1);
 
+    void on_muteButton_clicked();
+
+    void on_checkBoxShowMuteButton_clicked();
+
+    void on_checkBoxListDrivers_clicked();
+
 private:
     Ui::DialogSettings* ui;
-    Main* main;
+    Main* _main;
     AudioObjectFile audio;
     HostInfoContainer* _displayHost0 = nullptr;
     HostInfoContainer* _displayHost1 = nullptr;
@@ -91,8 +97,13 @@ private:
     void inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void setOutputDeviceVolume(int value, int devDisplayIndex);
     void updateFileName(QString fn);
-
-    bool _connectedInputVisualizer = false;
+    void updateMuteButton();
+    bool _inputObjectInited = false;
+    QPixmap invertPixmap(QPixmap icon);
+    void updateGroupBoxes();
+    void toggleOutput0();
+    void toggleOutput1();
+    void toggleInput0();
 };
 
 #endif // DIALOGSETTINGS_H

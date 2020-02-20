@@ -57,20 +57,7 @@
     </widget>
    </item>
    <item>
-    <widget class="WidgetKeybind" name="lineEdiKeybind">
-     <property name="cursor">
-      <cursorShape>ArrowCursor</cursorShape>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::ClickFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="clearButtonEnabled">
-      <bool>false</bool>
-     </property>
-    </widget>
+    <widget class="WidgetKeybind" name="keybindSound"/>
    </item>
    <item>
     <widget class="QLabel" name="labelFile">
@@ -204,9 +191,6 @@
          <height>20</height>
         </size>
        </property>
-       <property name="text">
-        <string/>
-       </property>
        <property name="icon">
         <iconset resource="../../res.qrc">
          <normaloff>:/icons/res/play.png</normaloff>:/icons/res/play.png</iconset>
@@ -227,9 +211,6 @@
          <height>20</height>
         </size>
        </property>
-       <property name="text">
-        <string/>
-       </property>
        <property name="icon">
         <iconset resource="../../res.qrc">
          <normaloff>:/icons/res/pause.png</normaloff>:/icons/res/pause.png</iconset>
@@ -249,9 +230,6 @@
          <width>40</width>
          <height>20</height>
         </size>
-       </property>
-       <property name="text">
-        <string/>
        </property>
        <property name="icon">
         <iconset resource="../../res.qrc">
@@ -281,15 +259,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WidgetKeybind</class>
-   <extends>QLineEdit</extends>
-   <header>src/Widget/widgetkeybind.h</header>
-  </customwidget>
-  <customwidget>
    <class>WidgetAudio</class>
    <extends>QWidget</extends>
    <header>src/Widget/widgetaudio.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetKeybind</class>
+   <extends>QPushButton</extends>
+   <header>src/Widget/widgetkeybind.h</header>
   </customwidget>
  </customwidgets>
  <resources>

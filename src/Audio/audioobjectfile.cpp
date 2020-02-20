@@ -10,12 +10,14 @@ bool AudioObjectFile::isPlaying() { return !isPaused() && !isStopped(); }
 bool AudioObjectFile::isPaused() { return paused; }
 
 void AudioObjectFile::stop() {
+    AudioObject::stop();
     paused = false;
     _file.clear();
 }
 
 void AudioObjectFile::pause() {
     if (!stopped) {
+        emit update(0);
         paused = true;
         stopped = false;
     }
@@ -28,7 +30,7 @@ void AudioObjectFile::play() {
         paused = false;
     } else {
         stopped = false;
-        _file.openFile(_filename);
+        _file.startRead();
     }
 }
 
@@ -48,6 +50,12 @@ void AudioObjectFile::setFile(const QString &filename) {
 
     _filename = filename.toStdString();
 
+    if (filename.isNull() || filename.isEmpty()) {
+        _hasFile = false;
+        return;
+    }
+
+    // Check to see if the file is readable
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open audio file.");
@@ -56,6 +64,9 @@ void AudioObjectFile::setFile(const QString &filename) {
         _hasFile = true;
     }
     file.close();
+
+    // If there's a new file being opened
+    if (_hasFile) _file.setFile(_filename);
 }
 
 bool AudioObjectFile::hasFile() {

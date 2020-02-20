@@ -22,6 +22,7 @@ AudioObject::~AudioObject() {
 
 void AudioObject::stop() {
     if (stopped) return;
+    emit update(0);
     stopped = true;
     device0Finished = false;
     sideBufferWrite = 0;

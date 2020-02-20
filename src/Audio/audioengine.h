@@ -6,6 +6,7 @@
 
 #include "audioobject.h"
 #include "audioobjectinput.h"
+#include "audioobjectfile.h"
 #include "../Widget/listitemsound.h"
 
 #include "device.h"
@@ -19,11 +20,12 @@ struct CallbackInfo {
 class AudioEngine
 {
 public:
-    AudioEngine(Main* main);
+    AudioEngine(Main* _main);
 
     static size_t FRAMES_PER_BUFFER;
     static size_t CHANNELS;
 
+    HostInfoContainer* defaultHost() { return _defaultHost; }
     Device* defaultOutput();
     Device* defaultInput();
 
@@ -31,6 +33,8 @@ public:
     void removeActiveOutput(Device*);
     void addActiveInput(Device*);
     void removeActiveInput(Device*);
+    void addActiveDevice(Device*, bool startInput, bool startOutput);
+    void removeActiveDevice(Device*, bool stopInput, bool stopOutput);
 
     void removeActiveDisplayOutput(int deviceDisplayIndex);
     Device* getActiveDisplayOutput(int deviceDisplayIndex);
@@ -57,19 +61,23 @@ public:
 
     void mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice);
 
-    void registerAudio(AudioObject*);
-    void unregisterAudio(AudioObject*);
+    void registerAudio(AudioObjectFile*);
+    void unregisterAudio(AudioObjectFile*);
+    const QList<AudioObjectFile*> audioRegistry() { return _audioObjectRegistry; }
 
     AudioObjectInput* inputObject() { return _inputObject; }
+
+    void updateSavedDevices();
 
     ~AudioEngine();
 
 private:
-    Main* main;
+    Main* _main;
     bool _isInitialized = false;
 
     Device* _defaultOutput = nullptr;
     Device* _defaultInput = nullptr;
+    HostInfoContainer* _defaultHost = nullptr;
     QList<HostInfoContainer*> _hosts;
     QList<Device*> _outputs;
     QList<Device*> _inputs;
@@ -77,12 +85,10 @@ private:
     QList<Device*> _activeInputs;
     QList<std::shared_ptr<DeviceIndexInfo>> _selectedOutputIndexes;
     QList<std::shared_ptr<DeviceIndexInfo>> _selectedInputIndexes;
-    QList<AudioObject*> _audioObjectRegistry;
+    QList<AudioObjectFile*> _audioObjectRegistry;
     AudioObjectInput* _inputObject = nullptr;
 
     Device* getDevice(int deviceIndex);
-    void addActiveDevice(Device*, bool startInput, bool startOutput);
-    void removeActiveDevice(Device*, bool stopInput, bool stopOutput);
 };
 
 #endif // AUDIOENGINE_H

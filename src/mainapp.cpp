@@ -8,8 +8,10 @@
 #include "Dialog/dialogsound.h"
 #include "Dialog/dialogsettings.h"
 #include "Dialog/dialogtestaudio.h"
+#include "Hotkey/hotkeytrigger.h"
 
 #include <QApplication>
+#include <singleapplication.h>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QJsonArray>
@@ -24,16 +26,21 @@
 #include <QThread>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QGroupBox>
 
 class MyThread : public QThread
 {
 public:
-    MyThread(Main &main) : main(main) {}
+    MyThread(Main* _main);
 protected:
     void run();
 private:
-    Main &main;
+    Main* _main;
 };        
+
+MyThread::MyThread(Main* _main) : _main(_main) {
+    QObject::connect(this, SIGNAL(finished()), _main, SLOT(updateMuteButton()));
+}
 
 void MyThread::run()
 {
@@ -43,8 +50,8 @@ void MyThread::run()
         QFile::copy(":/audio/res/test.ogg", Main::DEFAULT_TEST_FILE);
     }
 
-    main.audio()->init();
-    if (main.getAudioTestDialog()) main.getAudioTestDialog()->audioEngineInit();
+    _main->audio()->init();
+    if (_main->getAudioTestDialog()) _main->getAudioTestDialog()->audioEngineInit();
 }
 
 void Main::setAudioTestDialog(DialogTestAudio *s) {
@@ -56,12 +63,32 @@ DialogTestAudio *Main::getAudioTestDialog() {
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    // From https://stackoverflow.com/questions/5006547/qt-best-practice-for-a-single-instance-app-protection
+    // RunGuard guard("soundboard_totally_random_but_unique_key");
+    // if (!guard.tryToRun()) return 0;
+
+    SingleApplication a(argc, argv);
+    if (a.isSecondary()) {
+        a.exit(0);
+        return a.exec();
+    }
+
+    a.setWindowIcon(QIcon(":/icons/res/icon.png"));
+
     Main w;
     w.show();
+    w.restoreSizes();
+
+    // Bring attention to the window if a new instance is started
+    QObject::connect(
+        &a,
+        &SingleApplication::instanceStarted,
+        &w,
+        [&]{ w.raise(); w.activateWindow(); w.showNormal(); }
+    );
 
     // Initializes audio engine on separate thread so that the UI starts super fast
-    MyThread t(w);
+    MyThread t(&w);
     t.start();
 
     return a.exec();
@@ -80,6 +107,37 @@ QString Main::HAS_ACTIVE_BOARD = "has_active_board";
 bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
 QString Main::SETTINGS_TAB = "settings_tab";
 
+QString Main::HK_ENABLE_KEYBINDS_HAS = "hk_enable_keybinds_has";
+QString Main::HK_ENABLE_KEYBINDS_KEY = "hk_enable_keybinds_key";
+QString Main::HK_DISABLE_KEYBINDS_HAS = "hk_disable_keybinds_has";
+QString Main::HK_DISABLE_KEYBINDS_KEY = "hk_disable_keybinds_key";
+QString Main::HK_STOP_SOUNDS_HAS = "hk_stop_sounds_has";
+QString Main::HK_STOP_SOUNDS_KEY = "hk_stop_sounds_key";
+QString Main::HK_PAUSE_SOUNDS_HAS = "hk_pause_sounds_has";
+QString Main::HK_PAUSE_SOUNDS_KEY = "hk_pause_sounds_key";
+QString Main::HK_RESUME_SOUNDS_HAS = "hk_resume_sounds_has";
+QString Main::HK_RESUME_SOUNDS_KEY = "hk_resume_sounds_key";
+QString Main::HK_MUTE_INPUT_HAS = "hk_mute_input_has";
+QString Main::HK_MUTE_INPUT_KEY = "hk_mute_input_key";
+QString Main::HK_UNMUTE_INPUT_HAS = "hk_unmute_input_has";
+QString Main::HK_UNMUTE_INPUT_KEY = "hk_unmute_input_key";
+QString Main::HK_TOGGLE_MUTE_INPUT_HAS = "hk_toggle_mute_input_has";
+QString Main::HK_TOGGLE_MUTE_INPUT_KEY = "hk_toggle_mute_input_key";
+
+QString Main::REMEMBER_WINDOW_SIZES = "remember_window_sizes";
+QString Main::WINDOW_MAIN_GEOMETRY = "window__main_geometry";
+QString Main::WINDOW_MAIN_SPLITTER0 = "window__main_slider0";
+QString Main::WINDOW_MAIN_SPLITTER1 = "window__main_slider1";
+QString Main::WINDOW_SETTINGS_WIDTH = "window_settings_width";
+QString Main::WINDOW_SETTINGS_HEIGHT = "window_settings_height";
+QString Main::WINDOW_BOARD_WIDTH = "window_board_width";
+QString Main::WINDOW_BOARD_HEIGHT = "window_board_height";
+QString Main::WINDOW_SOUND_WIDTH = "window_sound_width";
+QString Main::WINDOW_SOUND_HEIGHT = "window_sound_height";
+QString Main::SHOW_SETTINGS_OUTPUT0 = "show_settings_output0";
+QString Main::SHOW_SETTINGS_OUTPUT1 = "show_settings_output1";
+QString Main::SHOW_SETTINGS_INPUT0 = "show_settings_input0";
+
 QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
 QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
 QString Main::OUTPUT_INDEX0 = "output_index0";
@@ -91,6 +149,9 @@ QString Main::INPUT_VOLUME0 = "input_volume0";
 QString Main::TEST_VOLUME = "test_volume";
 QString Main::INPUT_OUT0 = "input_out0";
 QString Main::INPUT_OUT1 = "input_out1";
+QString Main::INPUT_MUTED = "input_muted";
+QString Main::SHOW_MUTE_BUTTON = "show_mute_button";
+QString Main::SHOW_DRIVERS = "show_drivers";
 QString Main::TEST_FILE = "test_file";
 
 Main::Main(QWidget* parent) :
@@ -144,6 +205,50 @@ Main::Main(QWidget* parent) :
     }
 
     connect(ui->listSounds, &QListWidget::currentRowChanged, this, &Main::rowChanged);
+
+    // Loads global keybinds & their behaviour
+    hkEnableKeybinds = new HotkeyTrigger(this, [this]{ enableKeybinds(); });
+    if (settings()->value(HK_ENABLE_KEYBINDS_HAS, false).toBool()) {
+        hkEnableKeybinds->setKey(static_cast<quint32>(settings()->value(HK_ENABLE_KEYBINDS_KEY, 0).toInt()));
+        hkEnableKeybinds->reg();
+    }
+    hkDisableKeybinds = new HotkeyTrigger(this, [this]{ disableKeybinds(); });
+    if (settings()->value(HK_DISABLE_KEYBINDS_HAS, false).toBool()) {
+        hkDisableKeybinds->setKey(static_cast<quint32>(settings()->value(HK_DISABLE_KEYBINDS_KEY, 0).toInt()));
+        hkDisableKeybinds->reg();
+    }
+    hkStopSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->stop(); });
+    if (settings()->value(HK_STOP_SOUNDS_HAS, false).toBool()) {
+        hkStopSounds->setKey(static_cast<quint32>(settings()->value(HK_STOP_SOUNDS_KEY, 0).toInt()));
+        hkStopSounds->reg();
+    }
+    hkPauseSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->pause(); });
+    if (settings()->value(HK_PAUSE_SOUNDS_HAS, false).toBool()) {
+        hkPauseSounds->setKey(static_cast<quint32>(settings()->value(HK_PAUSE_SOUNDS_KEY, 0).toInt()));
+        hkPauseSounds->reg();
+    }
+    hkResumeSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) if (sound->isPaused()) sound->play(); });
+    if (settings()->value(HK_RESUME_SOUNDS_HAS, false).toBool()) {
+        hkResumeSounds->setKey(static_cast<quint32>(settings()->value(HK_RESUME_SOUNDS_KEY, 0).toInt()));
+        hkResumeSounds->reg();
+    }
+    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(true); updateMuteButton(); });
+    if (settings()->value(HK_MUTE_INPUT_HAS, false).toBool()) {
+        hkMuteInput->setKey(static_cast<quint32>(settings()->value(HK_MUTE_INPUT_KEY, 0).toInt()));
+        hkMuteInput->reg();
+    }
+    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(false); updateMuteButton(); });
+    if (settings()->value(HK_UNMUTE_INPUT_HAS, false).toBool()) {
+        hkUnmuteInput->setKey(static_cast<quint32>(settings()->value(HK_UNMUTE_INPUT_KEY, 0).toInt()));
+        hkUnmuteInput->reg();
+    }
+    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(!_audio->inputObject()->isMuted()); updateMuteButton(); });
+    if (settings()->value(HK_TOGGLE_MUTE_INPUT_HAS, false).toBool()) {
+        hkToggleMuteInput->setKey(static_cast<quint32>(settings()->value(HK_TOGGLE_MUTE_INPUT_KEY, 0).toInt()));
+        hkToggleMuteInput->reg();
+    }
+
+    updateMuteButton();
 }
 
 Main::~Main()
@@ -153,6 +258,14 @@ Main::~Main()
     delete _audio;
     delete _settings;
 
+    delete hkEnableKeybinds;
+    delete hkDisableKeybinds;
+    delete hkStopSounds;
+    delete hkPauseSounds;
+    delete hkResumeSounds;
+    delete hkMuteInput;
+    delete hkUnmuteInput;
+    delete hkToggleMuteInput;
 }
 
 // https://stackoverflow.com/questions/31383519/qt-rightclick-on-qlistwidget-opens-contextmenu-and-delete-item
@@ -571,6 +684,22 @@ void Main::save(bool saveAs) {
 
     QFile file(tempFileName);
 
+    // If overwriting an existing board without knowing it
+    if (file.exists() && !hasFile) {
+        QString title = "Overwrite board?\n";
+        title += tempFileName;
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Soundboard",
+                                                                    tr(title.toStdString().c_str()),
+                                                                    QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::No);
+        switch (resBtn) {
+        case QMessageBox::Yes:
+            break;
+        default:
+            return;
+        }
+    }
+
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning("Couldn't write to save file.");
         // TODO inform user the file failed to save
@@ -651,10 +780,18 @@ void Main::closeEvent (QCloseEvent* event)
             break;
         default:
             event->ignore();
+            return;
         }
     } else {
         event->accept();
     }
+
+    // Save the _main window sizes
+    settings()->setValue(WINDOW_MAIN_GEOMETRY, saveGeometry());
+    QList<int> sizes = ui->splitter->sizes();
+    settings()->setValue(WINDOW_MAIN_SPLITTER0, sizes.at(0));
+    settings()->setValue(WINDOW_MAIN_SPLITTER1, sizes.at(1));
+    settings()->setValue(INPUT_MUTED, _audio->inputObject()->isMuted());
 }
 
 void Main::setChanged(bool changed) {
@@ -698,4 +835,116 @@ void Main::rowChanged(int row) {
     ui->buttonPlay->setEnabled(soundSelected);
     ui->buttonPause->setEnabled(soundSelected);
     ui->buttonStop->setEnabled(soundSelected);
+}
+
+void Main::on_splitter_splitterMoved(int pos, int /*index*/)
+{
+    updateButtonBar(pos);
+}
+
+void Main::updateButtonBar() {
+    updateButtonBar(ui->splitter->sizes().at(0));
+}
+
+void Main::updateButtonBar(int pos) {
+
+    int width = ui->splitter->width();
+    int handleWidth = ui->splitter->handleWidth();
+    if (pos >= width - handleWidth) pos = width;
+
+    // Far left
+    if (pos == 0) {
+        ui->boardButtons->hide();
+        ui->spacerLeft->changeSize(0, 0, QSizePolicy::Fixed);
+        ui->spacerMidLeft->changeSize(0, 0, QSizePolicy::Fixed);
+        ui->soundButtons->show();
+        ui->spacerRight->changeSize(0, 0, QSizePolicy::Expanding);
+        ui->spacerMidRight->changeSize(0, 0, QSizePolicy::Expanding);
+
+        // Far right
+    } else if (pos == ui->splitter->width()) {
+        ui->boardButtons->show();
+        ui->spacerLeft->changeSize(0, 0, QSizePolicy::Expanding);
+        ui->spacerMidLeft->changeSize(0, 0, QSizePolicy::Expanding);
+        ui->soundButtons->hide();
+        ui->spacerRight->changeSize(0, 0, QSizePolicy::Fixed);
+        ui->spacerMidRight->changeSize(0, 0, QSizePolicy::Fixed);
+
+        // Center around the middle line
+    } else {
+        ui->boardButtons->show();
+        ui->soundButtons->show();
+
+        int middle = pos - (handleWidth / 2);
+        int halfMuteButtonWidth = ui->muteButton->width() / 2;
+
+        int muteButtonLeft = middle;
+        int leftSpacerWidths = (muteButtonLeft - ui->boardButtons->width()) / 2;
+        bool aboveZero = leftSpacerWidths > 0;
+
+        ui->spacerLeft->changeSize(aboveZero ? leftSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+        ui->spacerMidLeft->changeSize(aboveZero ? leftSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+
+        int muteButtonRight = (leftSpacerWidths * 2) + ui->boardButtons->width() + halfMuteButtonWidth;
+        int rightSpacerWidths = (width - muteButtonRight - ui->soundButtons->width()) / 2;
+        aboveZero = rightSpacerWidths > 0;
+        ui->spacerRight->changeSize(aboveZero ? rightSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+        ui->spacerMidRight->changeSize(aboveZero ? rightSpacerWidths : 0, 0, aboveZero ? QSizePolicy::Maximum : QSizePolicy::Fixed);
+    }
+
+    // Update the appearance
+    ui->buttonBar->layout()->update();
+}
+
+void Main::resizeEvent(QResizeEvent* event) {
+    QMainWindow::resizeEvent(event);
+    updateButtonBar();
+}
+
+void Main::restoreSizes() {
+    // Restores the window geometry
+    if (settings()->value(REMEMBER_WINDOW_SIZES, true).toBool()) {
+        if (settings()->contains(WINDOW_MAIN_GEOMETRY)) restoreGeometry(settings()->value(WINDOW_MAIN_GEOMETRY).toByteArray());
+
+        if (settings()->contains(WINDOW_MAIN_SPLITTER0) && settings()->contains(WINDOW_MAIN_SPLITTER1)) {
+            QList<int> sizes;
+            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER0).toInt());
+            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER1).toInt());
+            ui->splitter->setSizes(sizes);
+        }
+    } else {
+        // Makes the "sounds" and "boards" sections equal width
+        QList<int> sizes;
+        sizes.append(ui->splitter->width() / 2);
+        sizes.append(ui->splitter->width() / 2);
+        ui->splitter->setSizes(sizes);
+    }
+    updateButtonBar();
+}
+
+void Main::showAudioEngineText(bool show) {
+    if (show) ui->labelAudioEngine->show();
+    else ui->labelAudioEngine->hide();
+}
+
+void Main::updateMuteButton() {
+    // If it wants to show, and there's an ACTIVE input device
+    if (_audio->activeInputs().size() > 0
+            && _audio->inputObject()
+            && ((_audio->inputObject()->isActiveOutput0() && _audio->getActiveDisplayOutput(0))
+                || (_audio->inputObject()->isActiveOutput1() && _audio->getActiveDisplayOutput(1)))
+            && settings()->value(SHOW_MUTE_BUTTON, true).toBool())
+    {
+        ui->muteButton->show();
+        ui->muteButton->setIcon(QIcon(_audio->inputObject()->isMuted() ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
+    }
+    else ui->muteButton->hide();
+}
+
+void Main::on_muteButton_clicked()
+{
+    if (_audio->inputObject()) {
+        _audio->inputObject()->setMute(!_audio->inputObject()->isMuted());
+        updateMuteButton();
+    }
 }

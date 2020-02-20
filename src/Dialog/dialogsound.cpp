@@ -8,17 +8,17 @@
 #include <QObject>
 #include <QFileDialog>
 
-DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
-    DialogTestAudio(main),
+DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
+    DialogTestAudio(_main),
     ui(new Ui::DialogSound),
-    main(main),
+    _main(_main),
     sound(sound),
     creatingNew(creatingNew),
     soundUpdated(false)
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : sound->text());
-    if (sound->hasKey()) ui->lineEdiKeybind->setKey(sound->key());
+    if (sound->hasKey()) ui->keybindSound->setKey(sound->key());
     ui->lineEditFile->setText(sound->filename());
     ui->spinBoxVolume->setValue(sound->volume());
     ui->sliderVolume->setValue(sound->volume());
@@ -28,14 +28,23 @@ DialogSound::DialogSound(Main* main, ListItemSound* sound, bool creatingNew) :
 
     updateTestButtons();
 
+    // Restore the geometry, if it was saved
+    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool()) {
+        if (_main->settings()->contains(Main::WINDOW_SOUND_WIDTH)) {
+            resize(_main->settings()->value(Main::WINDOW_SOUND_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_SOUND_HEIGHT, 500).toInt());
+        }
+    }
+
     // Disable the keybinds temporarily while the dialog is up
-    main->disableKeybinds();
+    _main->disableKeybinds();
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
 
     connect(sound->audio(), &AudioObject::update, this, [&](qreal level) {
         ui->outputBar->setLevel(level);
     });
     sound->audio()->setUpdateVisualizer(true);
+
+    _main->setAudioTestDialog(this);
 }
 
 DialogSound::~DialogSound()
@@ -46,13 +55,14 @@ DialogSound::~DialogSound()
 void DialogSound::on_buttonBox_accepted()
 {
     QString originalName = sound->text();
+    quint32 originalHasKey = sound->hasKey();
     quint32 originalKey = sound->key();
     // QString originalFilename = sound->filename();
     // int originalVolume = sound->volume();
 
     // Updates the values to the board
     sound->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemSound::NEW_SOUND);
-    if (ui->lineEdiKeybind->hasKey()) sound->setKey(ui->lineEdiKeybind->key());
+    if (ui->keybindSound->hasKey()) sound->setKey(ui->keybindSound->key());
     else sound->unSetKey();
     sound->setFileName(ui->lineEditFile->text());
     sound->setVolume(ui->spinBoxVolume->value());
@@ -60,10 +70,11 @@ void DialogSound::on_buttonBox_accepted()
     // If anything's ACTUALLY changed, then tell the program
     if (creatingNew
             || sound->text() != originalName
+            || sound->hasKey() != originalHasKey
             || sound->key() != originalKey
             || sound->filename() != originalFileName
             || sound->volume() != originalVolume) {
-        main->setChanged();
+        _main->setChanged();
     }
 
     soundUpdated = true;
@@ -110,16 +121,28 @@ void DialogSound::updateFileName(QString fn) {
 
 void DialogSound::onClose() {
     // Remove the board if it's being created new and wasn't saved (e.g. hit "OK: on)
+    bool removed = false;
     if (creatingNew && !soundUpdated) {
-       main->removeSound(sound, true);
+       _main->removeSound(sound, true);
+       removed = true;
     } else if (!creatingNew && !soundUpdated) {
         sound->setFileName(originalFileName);
         sound->setVolume(originalVolume);
     }
-    sound->audio()->stop();
+
+    if (!removed) {
+        sound->audio()->stop();
+        sound->audio()->setUpdateVisualizer(false);
+    }
+
     // Re-enable the keybinds
-    main->enableKeybinds();
-    sound->audio()->setUpdateVisualizer(false);
+    _main->enableKeybinds();
+
+    _main->setAudioTestDialog(nullptr);
+
+    // Save the geometry
+    _main->settings()->setValue(Main::WINDOW_SOUND_WIDTH, width());
+    _main->settings()->setValue(Main::WINDOW_SOUND_HEIGHT, height());
 }
 
 void DialogSound::on_pushButtonPlay_clicked()
@@ -142,7 +165,7 @@ void DialogSound::audioEngineInit() {
 }
 
 void DialogSound::updateTestButtons() {
-    bool enabled = main->audio()->isInitialized() && sound->audio()->hasFile();
+    bool enabled = _main->audio()->isInitialized() && sound->audio()->hasFile();
 
     ui->pushButtonPlay->setEnabled(enabled);
     ui->pushButtonPause->setEnabled(enabled);

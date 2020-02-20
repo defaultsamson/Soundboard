@@ -12,8 +12,8 @@
 
 QString ListItemBoard::NEW_BOARD = "New Board";
 
-ListItemBoard::ListItemBoard(Main* main) :
-    ListItem(main)
+ListItemBoard::ListItemBoard(Main* _main) :
+    ListItem(_main)
 {
     setText(NEW_BOARD);
 }
@@ -78,7 +78,7 @@ void ListItemBoard::load(const QJsonObject &json) {
 
     // Loads all the sounds
     for (int i = 0; i < arr.size(); ++i) {
-        ListItemSound* sound = new ListItemSound(main, this);
+        ListItemSound* sound = new ListItemSound(_main, this);
         sound->load(arr[i].toObject());
         addSound(sound);
     }
@@ -98,18 +98,17 @@ void ListItemBoard::save(QJsonObject &json) {
 }
 
 void ListItemBoard::reg(bool regThis, bool regSounds) {
-    if (regThis) hotkey->setRegistered(true);
+    if (regThis) _hotkey->setRegistered(true);
     // Register all sounds' keybinds
     if (regSounds) for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->reg();
 }
 
 void ListItemBoard::unreg(bool unregThis) {
-    if (unregThis) hotkey->setRegistered(false);
+    if (unregThis) _hotkey->setRegistered(false);
     // Unregister all sounds' keybinds
     for (size_t i = 0; i < sounds.size(); ++i) sounds.at(i)->unreg();
 }
 
 void ListItemBoard::trigger() {
-    ListItem::trigger();
-    main->setCurrentBoard(this);
+    _main->setCurrentBoard(this);
 }

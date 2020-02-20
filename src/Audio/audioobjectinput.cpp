@@ -77,7 +77,3 @@ size_t AudioObjectInput::read(float* buffer, size_t n) {
     }
     else return 0;
 }
-
-bool AudioObjectInput::doMix() {
-    return true;
-}
