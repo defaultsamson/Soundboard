@@ -10,6 +10,7 @@
 #include <QProgressBar>
 #include <QStandardPaths>
 #include <QFileDialog>
+#include <QStyle>
 
 // Allows storing the following types as QVariants
 Q_DECLARE_METATYPE(HostInfoContainer*)
@@ -66,6 +67,13 @@ DialogSettings::DialogSettings(Main* _main) :
     _main->audio()->registerAudio(&audio);
     if (audio.hasFile()) ui->lineEditTestFile->setText(testFile);
 
+    connect(ui->labelDevice0, &ClickableLabel::clicked, this, &DialogSettings::toggleOutput0);
+    connect(ui->arrowDevice0, &ClickableLabel::clicked, this, &DialogSettings::toggleOutput0);
+    connect(ui->labelDevice1, &ClickableLabel::clicked, this, &DialogSettings::toggleOutput1);
+    connect(ui->arrowDevice1, &ClickableLabel::clicked, this, &DialogSettings::toggleOutput1);
+    connect(ui->labelDeviceInput, &ClickableLabel::clicked, this, &DialogSettings::toggleInput0);
+    connect(ui->arrowDeviceInput, &ClickableLabel::clicked, this, &DialogSettings::toggleInput0);
+    updateGroupBoxes();
     refreshDeviceSelection();
 
     _main->setAudioTestDialog(this);
@@ -318,6 +326,7 @@ void DialogSettings::inputRemoved(int deviceDisplayIndex, HostInfoContainer** di
 void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 {
     _main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
+    updateGroupBoxes();
 }
 
 void DialogSettings::on_pushButtonRefresh_clicked() {
@@ -328,6 +337,63 @@ void DialogSettings::on_pushButtonRefresh_clicked() {
 
 void DialogSettings::audioEngineInit() {
     refreshDeviceSelection();
+}
+
+QPixmap DialogSettings::invertPixmap(QPixmap pixmap) {
+    QImage tempImage = pixmap.toImage();
+    tempImage.invertPixels();
+    return QPixmap::fromImage(std::move(tempImage));
+
+    // From https://forum.qt.io/topic/77032/qicon-from-standardpixmap/10
+    /*
+    QIcon invertedIcon;
+    for(auto singleMode : {QIcon::Normal,QIcon::Disabled,QIcon::Active,QIcon::Selected}){
+        for(auto singleState : {QIcon::On,QIcon::Off}){
+            const auto avalSize = icon.availableSizes(singleMode ,singleState );
+            for(auto& singleSize : avalSize){
+                QImage tempImage = icon.pixmap(singleSize,singleMode ,singleState).toImage();
+                tempImage.invertPixels();
+                invertedIcon.addPixmap(QPixmap::fromImage(std::move(tempImage)),singleMode,singleState);
+            }
+        }
+    }
+    return invertedIcon;
+    */
+}
+void DialogSettings::toggleOutput0() {
+    _main->settings()->setValue(Main::SHOW_SETTINGS_OUTPUT0, !_main->settings()->value(Main::SHOW_SETTINGS_OUTPUT0, true).toBool());
+    updateGroupBoxes();
+}
+void DialogSettings::toggleOutput1() {
+    _main->settings()->setValue(Main::SHOW_SETTINGS_OUTPUT1, !_main->settings()->value(Main::SHOW_SETTINGS_OUTPUT1, true).toBool());
+    updateGroupBoxes();
+}
+void DialogSettings::toggleInput0() {
+    _main->settings()->setValue(Main::SHOW_SETTINGS_INPUT0, !_main->settings()->value(Main::SHOW_SETTINGS_INPUT0, true).toBool());
+    updateGroupBoxes();
+}
+
+void DialogSettings::updateGroupBoxes() {
+    bool inited = _main->audio()->isInitialized();
+    bool dark = _main->settings()->value(Main::DARK_THEME, false).toBool();
+
+    bool show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT0, true).toBool();
+    QPixmap map = style()->standardPixmap(show ? QStyle::SP_TitleBarShadeButton : QStyle::SP_TitleBarUnshadeButton);
+    ui->arrowDevice0->setPixmap(dark ? invertPixmap(map) : map);
+    ui->labelDevice0->setText(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
+    show ? ui->frameDevice0->show() : ui->frameDevice0->hide();
+
+    show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT1, true).toBool();
+    map = style()->standardPixmap(show ? QStyle::SP_TitleBarShadeButton : QStyle::SP_TitleBarUnshadeButton);
+    ui->arrowDevice1->setPixmap(dark ? invertPixmap(map) : map);
+    ui->labelDevice1->setText(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
+    show ? ui->frameDevice1->show() : ui->frameDevice1->hide();
+
+    show = _main->settings()->value(Main::SHOW_SETTINGS_INPUT0, true).toBool();
+    map = style()->standardPixmap(show ? QStyle::SP_TitleBarShadeButton : QStyle::SP_TitleBarUnshadeButton);
+    ui->arrowDeviceInput->setPixmap(dark ? invertPixmap(map) : map);
+    ui->labelDeviceInput->setText(inited ? "Input Device" : "Input Device (INITIALIZING...)");
+    show ? ui->frameDeviceInput->show() : ui->frameDeviceInput->hide();
 }
 
 void DialogSettings::refreshDeviceSelection() {
@@ -354,9 +420,7 @@ void DialogSettings::refreshDeviceSelection() {
     }
 
     bool inited = a->isInitialized();
-    ui->groupBoxDevice0->setTitle(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
-    ui->groupBoxDevice1->setTitle(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
-    ui->groupBoxDeviceInput->setTitle(inited ? "Input Device" : "Input Device (INITIALIZING...)");
+    updateGroupBoxes();
     ui->pushButtonPlay->setEnabled(inited && a->activeOutputs().size() > 0 && audio.hasFile());
     ui->pushButtonPause->setEnabled(inited && a->activeOutputs().size() > 0 && audio.hasFile());
     ui->pushButtonStop->setEnabled(inited && a->activeOutputs().size() > 0 && audio.hasFile());

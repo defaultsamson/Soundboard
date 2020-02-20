@@ -99,6 +99,11 @@ private:
     void updateFileName(QString fn);
     void updateMuteButton();
     bool _inputObjectInited = false;
+    QPixmap invertPixmap(QPixmap icon);
+    void updateGroupBoxes();
+    void toggleOutput0();
+    void toggleOutput1();
+    void toggleInput0();
 };
 
 #endif // DIALOGSETTINGS_H

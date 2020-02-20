@@ -63,6 +63,9 @@ public:
     static QString WINDOW_SETTINGS_GEOMETRY;
     static QString WINDOW_BOARD_GEOMETRY;
     static QString WINDOW_SOUND_GEOMETRY;
+    static QString SHOW_SETTINGS_OUTPUT0;
+    static QString SHOW_SETTINGS_OUTPUT1;
+    static QString SHOW_SETTINGS_INPUT0;
 
     static QString EXPLICIT_NO_OUTPUT_DEVICES;
     static QString EXPLICIT_NO_INPUT_DEVICES;

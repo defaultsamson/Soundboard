@@ -40,6 +40,7 @@ SOURCES += \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
     src/Hotkey/hotkeytrigger.cpp \
+    src/Widget/clickablelabel.cpp \
     src/Widget/listitemboard.cpp \
     src/Widget/listitemsound.cpp \
     src/Widget/widgetkeybind.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     src/Dialog/dialogsettings.h \
     src/Dialog/dialogtestaudio.h \
     src/Hotkey/hotkeytrigger.h \
+    src/Widget/clickablelabel.h \
     src/Widget/listitemboard.h \
     src/Widget/listitemsound.h \
     src/Widget/widgetkeybind.h \
@@ -97,7 +99,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 QDEP_DEPENDS += Skycoder42/QHotkey@master
 #SingleApplication dependency
 DEFINES += QAPPLICATION_CLASS=QApplication
-QDEP_DEPENDS += qwertysam/SingleApplication@master # Original is itay-grudev/SingleApplication, just waiting for pull request
+QDEP_DEPENDS += itay-grudev/SingleApplication@master
 !load(qdep):error("Failed to load qdep feature, try running: qdep prfgen --qmake ~/Qt/$${QT_VERSION}/gcc_64/bin/qmake")
 
 

@@ -11,7 +11,7 @@
 #include "Hotkey/hotkeytrigger.h"
 
 #include <QApplication>
-#include <SingleApplication>
+#include <singleapplication.h>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QJsonArray>
@@ -26,6 +26,7 @@
 #include <QThread>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QGroupBox>
 
 class MyThread : public QThread
 {
@@ -128,6 +129,9 @@ QString Main::WINDOW_MAIN_SPLITTER1 = "window__main_slider1";
 QString Main::WINDOW_SETTINGS_GEOMETRY = "window_settings_geometry";
 QString Main::WINDOW_BOARD_GEOMETRY = "window_board_geometry";
 QString Main::WINDOW_SOUND_GEOMETRY = "window_sound_geometry";
+QString Main::SHOW_SETTINGS_OUTPUT0 = "show_settings_output0";
+QString Main::SHOW_SETTINGS_OUTPUT1 = "show_settings_output1";
+QString Main::SHOW_SETTINGS_INPUT0 = "show_settings_input0";
 
 QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
 QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
