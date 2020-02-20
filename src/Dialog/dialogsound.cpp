@@ -41,6 +41,8 @@ DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
         ui->outputBar->setLevel(level);
     });
     sound->audio()->setUpdateVisualizer(true);
+
+    _main->setAudioTestDialog(this);
 }
 
 DialogSound::~DialogSound()
@@ -133,6 +135,8 @@ void DialogSound::onClose() {
 
     // Re-enable the keybinds
     _main->enableKeybinds();
+
+    _main->setAudioTestDialog(nullptr);
 
     // Save the geometry
     _main->settings()->setValue(Main::WINDOW_SOUND_GEOMETRY, saveGeometry());
