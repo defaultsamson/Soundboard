@@ -73,6 +73,8 @@ int main(int argc, char *argv[])
         return a.exec();
     }
 
+    a.setWindowIcon(QIcon(":/icons/res/icon.png"));
+
     Main w;
     w.show();
     w.restoreSizes();

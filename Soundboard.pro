@@ -4,6 +4,8 @@
 #
 #-------------------------------------------------
 
+win32: RC_ICONS = res/icon.ico
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
