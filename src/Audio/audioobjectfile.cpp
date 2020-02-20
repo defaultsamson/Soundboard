@@ -10,6 +10,7 @@ bool AudioObjectFile::isPlaying() { return !isPaused() && !isStopped(); }
 bool AudioObjectFile::isPaused() { return paused; }
 
 void AudioObjectFile::stop() {
+    AudioObject::stop();
     paused = false;
     _file.clear();
 }
