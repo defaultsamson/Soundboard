@@ -76,14 +76,13 @@ int main(int argc, char *argv[])
     w.show();
     w.restoreSizes();
 
-    // window is a QWindow instance
+    // Bring attention to the window if a new instance is started
     QObject::connect(
         &a,
         &SingleApplication::instanceStarted,
         &w,
-        [&]{ w.raise(); w.activateWindow(); }
+        [&]{ w.raise(); w.activateWindow(); w.showNormal(); }
     );
-
 
     // Initializes audio engine on separate thread so that the UI starts super fast
     MyThread t(&w);
