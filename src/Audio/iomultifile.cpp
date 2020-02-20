@@ -18,7 +18,7 @@ size_t IOMultiFile::read(float *buffer, size_t n) {
 }
 size_t IOMultiFile::mix(float* buffer, size_t n) {
     float readBuffer[n];
-    sf_count_t maxRead = 0;
+    size_t maxRead = 0;
 
     // Makes it only read what it needs to
     if (mono) n /= 2;
@@ -27,8 +27,8 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
     modifyLock.lock();
     for (int i = _openFiles.size() - 1; i >= 0; i--) {
 
-        sf_count_t read = _openFiles.at(i)->read(readBuffer, static_cast<sf_count_t>(n));
-        for (sf_count_t i = 0; i < read; i++) {
+        size_t read = _openFiles.at(i)->read(readBuffer, static_cast<sf_count_t>(n));
+        for (size_t i = 0; i < read; i++) {
             if (mono) {
                 buffer[(i * 2)] += readBuffer[i];
                 buffer[(i * 2) + 1] += readBuffer[i];
@@ -40,7 +40,7 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
     }
     modifyLock.unlock();
 
-    return static_cast<size_t>(mono ? maxRead * 2 : maxRead);
+    return mono ? maxRead * 2 : maxRead;
 }
 
 void IOMultiFile::startRead() {

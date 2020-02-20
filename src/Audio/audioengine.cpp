@@ -21,7 +21,6 @@ AudioEngine::~AudioEngine() {
     for (int i = 0; i < _hosts.size(); i++) delete _hosts.at(i);
     delete _inputObject;
 }
-
 Device* AudioEngine::defaultOutput() {
     return _defaultOutput;
 }
@@ -232,7 +231,7 @@ void AudioEngine::refreshDevices() {
         device = Pa_GetDeviceInfo(i);
         bool isInput = device->maxInputChannels > 0;
         bool isOutput = device->maxOutputChannels > 0;
-        Device* dev = dev = new Device{nullptr, device, CHANNELS, std::shared_ptr<DeviceIndexInfo>(new DeviceIndexInfo{i, -1, -1, -1, -1}), isInput, isOutput};
+        Device* dev = new Device{nullptr, device, CHANNELS, std::shared_ptr<DeviceIndexInfo>(new DeviceIndexInfo{i, -1, -1, -1, -1}), isInput, isOutput};
 
         if (isInput) {
             _inputs.append(dev);
