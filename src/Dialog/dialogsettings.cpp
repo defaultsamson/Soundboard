@@ -33,9 +33,11 @@ DialogSettings::DialogSettings(Main* _main) :
     ui->checkBoxListDrivers->setChecked(_main->settings()->value(Main::SHOW_DRIVERS, false).toBool());
     ui->checkBoxWindowSize->setChecked(_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool());
     // Restore the geometry, if it was saved
-    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
-        if (_main->settings()->contains(Main::WINDOW_SETTINGS_GEOMETRY))
-            restoreGeometry(_main->settings()->value(Main::WINDOW_SETTINGS_GEOMETRY).toByteArray());
+    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool()) {
+        if (_main->settings()->contains(Main::WINDOW_SETTINGS_WIDTH)) {
+            resize(_main->settings()->value(Main::WINDOW_SETTINGS_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_SETTINGS_HEIGHT, 500).toInt());
+        }
+    }
 
     connect(ui->comboBoxDevice0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device0Changed);
     connect(ui->comboBoxDriver0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host0Changed);
@@ -111,7 +113,8 @@ void DialogSettings::handleClose() {
 
     // Save the geometry
     _main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
-    _main->settings()->setValue(Main::WINDOW_SETTINGS_GEOMETRY, saveGeometry());
+    _main->settings()->setValue(Main::WINDOW_SETTINGS_WIDTH, width());
+    _main->settings()->setValue(Main::WINDOW_SETTINGS_HEIGHT, height());
 
     _main->updateMuteButton();
 

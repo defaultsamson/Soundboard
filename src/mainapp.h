@@ -60,9 +60,12 @@ public:
     static QString WINDOW_MAIN_GEOMETRY;
     static QString WINDOW_MAIN_SPLITTER0;
     static QString WINDOW_MAIN_SPLITTER1;
-    static QString WINDOW_SETTINGS_GEOMETRY;
-    static QString WINDOW_BOARD_GEOMETRY;
-    static QString WINDOW_SOUND_GEOMETRY;
+    static QString WINDOW_SETTINGS_WIDTH;
+    static QString WINDOW_SETTINGS_HEIGHT;
+    static QString WINDOW_BOARD_WIDTH;
+    static QString WINDOW_BOARD_HEIGHT;
+    static QString WINDOW_SOUND_WIDTH;
+    static QString WINDOW_SOUND_HEIGHT;
     static QString SHOW_SETTINGS_OUTPUT0;
     static QString SHOW_SETTINGS_OUTPUT1;
     static QString SHOW_SETTINGS_INPUT0;

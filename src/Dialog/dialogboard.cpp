@@ -18,9 +18,11 @@ DialogBoard::DialogBoard(Main* _main, ListItemBoard* board, bool creatingNew) :
     if (board->hasKey()) ui->keybindBoard->setKey(board->key());
 
     // Restore the geometry, if it was saved
-    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
-        if (_main->settings()->contains(Main::WINDOW_BOARD_GEOMETRY))
-            restoreGeometry(_main->settings()->value(Main::WINDOW_BOARD_GEOMETRY).toByteArray());
+    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool()) {
+        if (_main->settings()->contains(Main::WINDOW_BOARD_WIDTH)) {
+            resize(_main->settings()->value(Main::WINDOW_BOARD_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_BOARD_HEIGHT, 500).toInt());
+        }
+    }
 
     // Disable the keybinds temporarily while the dialog is up
     _main->disableKeybinds();
@@ -68,5 +70,6 @@ void DialogBoard::onClose() {
     _main->enableKeybinds();
 
     // Save the geometry
-    _main->settings()->setValue(Main::WINDOW_BOARD_GEOMETRY, saveGeometry());
+    _main->settings()->setValue(Main::WINDOW_BOARD_WIDTH, width());
+    _main->settings()->setValue(Main::WINDOW_BOARD_HEIGHT, height());
 }

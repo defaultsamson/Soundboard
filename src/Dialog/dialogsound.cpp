@@ -29,9 +29,11 @@ DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
     updateTestButtons();
 
     // Restore the geometry, if it was saved
-    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool())
-        if (_main->settings()->contains(Main::WINDOW_SOUND_GEOMETRY))
-            restoreGeometry(_main->settings()->value(Main::WINDOW_SOUND_GEOMETRY).toByteArray());
+    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool()) {
+        if (_main->settings()->contains(Main::WINDOW_SOUND_WIDTH)) {
+            resize(_main->settings()->value(Main::WINDOW_SOUND_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_SOUND_HEIGHT, 500).toInt());
+        }
+    }
 
     // Disable the keybinds temporarily while the dialog is up
     _main->disableKeybinds();
@@ -139,7 +141,8 @@ void DialogSound::onClose() {
     _main->setAudioTestDialog(nullptr);
 
     // Save the geometry
-    _main->settings()->setValue(Main::WINDOW_SOUND_GEOMETRY, saveGeometry());
+    _main->settings()->setValue(Main::WINDOW_SOUND_WIDTH, width());
+    _main->settings()->setValue(Main::WINDOW_SOUND_HEIGHT, height());
 }
 
 void DialogSound::on_pushButtonPlay_clicked()
