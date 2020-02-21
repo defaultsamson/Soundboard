@@ -21,7 +21,7 @@ DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
     ui->lineEditName->setText(creatingNew ? "" : sound->text());
     if (sound->hasKey()) ui->keybindSound->setKey(sound->key());
     ui->lineEditFile->setText(sound->audio()->filename());
-    ui->widgetVolume->setVolume(sound->audio()->volumeInt());
+    ui->widgetVolume->setValue(sound->audio()->volumeInt());
 
     originalFileName = sound->audio()->filename();
     originalVolume = sound->audio()->volumeInt();
@@ -41,11 +41,11 @@ DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
     _main->disableKeybinds();
 
     // Sets up the audio visualizer
-    connect(sound->audio(), &AudioObject::update, this, [&](qreal level) { ui->outputBar->setLevel(level); });
+    connect(sound->audio(), &AudioObject::update, this, [this](qreal level) { ui->outputBar->setLevel(level); });
     sound->audio()->setUpdateVisualizer(true);
 
     // Connects the volume slider&box with the AudioObject
-    connect(ui->widgetVolume, &WidgetVolume::volumeChanged, sound->audio(), &AudioObject::setVolumeInt );
+    connect(ui->widgetVolume, &WidgetVolume::valueChanged, sound->audio(), &AudioObject::setVolumeInt );
 
     _main->setAudioTestDialog(this);
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
@@ -69,7 +69,7 @@ void DialogSound::on_buttonBox_accepted()
     if (ui->keybindSound->hasKey()) sound->setKey(ui->keybindSound->key());
     else sound->unSetKey();
     sound->audio()->setFile(ui->lineEditFile->text());
-    sound->audio()->setVolumeInt(ui->widgetVolume->volume());
+    sound->audio()->setVolumeInt(ui->widgetVolume->value());
 
     // If anything's ACTUALLY changed, then tell the program
     if (creatingNew

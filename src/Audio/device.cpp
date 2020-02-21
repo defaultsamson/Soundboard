@@ -19,7 +19,7 @@ Device::Device(HostInfoContainer* host,
 }
 
 // 0 - 100
-void Device::setVolume(int volumeInt) {
+void Device::setVolumeInt(int volumeInt) {
     _volumeInt = volumeInt;
     _volume = volumeInt / static_cast<float>(100);
 }

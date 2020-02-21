@@ -10,14 +10,14 @@ class WidgetVolume : public QWidget
     Q_OBJECT
 public:
     explicit WidgetVolume(QWidget *parent = nullptr);
-    int volume() { return _volume; }
+    int value() { return _volume; }
 
 public slots:
-    void setVolume(int volumeInt);
-    void setVolume(int volumeInt, bool fromSlider, bool fromSpinBox);
+    void setValue(int volumeInt);
+    void setValue(int volumeInt, bool fromSlider, bool fromSpinBox);
 
 signals:
-    void volumeChanged(int volumeInt);
+    void valueChanged(int volumeInt);
 
 private:
     int _volume = 0;

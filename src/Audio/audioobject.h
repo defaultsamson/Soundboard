@@ -2,7 +2,6 @@
 #define AUDIOOBJECT_H
 
 #include <QObject>
-#include <iostream>
 
 class AudioObject : public QObject {
 
@@ -22,7 +21,7 @@ public:
 
 public slots:
     void setVolume(const float volume) { _volume = volume; }
-    void setVolumeInt(const int volume) { _volumeInt = volume; _volume = volume / static_cast<float>(100); }
+    void setVolumeInt(const int volume) { _volumeInt = volume; setVolume(volume / static_cast<float>(100)); }
 
 protected:
     bool stopped = true;

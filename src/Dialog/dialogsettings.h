@@ -58,14 +58,6 @@ private slots:
     void on_buttonPlay_clicked();
     void on_buttonPause_clicked();
     void on_buttonStop_clicked();
-    void on_sliderVolumeOutput0_valueChanged(int value);
-    void on_spinBoxVolumeOutput0_valueChanged(int arg1);
-    void on_sliderVolumeOutput1_valueChanged(int value);
-    void on_spinBoxVolumeOutput1_valueChanged(int arg1);
-    void on_sliderVolumeInput0_valueChanged(int value);
-    void on_spinBoxVolumeInput0_valueChanged(int arg1);
-    void on_sliderVolumeAudioFile_valueChanged(int value);
-    void on_spinBoxVolumeAudioFile_valueChanged(int arg1);
     void on_buttonDeleteOutput0_clicked();
     void on_buttonDeleteOutput1_clicked();
     void on_buttonDeleteInput0_clicked();
@@ -89,6 +81,7 @@ private:
     void outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void inputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
     void setOutputDeviceVolume(int value, int devDisplayIndex);
+    void setInputDeviceVolume(int value);
     void updateFileName(QString fn);
     void updateMuteButton();
     bool _inputObjectInited = false;

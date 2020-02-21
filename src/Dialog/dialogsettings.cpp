@@ -50,28 +50,29 @@ DialogSettings::DialogSettings(Main* _main) :
     connect(ui->comboBoxDriverInput0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChangedInput0);
     connect(ui->comboBoxDeviceInput0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChangedInput0);
 
-    ui->spinBoxVolumeOutput0->setValue(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
-    ui->sliderVolumeOutput0->setValue(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
-    ui->spinBoxVolumeOutput1->setValue(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
-    ui->sliderVolumeOutput1->setValue(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
-    ui->spinBoxVolumeInput0->setValue(_main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
-    ui->sliderVolumeInput0->setValue(_main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
-
-    ui->spinBoxVolumeAudioFile->setValue(_main->settings()->value(Main::TEST_VOLUME, 100).toInt());
-    ui->sliderVolumeAudioFile->setValue(_main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    ui->volumeOutput0->setValue(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
+    ui->volumeOutput1->setValue(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
+    ui->volumeInput0->setValue(_main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+    connect(ui->volumeOutput0, &WidgetVolume::valueChanged, this, [this](int value){ setOutputDeviceVolume(value, 0); });
+    connect(ui->volumeOutput1, &WidgetVolume::valueChanged, this, [this](int value){ setOutputDeviceVolume(value, 1); });
+    connect(ui->volumeInput0, &WidgetVolume::valueChanged, this, [this](int value){ setInputDeviceVolume(value); });
 
     ui->checkBoxInput0Output0->setChecked(_main->settings()->value(Main::INPUT_OUT0, false).toBool());
     ui->checkBoxInput0Output1->setChecked(_main->settings()->value(Main::INPUT_OUT1, false).toBool());
 
     QString testFile = _main->settings()->value(Main::TEST_FILE, Main::DEFAULT_TEST_FILE).toString();
     audio.setFile(testFile);
-    audio.setVolume(_main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
     audio.setUpdateVisualizer(true);
-    connect(&audio, &AudioObject::update, this, [&](float level) {
+    connect(&audio, &AudioObject::update, this, [this](float level) {
         ui->visualizerAudioFile->setLevel(static_cast<qreal>(level));
     });
     _main->audio()->registerAudio(&audio);
     if (audio.hasFile()) ui->lineEditAudioFile->setText(testFile);
+
+    audio.setVolume(_main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
+    ui->volumeAudioFile->setValue(_main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    // Connects the volume slider&box with the AudioObject
+    connect(ui->volumeAudioFile, &WidgetVolume::valueChanged, &audio, &AudioObject::setVolumeInt);
 
     connect(ui->labelOutput0, &ClickableLabel::clicked, this, &DialogSettings::toggleOutput0);
     connect(ui->arrowOutput0, &ClickableLabel::clicked, this, &DialogSettings::toggleOutput0);
@@ -126,6 +127,8 @@ void DialogSettings::onClose() {
     _main->setAudioTestDialog(nullptr);
     _main->enableKeybinds();
     if (_inputObjectInited) _main->audio()->inputObject()->setUpdateVisualizer(false);
+
+    _main->settings()->setValue(Main::TEST_VOLUME, ui->volumeAudioFile->value());
 
     // Save the geometry
     _main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
@@ -595,7 +598,22 @@ void DialogSettings::refreshDeviceSelection() {
 
 void DialogSettings::setOutputDeviceVolume(int value, int devDisplayIndex) {
     Device* dev = _main->audio()->getActiveDisplayOutput(devDisplayIndex);
-    if (dev) dev->setVolume(value);
+    if (dev) dev->setVolumeInt(value);
+
+    switch (devDisplayIndex) {
+    case 0:
+        _main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
+        break;
+    case 1:
+        _main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
+        break;
+    }
+}
+
+void DialogSettings::setInputDeviceVolume(int value) {
+    AudioObjectInput* dev = _main->audio()->inputObject();
+    if (dev) dev->setVolumeInt(value);
+    _main->settings()->setValue(Main::INPUT_VOLUME0, value);
 }
 
 void DialogSettings::updateFileName(QString fn) {
@@ -705,57 +723,7 @@ void DialogSettings::on_buttonStop_clicked()
     audio.stop();
 }
 
-void DialogSettings::on_sliderVolumeOutput0_valueChanged(int value)
-{
-    // Allow users to edit the number in the box past what the slider goes to
-    if (!(value == ui->sliderVolumeOutput0->maximum() && ui->spinBoxVolumeOutput0->value() > value)) {
-        ui->spinBoxVolumeOutput0->setValue(value);
-        setOutputDeviceVolume(value, 0);
-        _main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
-    }
-}
-
-void DialogSettings::on_spinBoxVolumeOutput0_valueChanged(int value)
-{
-    ui->sliderVolumeOutput0->setValue(value);
-    setOutputDeviceVolume(value, 0);
-    _main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
-}
-
-void DialogSettings::on_sliderVolumeOutput1_valueChanged(int value)
-{
-    // Allow users to edit the number in the box past what the slider goes to
-    if (!(value == ui->sliderVolumeOutput1->maximum() && ui->spinBoxVolumeOutput1->value() > value)) {
-        ui->spinBoxVolumeOutput1->setValue(value);
-        setOutputDeviceVolume(value, 1);
-        _main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
-    }
-}
-
-void DialogSettings::on_spinBoxVolumeOutput1_valueChanged(int value)
-{
-    ui->sliderVolumeOutput1->setValue(value);
-    setOutputDeviceVolume(value, 1);
-    _main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
-}
-
-void DialogSettings::on_sliderVolumeInput0_valueChanged(int value)
-{
-    // Allow users to edit the number in the box past what the slider goes to
-    if (!(value == ui->sliderVolumeInput0->maximum() && ui->spinBoxVolumeInput0->value() > value)) {
-        ui->spinBoxVolumeInput0->setValue(value);
-        if (_inputObjectInited) _main->audio()->inputObject()->setVolumeInt(value);
-        _main->settings()->setValue(Main::INPUT_VOLUME0, value);
-    }
-}
-
-void DialogSettings::on_spinBoxVolumeInput0_valueChanged(int value)
-{
-    ui->sliderVolumeInput0->setValue(value);
-    if (_inputObjectInited) _main->audio()->inputObject()->setVolumeInt(value);
-    _main->settings()->setValue(Main::INPUT_VOLUME0, value);
-}
-
+/*
 void DialogSettings::on_sliderVolumeAudioFile_valueChanged(int value)
 {
     // Allow users to edit the number in the box past what the slider goes to
@@ -771,7 +739,7 @@ void DialogSettings::on_spinBoxVolumeAudioFile_valueChanged(int value)
     ui->sliderVolumeAudioFile->setValue(value);
     audio.setVolumeInt(value);
     _main->settings()->setValue(Main::TEST_VOLUME, value);
-}
+}*/
 
 void DialogSettings::on_buttonDeleteOutput0_clicked()
 {

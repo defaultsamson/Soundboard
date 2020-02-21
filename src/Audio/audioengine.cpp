@@ -192,13 +192,13 @@ const QList<Device*> AudioEngine::inputs() {
 
 void AudioEngine::init() {
     _main->showAudioEngineText(true);
+    _inputObject = new AudioObjectInput();
+    _inputObject->setOutput0(_main->settings()->value(Main::INPUT_OUT0, false).toBool());
+    _inputObject->setOutput1(_main->settings()->value(Main::INPUT_OUT1, false).toBool());
 #ifdef Q_OS_LINUX
     PaJack_SetClientName("Soundboard");
 #endif
     Pa_Initialize();
-    _inputObject = new AudioObjectInput();
-    _inputObject->setOutput0(_main->settings()->value(Main::INPUT_OUT0, false).toBool());
-    _inputObject->setOutput1(_main->settings()->value(Main::INPUT_OUT1, false).toBool());
     refreshDevices();
     _isInitialized = true;
 }
@@ -286,12 +286,12 @@ void AudioEngine::refreshDevices() {
     // There's a saved device, load it
     if (out0) {
         out0->indexes()->outputDisplayIndex = 0;
-        out0->setVolume(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
+        out0->setVolumeInt(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
         addActiveOutput(out0);
     }
     if (out1) {
         out1->indexes()->outputDisplayIndex = 1;
-        out1->setVolume(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
+        out1->setVolumeInt(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
         addActiveOutput(out1);
     }
     if (in0) {

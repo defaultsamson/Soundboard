@@ -1,7 +1,6 @@
 #include "widgetvolume.h"
 
 #include <QHBoxLayout>
-#include <limits>
 #include <iostream>
 
 WidgetVolume::WidgetVolume(QWidget *parent) : QWidget(parent)
@@ -13,21 +12,21 @@ WidgetVolume::WidgetVolume(QWidget *parent) : QWidget(parent)
     slider->setRange(0, 200);
     slider->setValue(100);
     layout->addWidget(slider);
-    QObject::connect(slider, &QSlider::valueChanged, this, [&](int value){ setVolume(value, true, false); });
+    QObject::connect(slider, &QSlider::valueChanged, this, [&](int value){ setValue(value, true, false); });
 
     spinBox = new QSpinBox();
-    spinBox->setRange(0, std::numeric_limits<int>::max()); // max for spinBox is maxInt
+    spinBox->setRange(0, 1000);
     layout->addWidget(spinBox);
-    QObject::connect(spinBox, &QSpinBox::valueChanged, this, [&](int value){ setVolume(value, false, true); });
+    QObject::connect(spinBox, &QSpinBox::valueChanged, this, [&](int value){ setValue(value, false, true); });
 
     setLayout(layout);
 }
 
-void WidgetVolume::setVolume(int volumeInt) {
-    setVolume(volumeInt, false, false);
+void WidgetVolume::setValue(int volumeInt) {
+    setValue(volumeInt, false, false);
 }
 
-void WidgetVolume::setVolume(int volumeInt, bool fromSlider, bool fromSpinBox) {
+void WidgetVolume::setValue(int volumeInt, bool fromSlider, bool fromSpinBox) {
     if (fromSlider) {
         // Allow users to edit the number in the spinbox past what the slider goes to
         if (!(volumeInt == slider->maximum() && spinBox->value() > volumeInt)) {
@@ -41,7 +40,7 @@ void WidgetVolume::setVolume(int volumeInt, bool fromSlider, bool fromSpinBox) {
         // Only emit volumeChanged here, because each setValue call to "spinBox" and "slider"
         // Will result in this function being called again. emitting volumeChanged here
         // makes it so that it only emits once.
-        emit volumeChanged(volumeInt);
+        emit valueChanged(volumeInt);
 
     } else {
         _volume = volumeInt;
