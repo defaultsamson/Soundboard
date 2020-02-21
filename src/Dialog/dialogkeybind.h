@@ -15,7 +15,7 @@ class DialogKeybind : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogKeybind(QWidget* parent, WidgetKeybind* text);
+    explicit DialogKeybind(QWidget* parent, WidgetKeybind* keybindWidget);
     ~DialogKeybind();
 
 protected:

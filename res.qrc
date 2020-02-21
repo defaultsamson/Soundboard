@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/icons">
         <file>res/add.png</file>
-        <file>res/delete2.png</file>
+        <file>res/delete.png</file>
         <file>res/edit.png</file>
         <file>res/pause.png</file>
         <file>res/play.png</file>

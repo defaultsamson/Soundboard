@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>834</height>
+    <width>500</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabAudio">
       <attribute name="title">
@@ -61,8 +61,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>459</width>
-            <height>754</height>
+            <width>464</width>
+            <height>726</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -174,7 +174,7 @@
                          </property>
                          <property name="icon">
                           <iconset resource="../../res.qrc">
-                           <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+                           <normaloff>:/icons/res/delete.png</normaloff>:/icons/res/delete.png</iconset>
                          </property>
                          <property name="iconSize">
                           <size>
@@ -331,7 +331,7 @@
                          </property>
                          <property name="icon">
                           <iconset resource="../../res.qrc">
-                           <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+                           <normaloff>:/icons/res/delete.png</normaloff>:/icons/res/delete.png</iconset>
                          </property>
                          <property name="iconSize">
                           <size>
@@ -478,7 +478,7 @@
                         </property>
                         <property name="icon">
                          <iconset resource="../../res.qrc">
-                          <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+                          <normaloff>:/icons/res/delete.png</normaloff>:/icons/res/delete.png</iconset>
                         </property>
                         <property name="iconSize">
                          <size>
@@ -961,8 +961,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>459</width>
-            <height>754</height>
+            <width>478</width>
+            <height>420</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -1035,36 +1035,10 @@
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_29">
                <item>
-                <widget class="WidgetKeybind" name="keybindKeybindsEnable">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="cursor">
-                  <cursorShape>ArrowCursor</cursorShape>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::ClickFocus</enum>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindKeybindsEnable" native="true"/>
                </item>
                <item>
-                <widget class="WidgetKeybind" name="keybindKeybindsDisable">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="cursor">
-                  <cursorShape>ArrowCursor</cursorShape>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::ClickFocus</enum>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindKeybindsDisable" native="true"/>
                </item>
               </layout>
              </item>
@@ -1161,52 +1135,13 @@
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_24">
                <item>
-                <widget class="WidgetKeybind" name="keybindSoundsResume">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="cursor">
-                  <cursorShape>ArrowCursor</cursorShape>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::ClickFocus</enum>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindSoundsResume" native="true"/>
                </item>
                <item>
-                <widget class="WidgetKeybind" name="keybindSoundsPause">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="cursor">
-                  <cursorShape>ArrowCursor</cursorShape>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::ClickFocus</enum>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindSoundsPause" native="true"/>
                </item>
                <item>
-                <widget class="WidgetKeybind" name="keybindSoundsStop">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="cursor">
-                  <cursorShape>ArrowCursor</cursorShape>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::ClickFocus</enum>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindSoundsStop" native="true"/>
                </item>
               </layout>
              </item>
@@ -1303,34 +1238,13 @@
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_26">
                <item>
-                <widget class="WidgetKeybind" name="keybindInput0Mute">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindInput0Mute" native="true"/>
                </item>
                <item>
-                <widget class="WidgetKeybind" name="keybindInput0Unmute">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindInput0Unmute" native="true"/>
                </item>
                <item>
-                <widget class="WidgetKeybind" name="keybindInput0ToggleMute">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
+                <widget class="WidgetKeybind" name="keybindInput0ToggleMute" native="true"/>
                </item>
               </layout>
              </item>
@@ -1385,8 +1299,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>459</width>
-            <height>754</height>
+            <width>478</width>
+            <height>420</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -1535,14 +1449,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>WidgetKeybind</class>
-   <extends>QPushButton</extends>
-   <header>src/Widget/widgetkeybind.h</header>
-  </customwidget>
-  <customwidget>
    <class>ClickableLabel</class>
    <extends>QLabel</extends>
    <header>src/Widget/clickablelabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WidgetKeybind</class>
+   <extends>QWidget</extends>
+   <header>src/Widget/widgetkeybind.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

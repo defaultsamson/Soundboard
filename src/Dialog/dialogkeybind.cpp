@@ -4,12 +4,13 @@
 #include "../Widget/widgetkeybind.h"
 #include <QKeyEvent>
 
-DialogKeybind::DialogKeybind(QWidget* parent, WidgetKeybind* widget) :
+DialogKeybind::DialogKeybind(QWidget* parent, WidgetKeybind* keybindWidget) :
     QDialog(parent),
     ui(new Ui::DialogKeybind),
-    widget(widget)
+    widget(keybindWidget)
 {
     ui->setupUi(this);
+    ui->buttonUnbind->setEnabled(widget->hasKey());
 }
 
 DialogKeybind::~DialogKeybind()
