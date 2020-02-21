@@ -354,9 +354,16 @@ void DialogSettings::audioEngineInit() {
     refreshDeviceSelection();
 }
 
-QPixmap DialogSettings::invertPixmap(QPixmap pixmap) {
+QPixmap DialogSettings::modifyPixmap(QPixmap pixmap, bool dark, bool rotate) {
+    if (!dark && !rotate) return pixmap;
+
     QImage tempImage = pixmap.toImage();
-    tempImage.invertPixels();
+    if (dark) tempImage.invertPixels();
+    if (rotate) {
+        tempImage = tempImage.transformed(QTransform().rotate(-90));
+        qDebug() << "Rotating";
+    }
+
     return QPixmap::fromImage(std::move(tempImage));
 
     // From https://forum.qt.io/topic/77032/qicon-from-standardpixmap/10
@@ -393,20 +400,20 @@ void DialogSettings::updateGroupBoxes() {
     bool dark = _main->settings()->value(Main::DARK_THEME, false).toBool();
 
     bool show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT0, true).toBool();
-    QPixmap map = style()->standardPixmap(show ? QStyle::SP_TitleBarShadeButton : QStyle::SP_TitleBarUnshadeButton);
-    ui->arrowDevice0->setPixmap(dark ? invertPixmap(map) : map);
+    QPixmap map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
+    ui->arrowDevice0->setPixmap(modifyPixmap(map, dark, !show));
     ui->labelDevice0->setText(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
     show ? ui->frameDevice0->show() : ui->frameDevice0->hide();
 
     show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT1, true).toBool();
-    map = style()->standardPixmap(show ? QStyle::SP_TitleBarShadeButton : QStyle::SP_TitleBarUnshadeButton);
-    ui->arrowDevice1->setPixmap(dark ? invertPixmap(map) : map);
+    map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
+    ui->arrowDevice1->setPixmap(modifyPixmap(map, dark, !show));
     ui->labelDevice1->setText(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
     show ? ui->frameDevice1->show() : ui->frameDevice1->hide();
 
     show = _main->settings()->value(Main::SHOW_SETTINGS_INPUT0, true).toBool();
-    map = style()->standardPixmap(show ? QStyle::SP_TitleBarShadeButton : QStyle::SP_TitleBarUnshadeButton);
-    ui->arrowDeviceInput->setPixmap(dark ? invertPixmap(map) : map);
+    map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
+    ui->arrowDeviceInput->setPixmap(modifyPixmap(map, dark, !show));
     ui->labelDeviceInput->setText(inited ? "Input Device" : "Input Device (INITIALIZING...)");
     show ? ui->frameDeviceInput->show() : ui->frameDeviceInput->hide();
 }

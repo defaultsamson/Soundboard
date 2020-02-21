@@ -100,7 +100,7 @@ private:
     void updateFileName(QString fn);
     void updateMuteButton();
     bool _inputObjectInited = false;
-    QPixmap invertPixmap(QPixmap icon);
+    QPixmap modifyPixmap(QPixmap icon, bool dark, bool rotate);
     void updateGroupBoxes();
     void toggleOutput0();
     void toggleOutput1();
