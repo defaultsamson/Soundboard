@@ -49,6 +49,7 @@ SOURCES += \
     src/Widget/listitem.cpp \
     src/Dialog/dialogsound.cpp \
     src/Widget/widgetaudio.cpp \
+    src/Widget/widgetvolume.cpp \
     src/mainapp.cpp
 
 HEADERS += \
@@ -70,6 +71,7 @@ HEADERS += \
     src/Widget/listitem.h \
     src/Dialog/dialogsound.h \
     src/Widget/widgetaudio.h \
+    src/Widget/widgetvolume.h \
     src/mainapp.h
 
 FORMS += \

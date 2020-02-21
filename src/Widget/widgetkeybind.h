@@ -7,8 +7,9 @@
 
 class WidgetKeybind : public QWidget
 {
+    Q_OBJECT
 public:
-    WidgetKeybind(QWidget* parent);
+    explicit WidgetKeybind(QWidget* parent = nullptr);
     void setKey(quint32 key);
     quint32 key();
     bool hasKey();

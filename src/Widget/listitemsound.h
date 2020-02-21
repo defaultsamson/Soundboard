@@ -19,10 +19,6 @@ public:
     static QString NEW_SOUND;
     ListItemSound(Main* _main, ListItemBoard* board);
     ~ListItemSound() override;
-    void setFileName(QString name);
-    QString filename();
-    void setVolume(int v);
-    int volume();
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) override;
     void trigger() override;
@@ -31,11 +27,6 @@ public:
 private:
     ListItemBoard* board;
     AudioObjectFile* _audio;
-    QString _filename;
-    int _volume;
-    bool _filenameChanged;
-    bool _volumeChanged;
-    void reload();
 };
 
 #endif // LISTITEMSOUND_H

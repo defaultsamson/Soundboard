@@ -14,7 +14,6 @@ WidgetKeybind::WidgetKeybind(QWidget* parent) :
     _hasKey(false)
 {
     QHBoxLayout *layout = new QHBoxLayout();
-
     layout->setContentsMargins(QMargins(0, 0, 0, 0));
 
     int fixedHeight = 30;

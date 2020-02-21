@@ -2,7 +2,7 @@
 #define AUDIOOBJECT_H
 
 #include <QObject>
-
+#include <iostream>
 
 class AudioObject : public QObject {
 
@@ -11,8 +11,7 @@ class AudioObject : public QObject {
 public:
     AudioObject();
     virtual ~AudioObject();
-    void setVolumeInt(const int volume) { _volumeInt = volume; _volume = volume / static_cast<float>(100); }
-    void setVolume(const float volume) { _volume = volume; }
+    int volumeInt() { return _volumeInt; }
     virtual void write(const float* buffer, size_t n) = 0;
     virtual size_t read(float* buffer, size_t n) = 0;
     virtual void mix(float* buffer, size_t framesPerBuffer, size_t channels, int deviceListIndex, float deviceVolume, bool singleDevice);
@@ -20,6 +19,10 @@ public:
     bool isStopped() { return stopped; }
     virtual bool doMix() { return true; }
     void setUpdateVisualizer(bool update) { _updateVisualiser = update; }
+
+public slots:
+    void setVolume(const float volume) { _volume = volume; }
+    void setVolumeInt(const int volume) { _volumeInt = volume; _volume = volume / static_cast<float>(100); }
 
 protected:
     bool stopped = true;
@@ -42,7 +45,7 @@ private:
     bool _updateVisualiser = false;
 
 signals:
-    void update(float volume);
+    void update(float level);
 };
 
 #endif // AUDIOOBJECT_H
