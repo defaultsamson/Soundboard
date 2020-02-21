@@ -359,10 +359,7 @@ QPixmap DialogSettings::modifyPixmap(QPixmap pixmap, bool dark, bool rotate) {
 
     QImage tempImage = pixmap.toImage();
     if (dark) tempImage.invertPixels();
-    if (rotate) {
-        tempImage = tempImage.transformed(QTransform().rotate(-90));
-        qDebug() << "Rotating";
-    }
+    if (rotate) tempImage = tempImage.transformed(QTransform().rotate(-90));
 
     return QPixmap::fromImage(std::move(tempImage));
 
