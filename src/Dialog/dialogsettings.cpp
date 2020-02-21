@@ -22,7 +22,6 @@ DialogSettings::DialogSettings(Main* _main) :
     _main(_main)
 {
     ui->setupUi(this);
-
     ui->tabWidget->setCurrentIndex(_main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
 
 #ifdef Q_OS_WIN
@@ -38,6 +37,8 @@ DialogSettings::DialogSettings(Main* _main) :
             resize(_main->settings()->value(Main::WINDOW_SETTINGS_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_SETTINGS_HEIGHT, 500).toInt());
         }
     }
+
+    updateScrollAreaPalette();
 
     connect(ui->comboBoxDevice0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::device0Changed);
     connect(ui->comboBoxDriver0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::host0Changed);
@@ -103,6 +104,16 @@ DialogSettings::DialogSettings(Main* _main) :
 DialogSettings::~DialogSettings()
 {
     delete ui;
+}
+
+void DialogSettings::updateScrollAreaPalette() {
+    QPalette pal = palette();
+    // Hardcoded, there doesn't seem to be a way to not hardcode this, as the tabWidget doesn't seem to
+    // have a QPalette::XXXXX value that correlates to its background. It seems to be QPalette:Button,
+    // except that colour isn't accurate in light mode. QPalette::AlternateBase seems to be accurate
+    // in dark mode.
+    pal.setColor(QPalette::Window, _main->settings()->value(Main::DARK_THEME, false).toBool() ? QColor(66, 66, 66) : QColor(255, 255, 255));
+    ui->scrollArea->setPalette(pal);
 }
 
 void DialogSettings::handleClose() {
@@ -329,6 +340,7 @@ void DialogSettings::inputRemoved(int deviceDisplayIndex, HostInfoContainer** di
 void DialogSettings::on_checkBoxDarkTheme_stateChanged(int /* arg1 */)
 {
     _main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
+    updateScrollAreaPalette();
     updateGroupBoxes();
 }
 

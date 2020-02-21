@@ -37,6 +37,7 @@ public:
     void changeHost();
     void changeDevice();
     void audioEngineInit();
+    void updateScrollAreaPalette();
 
 private slots:
     void on_buttonBox_accepted();
