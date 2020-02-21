@@ -76,6 +76,14 @@ private slots:
     void on_buttonAudioFile_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_checkBoxDarkTheme_clicked();
+    void on_buttonDeleteKeybindsEnable_clicked();
+    void on_buttonDeleteKeybindsDisable_clicked();
+    void on_buttonDeleteSoundsResume_clicked();
+    void on_buttonDeleteSoundsPause_clicked();
+    void on_buttonDeleteSoundsStop_clicked();
+    void on_buttonDeleteInput0Mute_clicked();
+    void on_buttonDeleteInput0Unmute_clicked();
+    void on_buttonDeleteInput0ToggleMute_clicked();
 
 private:
     Ui::DialogSettings* ui;

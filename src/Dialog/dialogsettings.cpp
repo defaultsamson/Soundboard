@@ -839,3 +839,43 @@ void DialogSettings::on_checkBoxDarkTheme_clicked()
     updateScrollAreaPalette();
     updateGroupBoxes();
 }
+
+void DialogSettings::on_buttonDeleteKeybindsEnable_clicked()
+{
+    ui->keybindKeybindsEnable->unSetKey();
+}
+
+void DialogSettings::on_buttonDeleteKeybindsDisable_clicked()
+{
+    ui->keybindKeybindsDisable->unSetKey();
+}
+
+void DialogSettings::on_buttonDeleteSoundsResume_clicked()
+{
+    ui->keybindSoundsResume->unSetKey();
+}
+
+void DialogSettings::on_buttonDeleteSoundsPause_clicked()
+{
+    ui->keybindSoundsPause->unSetKey();
+}
+
+void DialogSettings::on_buttonDeleteSoundsStop_clicked()
+{
+    ui->keybindSoundsStop->unSetKey();
+}
+
+void DialogSettings::on_buttonDeleteInput0Mute_clicked()
+{
+    ui->keybindInput0Mute->unSetKey();
+}
+
+void DialogSettings::on_buttonDeleteInput0Unmute_clicked()
+{
+    ui->keybindInput0Unmute->unSetKey();
+}
+
+void DialogSettings::on_buttonDeleteInput0ToggleMute_clicked()
+{
+    ui->keybindInput0ToggleMute->unSetKey();
+}
