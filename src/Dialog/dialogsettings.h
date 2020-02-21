@@ -43,45 +43,37 @@ private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
 
-    void host0Changed(int index);
-    void device0Changed(int index);
-    void host1Changed(int index);
-    void device1Changed(int index);
-    void hostInputChanged(int index);
-    void deviceInputChanged(int index);
-
-    void on_checkBoxDarkTheme_stateChanged(int arg1);
-    void on_pushButtonRefresh_clicked();
-    void on_tabWidget_currentChanged(int index);
-    void on_pushButtonPlay_clicked();
-    void on_pushButtonPause_clicked();
-    void on_pushButtonStop_clicked();
-
-    void on_sliderDevice0_valueChanged(int value);
-    void on_spinBoxDevice0_valueChanged(int arg1);
-    void on_sliderDevice1_valueChanged(int value);
-    void on_spinBoxDevice1_valueChanged(int arg1);
-    void on_sliderInput_valueChanged(int value);
-    void on_spinBoxInput_valueChanged(int arg1);
-
-    void on_sliderTest_valueChanged(int value);
-    void on_spinBoxTest_valueChanged(int arg1);
-
-    void on_deleteButtonDevice0_clicked();
-    void on_deleteButtonDevice1_clicked();
-    void on_deleteButtonDeviceInput_clicked();
-
-    void on_checkBoxInput0_clicked();
-    void on_checkBoxInput1_clicked();
-
-    void on_pushButtonTestFile_clicked();
-    void on_lineEditTestFile_textEdited(const QString &arg1);
-
-    void on_muteButton_clicked();
+    void hostChangedOutput0(int index);
+    void deviceChangedOutput0(int index);
+    void hostChangedOutput1(int index);
+    void deviceChangedOutput1(int index);
+    void hostChangedInput0(int index);
+    void deviceChangedInput0(int index);
 
     void on_checkBoxShowMuteButton_clicked();
-
     void on_checkBoxListDrivers_clicked();
+    void on_buttonRefresh_clicked();
+    void on_buttonPlay_clicked();
+    void on_buttonPause_clicked();
+    void on_buttonStop_clicked();
+    void on_sliderVolumeOutput0_valueChanged(int value);
+    void on_spinBoxVolumeOutput0_valueChanged(int arg1);
+    void on_sliderVolumeOutput1_valueChanged(int value);
+    void on_spinBoxVolumeOutput1_valueChanged(int arg1);
+    void on_sliderVolumeInput0_valueChanged(int value);
+    void on_spinBoxVolumeInput0_valueChanged(int arg1);
+    void on_sliderVolumeAudioFile_valueChanged(int value);
+    void on_spinBoxVolumeAudioFile_valueChanged(int arg1);
+    void on_buttonDeleteOutput0_clicked();
+    void on_buttonDeleteOutput1_clicked();
+    void on_buttonDeleteInput0_clicked();
+    void on_checkBoxInput0Output0_clicked();
+    void on_checkBoxInput0Output1_clicked();
+    void on_lineEditAudioFile_textEdited(const QString &arg1);
+    void on_buttonMuteInput0_clicked();
+    void on_buttonAudioFile_clicked();
+    void on_tabWidget_currentChanged(int index);
+    void on_checkBoxDarkTheme_clicked();
 
 private:
     Ui::DialogSettings* ui;
