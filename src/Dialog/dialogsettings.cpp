@@ -22,6 +22,9 @@ DialogSettings::DialogSettings(Main* _main) :
     _main(_main)
 {
     ui->setupUi(this);
+
+    QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
+
     ui->tabWidget->setCurrentIndex(_main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
 
 #ifdef Q_OS_WIN
@@ -118,7 +121,7 @@ void DialogSettings::updateScrollAreaPalette() {
     ui->scrollAreaOther->setPalette(pal);
 }
 
-void DialogSettings::handleClose() {
+void DialogSettings::onClose() {
     _main->audio()->unregisterAudio(&audio);
     _main->setAudioTestDialog(nullptr);
     _main->enableKeybinds();
@@ -230,15 +233,14 @@ void DialogSettings::handleClose() {
 
 void DialogSettings::on_buttonBox_accepted()
 {
-    // TODO save
-    handleClose();
     close();
 }
 
 void DialogSettings::on_buttonBox_rejected()
 {
-    handleClose();
     close();
+    // TODO make it revert all settings back
+    // Possible give a message box warning to confirm discarding all settings
 }
 
 void DialogSettings::hostChangedOutput0(int index)
@@ -589,11 +591,6 @@ void DialogSettings::refreshDeviceSelection() {
 
     delete displayedOutputs;
     delete displayedInputs;
-}
-
-void DialogSettings::closeEvent(QCloseEvent* bar) {
-    handleClose();
-    bar->accept();
 }
 
 void DialogSettings::setOutputDeviceVolume(int value, int devDisplayIndex) {

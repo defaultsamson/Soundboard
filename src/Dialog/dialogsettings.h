@@ -43,6 +43,8 @@ private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
 
+    void onClose();
+
     void hostChangedOutput0(int index);
     void deviceChangedOutput0(int index);
     void hostChangedOutput1(int index);
@@ -82,8 +84,6 @@ private:
     HostInfoContainer* _displayHost0 = nullptr;
     HostInfoContainer* _displayHost1 = nullptr;
     HostInfoContainer* _displayHostInput = nullptr;
-    void closeEvent(QCloseEvent* bar);
-    void handleClose();
     void outputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost);
     void inputChanged(QComboBox* selector, int selectorIndex, int deviceDisplayIndex, HostInfoContainer** displayHost);
     void outputRemoved(int deviceDisplayIndex, HostInfoContainer** displayHost);
