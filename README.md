@@ -8,10 +8,33 @@ A Soundboard written in C++ with Qt
     - **DO NOT INSTALL VIA QPMX AS THEY SAY**
     - Note: Really, all you have to do is install qdep and prepare your Qt's qmake version for it (as described in their README). The Soundboard.pro file is already set up properly here, so all you'll have to do is compile the program, and it'll isntall the QHotkey library for you.
 4. Install [libsndfile](https://github.com/erikd/libsndfile)
-    - On Linux `sudo apt install libsndfile-dev`
-    - On Windows
-        - Download the windows installer from [here](http://www.mega-nerd.com/libsndfile/)
-        - Add the `bin` folder to your `PATH` variable (This will make sure it can run from Qt Creator)
+    - **WITH MP3 SUPPORT:**
+        - On Linux
+            - For Linux:
+                - `git clone --single-branch --branch mpeg-support https://github.com/arthurt/libsndfile`
+                     - Until the main libsndfile repo gets mp3 support, clone [arthurt's fork](https://github.com/arthurt/libsndfile) & the `mpeg-support`
+                - `./autogen.sh`
+                - `./configure --enable-experimental --enable-mpeg`
+                    - According to the [MPEG pull request](https://github.com/erikd/libsndfile/pull/499) on the main repo, you need the `--enable-experimental` tag
+                - `make`
+                - `sudo make install`
+            - For Windows:
+                - Install 64-bit MingW with `sudo apt install mingw-w64`
+                - `git clone --single-branch --branch mpeg-support https://github.com/arthurt/libsndfile`
+                     - Until the main libsndfile repo gets mp3 support, clone [arthurt's fork](https://github.com/arthurt/libsndfile) & the `mpeg-support`
+                - `./autogen.sh`
+                - `./configure --enable-experimental --enable-mpeg --host=x86_64-w64-mingw32`
+                    - According to the [MPEG pull request](https://github.com/erikd/libsndfile/pull/499) on the main repo, you need the `--enable-experimental` tag
+                - `make`
+                - Then copy `./libsndfile/src/.libs/libsndfile-1.dll` to the Qt installation `bin` folder `C:\Qt\5.14.0\mingw73_64\bin\`
+                - Then copy `./libsndfile/src/.libs/libsndfile.dll.a` to the Qt installation `lib` folder `C:\Qt\5.14.0\mingw73_64\lib\`
+        - On Windows
+            - Good luck?
+    - **NO MP3 SUPPORT:**
+        - On Linux `sudo apt install libsndfile-dev`
+        - On Windows
+            - Download the windows installer from [here](http://www.mega-nerd.com/libsndfile/)
+            - Add the `bin` folder to your `PATH` variable (This will make sure it can run from Qt Creator)
 5. Install [PortAudio](http://www.portaudio.com/usinggit.html)
     - On Linux `sudo apt install libportaudio2`
         - On Linux: make sure the configuration ends with `ALSA ... yes` and `JACK ... yes`
