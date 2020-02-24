@@ -7,6 +7,8 @@
 #include <QMutex>
 #include <memory>
 
+#include "../Hotkey/hotkeyutil.h"
+
 /** Sometimes when pressing a key on an external numpad,
  * they may function by simulating a numlock press, then
  * allowing the numpad keypress to go through, then
@@ -70,6 +72,9 @@ void DialogKeybind::setKey(quint32 nativeKeycode) {
 
 void DialogKeybind::keyPressEvent(QKeyEvent* e) {
     // When a key is presed, update the widget value and close the dialog
+
+    // quint32 key = e->nativeScanCode();
+    // qDebug() << "[" << key << ", " << HotkeyUtil::keycodeToString(key) << "]";
 
     if (threadStarted) {
         // If the thread is alread started, then capture the key being pressed

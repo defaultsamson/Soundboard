@@ -3,8 +3,8 @@
 #include <QString>
 #include <QHotkey>
 
-QString HotkeyUtil::keycodeToString(quint32 keycode) {
-    return QString::number(keycode);
+QString HotkeyUtil::keycodeToString(quint32 keycode, bool useNativeTranslation) {
+    return "(keycode: " + QString::number(keycode) + ")";
 }
 
 QHotkey::NativeShortcut HotkeyUtil::scancodeToNative(quint32 k) {
