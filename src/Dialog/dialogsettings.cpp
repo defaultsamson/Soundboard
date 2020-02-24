@@ -80,6 +80,8 @@ DialogSettings::DialogSettings(Main* _main) :
     connect(ui->arrowOutput1, &ClickableLabel::clicked, this, &DialogSettings::toggleOutput1);
     connect(ui->labelInput0, &ClickableLabel::clicked, this, &DialogSettings::toggleInput0);
     connect(ui->arrowInput0, &ClickableLabel::clicked, this, &DialogSettings::toggleInput0);
+    connect(ui->labelAudioFile, &ClickableLabel::clicked, this, &DialogSettings::toggleAudioFile);
+    connect(ui->arrowAudioFile, &ClickableLabel::clicked, this, &DialogSettings::toggleAudioFile);
     updateGroupBoxes();
     refreshDeviceSelection();
 
@@ -87,6 +89,7 @@ DialogSettings::DialogSettings(Main* _main) :
     _main->disableKeybinds();
 
     // Load keybinds
+    updateKeybindNaming();
     _main->hkEnableKeybinds->unreg();
     if (_main->hkEnableKeybinds->hasKey()) ui->keybindKeybindsEnable->setKey(_main->hkEnableKeybinds->key());
     _main->hkDisableKeybinds->unreg();
@@ -103,6 +106,20 @@ DialogSettings::DialogSettings(Main* _main) :
     if (_main->hkUnmuteInput->hasKey()) ui->keybindInput0Unmute->setKey(_main->hkUnmuteInput->key());
     _main->hkToggleMuteInput->unreg();
     if (_main->hkToggleMuteInput->hasKey()) ui->keybindInput0ToggleMute->setKey(_main->hkToggleMuteInput->key());
+
+    ui->checkBoxNonNativeKeys->setChecked(_main->settings()->value(Main::NON_NATIVE_KEYNAMING, true).toBool());
+}
+
+void DialogSettings::updateKeybindNaming() {
+    bool nonNative = _main->settings()->value(Main::NON_NATIVE_KEYNAMING, true).toBool();
+    ui->keybindKeybindsEnable->updateKeyname(nonNative);
+    ui->keybindKeybindsDisable->updateKeyname(nonNative);
+    ui->keybindSoundsStop->updateKeyname(nonNative);
+    ui->keybindSoundsPause->updateKeyname(nonNative);
+    ui->keybindSoundsResume->updateKeyname(nonNative);
+    ui->keybindInput0Mute->updateKeyname(nonNative);
+    ui->keybindInput0Unmute->updateKeyname(nonNative);
+    ui->keybindInput0ToggleMute->updateKeyname(nonNative);
 }
 
 DialogSettings::~DialogSettings()
@@ -385,6 +402,10 @@ void DialogSettings::toggleInput0() {
     _main->settings()->setValue(Main::SHOW_SETTINGS_INPUT0, !_main->settings()->value(Main::SHOW_SETTINGS_INPUT0, true).toBool());
     updateGroupBoxes();
 }
+void DialogSettings::toggleAudioFile() {
+    _main->settings()->setValue(Main::SHOW_SETTINGS_AUDIO_FILE, !_main->settings()->value(Main::SHOW_SETTINGS_AUDIO_FILE, true).toBool());
+    updateGroupBoxes();
+}
 
 void DialogSettings::updateGroupBoxes() {
     bool inited = _main->audio()->isInitialized();
@@ -407,6 +428,11 @@ void DialogSettings::updateGroupBoxes() {
     ui->arrowInput0->setPixmap(modifyPixmap(map, dark, !show));
     ui->labelInput0->setText(inited ? "Input Device" : "Input Device (INITIALIZING...)");
     show ? ui->frameInput0->show() : ui->frameInput0->hide();
+
+    show = _main->settings()->value(Main::SHOW_SETTINGS_AUDIO_FILE, true).toBool();
+    map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
+    ui->arrowAudioFile->setPixmap(modifyPixmap(map, dark, !show));
+    show ? ui->frameAudioFile->show() : ui->frameAudioFile->hide();
 }
 
 void DialogSettings::refreshDeviceSelection() {
@@ -806,4 +832,10 @@ void DialogSettings::on_checkBoxDarkTheme_clicked()
     _main->setDarkTheme(ui->checkBoxDarkTheme->isChecked());
     updateScrollAreaPalette();
     updateGroupBoxes();
+}
+
+void DialogSettings::on_checkBoxNonNativeKeys_clicked()
+{
+    _main->settings()->setValue(Main::NON_NATIVE_KEYNAMING, ui->checkBoxNonNativeKeys->isChecked());
+    updateKeybindNaming();
 }

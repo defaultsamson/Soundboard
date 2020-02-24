@@ -19,6 +19,7 @@ DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : sound->text());
+    ui->keybindSound->updateKeyname(_main->settings()->value(Main::NON_NATIVE_KEYNAMING, true).toBool());
     if (sound->hasKey()) ui->keybindSound->setKey(sound->key());
     ui->lineEditFile->setText(sound->audio()->filename());
     ui->widgetVolume->setValue(sound->audio()->volumeInt());

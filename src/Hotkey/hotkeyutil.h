@@ -8,7 +8,7 @@
 class HotkeyUtil
 {
 public:
-    static QString keycodeToString(quint32 native, bool useNativeTranslation = false);
+    static QString keycodeToString(quint32 native, bool nonNative = false);
     static QHotkey::NativeShortcut scancodeToNative(quint32 k);
 private:
     static bool keymapInited;

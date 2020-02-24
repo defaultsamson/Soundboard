@@ -55,6 +55,7 @@ public:
     static QString HK_UNMUTE_INPUT_KEY;
     static QString HK_TOGGLE_MUTE_INPUT_HAS;
     static QString HK_TOGGLE_MUTE_INPUT_KEY;
+    static QString NON_NATIVE_KEYNAMING;
 
     static QString REMEMBER_WINDOW_SIZES;
     static QString WINDOW_MAIN_GEOMETRY;
@@ -69,6 +70,7 @@ public:
     static QString SHOW_SETTINGS_OUTPUT0;
     static QString SHOW_SETTINGS_OUTPUT1;
     static QString SHOW_SETTINGS_INPUT0;
+    static QString SHOW_SETTINGS_AUDIO_FILE;
 
     static QString EXPLICIT_NO_OUTPUT_DEVICES;
     static QString EXPLICIT_NO_INPUT_DEVICES;

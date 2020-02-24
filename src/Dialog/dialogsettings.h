@@ -68,6 +68,7 @@ private slots:
     void on_buttonAudioFile_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_checkBoxDarkTheme_clicked();
+    void on_checkBoxNonNativeKeys_clicked();
 
 private:
     Ui::DialogSettings* ui;
@@ -90,6 +91,8 @@ private:
     void toggleOutput0();
     void toggleOutput1();
     void toggleInput0();
+    void toggleAudioFile();
+    void updateKeybindNaming();
 };
 
 #endif // DIALOGSETTINGS_H

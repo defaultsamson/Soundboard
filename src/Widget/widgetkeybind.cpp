@@ -11,7 +11,8 @@
 WidgetKeybind::WidgetKeybind(QWidget* parent) :
     QWidget(parent),
     _key(0),
-    _hasKey(false)
+    _hasKey(false),
+    _nonNative(true)
 {
     QHBoxLayout *layout = new QHBoxLayout();
     layout->setContentsMargins(QMargins(0, 0, 0, 0));
@@ -35,8 +36,13 @@ WidgetKeybind::WidgetKeybind(QWidget* parent) :
 void WidgetKeybind::setKey(quint32 key) {
     _key = key;
     _hasKey = true;
-    buttonKey->setText(HotkeyUtil::keycodeToString(_key));
     buttonDelete->setEnabled(_hasKey);
+    updateKeyname(_nonNative);
+}
+
+void WidgetKeybind::updateKeyname(bool nonNative) {
+    _nonNative = nonNative;
+    if (_hasKey) buttonKey->setText(HotkeyUtil::keycodeToString(_key, nonNative));
 }
 
 void WidgetKeybind::unSetKey() {

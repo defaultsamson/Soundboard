@@ -7,9 +7,9 @@
 bool HotkeyUtil::keymapInited = false;
 QHash<quint32, QString> HotkeyUtil::keymap = QHash<quint32, QString>();
 
-QString HotkeyUtil::keycodeToString(quint32 keycode, bool useNativeTranslation) {
+QString HotkeyUtil::keycodeToString(quint32 keycode, bool nonNative) {
     // Prioritize non-native translations if told to
-    if (!useNativeTranslation) {
+    if (nonNative) {
         if (!keymapInited) initKeymap();
         QString name = keymap.value(keycode);
         if (!name.isNull() && !name.isEmpty()) return name;

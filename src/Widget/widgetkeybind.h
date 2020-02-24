@@ -14,10 +14,12 @@ public:
     quint32 key();
     bool hasKey();
     void unSetKey();
+    void updateKeyname(bool nonNative);
 
 private:
     quint32 _key;
     bool _hasKey;
+    bool _nonNative;
 
     QPushButton *buttonKey;
     QPushButton *buttonDelete;

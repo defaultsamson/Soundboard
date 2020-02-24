@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabAudio">
       <attribute name="title">
@@ -60,9 +60,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-224</y>
+            <y>0</y>
             <width>464</width>
-            <height>644</height>
+            <height>735</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -689,18 +689,41 @@
             </layout>
            </item>
            <item>
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Audio Test</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="ClickableLabel" name="arrowAudioFile">
+               <property name="minimumSize">
+                <size>
+                 <width>17</width>
+                 <height>17</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>17</width>
+                 <height>17</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="ClickableLabel" name="labelAudioFile">
+               <property name="text">
+                <string>Audio Test</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
             <widget class="QFrame" name="frameAudioFile">
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_9">
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_15">
                 <item>
@@ -876,6 +899,49 @@
                </layout>
               </item>
              </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>2</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Advanced Audio Settings</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxShowMuteButton">
+             <property name="toolTip">
+              <string>This displays on the main window ONLY when there's an active input device being played through an output device.</string>
+             </property>
+             <property name="text">
+              <string>Show input device mute button on main window</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxListDrivers">
+             <property name="text">
+              <string>List device drivers</string>
+             </property>
             </widget>
            </item>
            <item>
@@ -1217,6 +1283,43 @@
             </layout>
            </item>
            <item>
+            <spacer name="verticalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>2</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Advanced Keybind Settings</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxNonNativeKeys">
+             <property name="toolTip">
+              <string>Uses custom keynames (easier to read) with native fallback.
+Disable if you're experiencing keyname issues.</string>
+             </property>
+             <property name="text">
+              <string>Use non-native key naming</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -1281,46 +1384,12 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="checkBoxShowMuteButton">
-             <property name="toolTip">
-              <string>This displays on the main window ONLY when there's an active input device being played through an output device.</string>
-             </property>
-             <property name="text">
-              <string>Show input device mute button</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QCheckBox" name="checkBoxWindowSize">
              <property name="toolTip">
               <string>Each window will open to its previous size, making returning to menus more natural.</string>
              </property>
              <property name="text">
               <string>Remember window size after closing</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="Line" name="line_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>Advanced Settings</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBoxListDrivers">
-             <property name="text">
-              <string>List device drivers in Audio tab</string>
              </property>
             </widget>
            </item>
