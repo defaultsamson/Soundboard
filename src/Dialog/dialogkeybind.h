@@ -5,6 +5,10 @@
 #include <QDialog>
 #include <QWidget>
 #include <QKeyEvent>
+#include <QMutex>
+#include <memory>
+
+class NumlockThread;
 
 namespace Ui {
 class DialogKeybind;
@@ -18,6 +22,8 @@ public:
     explicit DialogKeybind(QWidget* parent, WidgetKeybind* keybindWidget);
     ~DialogKeybind();
 
+    void setKey(quint32 nativeKeycode);
+
 protected:
     void keyPressEvent(QKeyEvent* e);
 
@@ -27,6 +33,10 @@ private slots:
 private:
     Ui::DialogKeybind* ui;
     WidgetKeybind* widget;
+    std::shared_ptr<NumlockThread> numlockThread;
+    bool threadStarted = false;
+    bool stopThreadFromSettingKey = false;
+    std::shared_ptr<QMutex> _keyEventLock;
 };
 
 #endif // DIALOGKEYBIND_H

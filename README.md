@@ -48,7 +48,7 @@ A Soundboard written in C++ with Qt
         - Copy `C:\msys64\mingw64\lib\libportaudio.dll.a` to my Qt install `C:\Qt\5.14.0\mingw73_64\lib\libportaudio.dll.a`
         - Copy `C:\msys64\mingw64\bin\libportaudio-2.dll` to my Qt install `C:\Qt\5.14.0\mingw73_64\bin\libportaudio-2.dll`
         - Copy `C:\msys64\mingw64\include\portaudio.h` to my Qt install `C:\Qt\5.14.0\mingw73_64\include\portaudio.h`
-        - Copy `C:\msys64\mingw64\pkgconfig\portaudio-2.0.pc` to my Qt install `C:\Qt\5.14.0\mingw73_64\pkgconfig\portaudio-2.0.pc`
+        - Copy `C:\msys64\mingw64\pkgconfig\portaudio-2.0.pc` to my Qt install `C:\Qt\5.14.0\mingw73_64\lib\pkgconfig\portaudio-2.0.pc`
     - Building it yourself
         - Note: Be sure to configure PortAudio with `./configure --enable-cxx`
         - [Compile and install](http://portaudio.com/docs/v19-doxydocs/tutorial_start.html) on the system
