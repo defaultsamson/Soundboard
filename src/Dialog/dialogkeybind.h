@@ -27,9 +27,6 @@ public:
 protected:
     void keyPressEvent(QKeyEvent* e);
 
-private slots:
-    void on_buttonUnbind_clicked();
-
 private:
     Ui::DialogKeybind* ui;
     WidgetKeybind* widget;

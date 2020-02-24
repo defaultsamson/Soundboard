@@ -53,9 +53,6 @@ DialogKeybind::DialogKeybind(QWidget* parent, WidgetKeybind* keybindWidget) :
     widget(keybindWidget)
 {
     ui->setupUi(this);
-    ui->buttonUnbind->setEnabled(widget->hasKey());
-
-
     _keyEventLock = std::shared_ptr<QMutex>(new QMutex());
     numlockThread = std::shared_ptr<NumlockThread>(new NumlockThread(this, _keyEventLock));
 }
@@ -81,7 +78,7 @@ void DialogKeybind::keyPressEvent(QKeyEvent* e) {
         stopThreadFromSettingKey = true;
         _keyEventLock->unlock();
     } else if (e->key() == Qt::Key_NumLock) {
-        // If the key pressedis numlock, start the thread
+        // If the key pressed is numlock, start the thread
         threadStarted = true;
         numlockThread->setNumlock(e->nativeScanCode());
         numlockThread->start();
@@ -89,10 +86,4 @@ void DialogKeybind::keyPressEvent(QKeyEvent* e) {
         // If there's no thread, and the key isn't numlock
         setKey(e->nativeScanCode());
     }
-}
-
-void DialogKeybind::on_buttonUnbind_clicked()
-{
-    widget->unSetKey();
-    close();
 }
