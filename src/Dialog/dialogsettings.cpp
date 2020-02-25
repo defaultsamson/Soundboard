@@ -454,7 +454,7 @@ void DialogSettings::refreshDeviceSelection() {
     ui->labelDriverOutput1->setVisible(showDrivers);
     ui->comboBoxDriverOutput1->setVisible(showDrivers);
     ui->labelDriverInput0->setVisible(showDrivers);
-    ui->comboBoxDeviceInput0->setVisible(showDrivers);
+    ui->comboBoxDriverInput0->setVisible(showDrivers);
 
     // Revert all the dsplay hosts to the default host
     if (!showDrivers) {
