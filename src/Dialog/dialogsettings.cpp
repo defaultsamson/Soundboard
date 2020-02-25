@@ -413,20 +413,29 @@ void DialogSettings::updateGroupBoxes() {
 
     bool show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT0, true).toBool();
     QPixmap map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
+    Device* device = _main->audio()->getActiveDisplayOutput(0);
     ui->arrowOutput0->setPixmap(modifyPixmap(map, dark, !show));
-    ui->labelOutput0->setText(inited ? "Output Device 1" : "Output Device 1 (INITIALIZING...)");
+    ui->labelOutput0->setText(inited
+                              ? QString("Output Device 1") + (device ? QString(" (") + device->info()->name + ")" : "")
+                              : "Output Device 1 (INITIALIZING...)");
     show ? ui->frameOutput0->show() : ui->frameOutput0->hide();
 
     show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT1, true).toBool();
     map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
+    device = _main->audio()->getActiveDisplayOutput(1);
     ui->arrowOutput1->setPixmap(modifyPixmap(map, dark, !show));
-    ui->labelOutput1->setText(inited ? "Output Device 2" : "Output Device 2 (INITIALIZING...)");
+    ui->labelOutput1->setText(inited
+                              ? QString("Output Device 2") + (device ? QString(" (") + device->info()->name + ")" : "")
+                              : "Output Device 2 (INITIALIZING...)");
     show ? ui->frameOutput1->show() : ui->frameOutput1->hide();
 
     show = _main->settings()->value(Main::SHOW_SETTINGS_INPUT0, true).toBool();
     map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
+    device = _main->audio()->getActiveDisplayInput(0);
     ui->arrowInput0->setPixmap(modifyPixmap(map, dark, !show));
-    ui->labelInput0->setText(inited ? "Input Device" : "Input Device (INITIALIZING...)");
+    ui->labelInput0->setText(inited
+                              ? QString("Input Device") + (device ? QString(" (") + device->info()->name + ")" : "")
+                              : "Input Device (INITIALIZING...)");
     show ? ui->frameInput0->show() : ui->frameInput0->hide();
 
     show = _main->settings()->value(Main::SHOW_SETTINGS_AUDIO_FILE, true).toBool();
@@ -438,20 +447,17 @@ void DialogSettings::updateGroupBoxes() {
 void DialogSettings::refreshDeviceSelection() {
     AudioEngine* a = _main->audio();
 
-    if (_main->settings()->value(Main::SHOW_DRIVERS, false).toBool()) {
-        ui->labelDriverOutput0->show();
-        ui->comboBoxDriverOutput0->show();
-        ui->labelDriverOutput1->show();
-        ui->comboBoxDriverOutput1->show();
-        ui->labelDriverInput0->show();
-        ui->comboBoxDeviceInput0->show();
-    } else {
-        ui->labelDriverOutput0->hide();
-        ui->comboBoxDriverOutput0->hide();
-        ui->labelDriverOutput1->hide();
-        ui->comboBoxDriverOutput1->hide();
-        ui->labelDriverInput0->hide();
-        ui->comboBoxDriverInput0->hide();
+    bool showDrivers = _main->settings()->value(Main::SHOW_DRIVERS, false).toBool();
+
+    ui->labelDriverOutput0->setVisible(showDrivers);
+    ui->comboBoxDriverOutput0->setVisible(showDrivers);
+    ui->labelDriverOutput1->setVisible(showDrivers);
+    ui->comboBoxDriverOutput1->setVisible(showDrivers);
+    ui->labelDriverInput0->setVisible(showDrivers);
+    ui->comboBoxDeviceInput0->setVisible(showDrivers);
+
+    // Revert all the dsplay hosts to the default host
+    if (!showDrivers) {
         HostInfoContainer* host = _main->audio()->defaultHost() ? _main->audio()->defaultHost() : nullptr;
         _displayHost0 = host;
         _displayHost1 = host;
