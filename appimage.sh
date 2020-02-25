@@ -1,3 +1,10 @@
+if [ "$1" == "clean" ]; then
+	rm -rf ./AppDir
+	rm ./*.AppImage
+	echo Cleaned!
+	exit
+fi
+
 LINUX_DEPLOY=$1
 BUILD_DIR=$2
 
