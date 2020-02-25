@@ -93,7 +93,7 @@ void DialogSound::on_buttonBox_rejected()
 
 void DialogSound::on_pushButtonFile_clicked()
 {
-    QString fn = QFileDialog::getOpenFileName(this, tr("Load Audio File"), QString(), tr("(*.wav *.ogg *.flac *.mp3)"));
+    QString fn = QFileDialog::getOpenFileName(this, tr("Load Audio File"), QString(), tr("(*.wav *.ogg *.flac *.aiff *.mp2)"));
     if (fn.isNull()) return;
     updateFileName(fn);
 }
