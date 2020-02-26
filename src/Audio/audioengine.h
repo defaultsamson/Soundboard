@@ -88,6 +88,8 @@ private:
     QList<AudioObjectFile*> _audioObjectRegistry;
     AudioObjectInput* _inputObject = nullptr;
 
+    void updateListIndexes(bool inputs, bool outputs);
+
     Device* getDevice(int deviceIndex);
 };
 

@@ -2,8 +2,6 @@
 
 #include "audioengine.h"
 
-#include <iostream>
-
 AudioObjectInput::AudioObjectInput() {
     // Set up the inBuffer to hold as much data as a device's total requested frames (frames per buffer * channels), times the SIDE_BUFFER_MULTIPLIER
     inBuffer = new float[SIDE_BUFFER_MULTIPLIER * AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS];
@@ -27,8 +25,22 @@ void AudioObjectInput::stop() {
 }
 
 void AudioObjectInput::write(const float* buffer, size_t n) {
-    if ((!_output0 && !_output1) || !_hasInputDevice) {
-        stop();
+    // If the device is stopped, still update the visualizers
+    if (stopped) {
+        float maxLevel = 0;
+        // Read the amount of bytes read from mixBuffer into buffer, and apply the volume
+        for (size_t i = 0; i < n; i++){
+            float final = buffer[i];
+            // Update with the greatest level
+            if (final < 0) final *= -1;
+            if (final > maxLevel) maxLevel = final;
+        }
+        emit update(maxLevel);
+    }
+    if ((!(_output0 && _hasOutput0) && !(_output1 && _hasOutput1)) || !_hasInputDevice) { // if ((!_output0 && !_output1) || !_hasInputDevice) {
+        if (!stopped) {
+            stop();
+        }
         return;
     }
     stopped = false;

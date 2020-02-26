@@ -60,15 +60,15 @@ void AudioEngine::addActiveDevice(Device* dev, bool startInput, bool startOutput
 
     // Adding device to the end of the list
     if (startOutput) {
-        dev->indexes()->outputListIndex = _activeOutputs.size();
         _activeOutputs.append(dev);
-        _selectedOutputIndexes.append(dev->indexes());
+        if (!_selectedOutputIndexes.contains(dev->indexes())) _selectedOutputIndexes.append(dev->indexes());
     }
     if (startInput) {
-        dev->indexes()->inputListIndex = _activeInputs.size();
         _activeInputs.append(dev);
-        _selectedInputIndexes.append(dev->indexes());
+        if (!_selectedInputIndexes.contains(dev->indexes()))  _selectedInputIndexes.append(dev->indexes());
     }
+    updateListIndexes(startOutput, startInput);
+
     // size_t channels = CHANNELS <= device->info->maxOutputChannels ? CHANNELS : device->info->maxOutputChannels;
 
     PaError err;
@@ -110,6 +110,8 @@ void AudioEngine::addActiveDevice(Device* dev, bool startInput, bool startOutput
     dev->setOutputting(startOutput);
 
     _inputObject->setHasInputDevice(_activeInputs.size() > 0);
+    _inputObject->setHasOutput0(getActiveDisplayOutput(0));
+    _inputObject->setHasOutput1(getActiveDisplayOutput(1));
 }
 void AudioEngine::removeActiveDevice(Device* dev, bool stopInput, bool stopOutput) {
     if (!dev) return;
@@ -129,10 +131,7 @@ void AudioEngine::removeActiveDevice(Device* dev, bool stopInput, bool stopOutpu
             }
         }
         _activeInputs.removeOne(dev);
-        // Updates the deviceListIndex data
-        for (int i = 0; i < _activeInputs.size(); i++) {
-            _activeInputs.at(i)->indexes()->inputListIndex = i;
-        }
+        updateListIndexes(true, false);
     }
     if (stopOutput) {
         dev->indexes()->outputDisplayIndex = -1;
@@ -144,10 +143,7 @@ void AudioEngine::removeActiveDevice(Device* dev, bool stopInput, bool stopOutpu
             }
         }
         _activeOutputs.removeOne(dev);
-        // Updates the deviceListIndex data
-        for (int i = 0; i < _activeOutputs.size(); i++) {
-            _activeOutputs.at(i)->indexes()->outputListIndex = i;
-        }
+        updateListIndexes(false, true);
     }
 
     if (stopInput) dev->setInputting(false);
@@ -156,6 +152,25 @@ void AudioEngine::removeActiveDevice(Device* dev, bool stopInput, bool stopOutpu
     // This closes any streams and restarts any that are neccessary
     // e.g. if the output was stopped but this device is still inputting
     addActiveDevice(dev, dev->isInputting(), dev->isOutputting());
+
+    _inputObject->setHasInputDevice(_activeInputs.size() > 0);
+    _inputObject->setHasOutput0(getActiveDisplayOutput(0));
+    _inputObject->setHasOutput1(getActiveDisplayOutput(1));
+}
+
+void AudioEngine::updateListIndexes(bool inputs, bool outputs) {
+    if (inputs) {
+        // Updates the deviceListIndex data
+        for (int i = 0; i < _activeInputs.size(); i++) {
+            _activeInputs.at(i)->indexes()->inputListIndex = i;
+        }
+    }
+    if (outputs) {
+        // Updates the deviceListIndex data
+        for (int i = 0; i < _activeOutputs.size(); i++) {
+            _activeOutputs.at(i)->indexes()->outputListIndex = i;
+        }
+    }
 }
 
 void AudioEngine::removeActiveDisplayOutput(int deviceDisplayIndex) { // makes controlling easier from the settings dialogue
