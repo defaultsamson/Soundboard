@@ -59,7 +59,7 @@ if "%~3"=="" goto :firstend
 set OUTPUT=SoundboardInstaller.exe
 %3 -t %4 -p installer\packaged -c installer\config.xml %OUTPUT%
 
-echo Finished! Created installer Soundboard/%OUTPUT% and output files to Soundboard\%DATA%
+echo Finished! Created installer Soundboard\%OUTPUT% and output files to Soundboard\%DATA%
 goto :end
 
 :firstend
@@ -72,6 +72,7 @@ goto :end
 
 :clean
 rmdir /s /q %DATA%
+del %OUTPUT%
 echo Cleaned!
 goto :end
 
