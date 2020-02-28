@@ -17,7 +17,7 @@ public:
     ~HotkeyTrigger();
     bool hasKey() { return _hasKey; }
     quint32 key() { return _key; }
-    void unSetKey() { _hasKey = false; }
+    void unSetKey() { _hasKey = false; _hotkey->resetShortcut(); }
     void setKey(quint32 key);
     void reg() { if (_hasKey) _hotkey->setRegistered(true); }
     void unreg() { _hotkey->setRegistered(false); }
