@@ -12,6 +12,9 @@
 #include "device.h"
 #include <memory>
 
+// TODO allow the user to change these
+#define SAMPLE_RATE (44100)
+
 struct CallbackInfo {
     AudioEngine* audio;
     Device* device;

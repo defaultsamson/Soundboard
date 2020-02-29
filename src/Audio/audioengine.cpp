@@ -10,7 +10,6 @@
 #include <iostream>
 
 // TODO allow the user to change these
-#define SAMPLE_RATE (44100)
 size_t AudioEngine::FRAMES_PER_BUFFER = 256;
 size_t AudioEngine::CHANNELS = 2;
 

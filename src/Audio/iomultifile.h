@@ -4,6 +4,7 @@
 #include <string>
 #include <QList>
 #include <sndfile.hh>
+#include <samplerate.h>
 #include <mutex>
 
 class IOMultiFile
@@ -18,6 +19,8 @@ public:
     void clear();
     void startRead();
 private:
+    SRC_STATE* state;
+    SRC_DATA data;
     QList<SndfileHandle*> _openFiles;
     std::mutex modifyLock;
     std::string _filename;
