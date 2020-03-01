@@ -25,24 +25,22 @@ void AudioObjectInput::write(const float* buffer, size_t n) {
             if (final > maxLevel) maxLevel = final;
         }
         emit update(maxLevel);
-    }
-    if ((!(_output0 && _hasOutput0) && !(_output1 && _hasOutput1)) || !_hasInputDevice) {
-        if (!stopped) {
-            stop();
+    } else {
+        if ((!(_output0 && _hasOutput0) && !(_output1 && _hasOutput1)) || !_hasInputDevice) {
+            if (!stopped) stop();
+        } else {
+            stopped = false;
+            inBuffer.write(buffer, n);
         }
-        return;
     }
-    stopped = false;
-
-    inBuffer.write(buffer, n);
 }
 
 size_t AudioObjectInput::read(float* buffer, size_t n) {
+    if (stopped) return 0;
     if ((!_output0 && !_output1) || !_hasInputDevice) {
         stop();
         return 0;
     }
-    if (stopped) return 0;
     // Makes sure that the inBuffer writing is always ahead of the reading
     if (inBuffer.writingAhead()) {
         size_t read = inBuffer.read(buffer, n);
