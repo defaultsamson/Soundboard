@@ -7,12 +7,12 @@ TempBuffer::TempBuffer() {
     _buffer = new float[BUFFER_MULTIPLIER * FRAMES];
 
     // Set up size_t's that represent how much data is in each section of _buffer
-    _readCount = new size_t[BUFFER_MULTIPLIER];
+    _byteCount = new size_t[BUFFER_MULTIPLIER];
 }
 
 TempBuffer::~TempBuffer() {
     delete [] _buffer;
-    delete [] _readCount;
+    delete [] _byteCount;
 }
 
 void TempBuffer::write(const float* buffer, size_t n, float volume, bool overwrite) {
@@ -33,7 +33,7 @@ void TempBuffer::write(const float* buffer, size_t n, float volume, bool overwri
         }
     }
 
-    _readCount[_writeIndex] = n;
+    _byteCount[_writeIndex] = n;
     _writeIndex++;
 
     // If the _writeIndex has reached the BUFFER_MULTIPLIER, the next write will
@@ -48,11 +48,11 @@ size_t TempBuffer::read(float* buffer, size_t /*n*/, float volume, bool overwrit
     // TODO continue filling the buffer if the availableRead < n
 
     // Ensures that the writing is always ahead of the reading
-    if (_writeIndex + (BUFFER_MULTIPLIER * _writingLoopsAhead) > _readIndex) return 0;
+    if (!writingAhead()) return 0;
 
-    float* start = _buffer + (FRAMES * _writeIndex);
+    float* start = _buffer + (FRAMES * _readIndex);
 
-    size_t availableRead = _readCount[_readIndex];
+    size_t availableRead = _byteCount[_readIndex];
     _readIndex++;
 
     // If the _readIndex has reached the BUFFER_MULTIPLIER, the next read will
@@ -87,9 +87,13 @@ bool TempBuffer::readCaughtUp() {
     return _writingLoopsAhead == 0 && _readIndex >= _writeIndex;
 }
 
+bool TempBuffer::writingAhead() {
+    return _writeIndex + (BUFFER_MULTIPLIER * _writingLoopsAhead) > _readIndex;
+}
+
 void TempBuffer::clear() {
     _writeIndex = 0;
     _readIndex = 0;
     _writingLoopsAhead = 0;
-    memset(_readCount, 0, BUFFER_MULTIPLIER);
+    memset(_byteCount, 0, BUFFER_MULTIPLIER);
 }

@@ -29,13 +29,7 @@ public:
     bool isMuted() { return _isMuted; }
 
 private:
-    const size_t SIDE_BUFFER_MULTIPLIER = 64;
-
-    float *inBuffer = nullptr;
-    size_t* bytesWritten = nullptr;
-    size_t inBufferWrite = 0;
-    size_t inBufferRead = 0;
-    size_t inBufferLoopsAhead = 0;
+    TempBuffer inBuffer;
 
     bool _output0 = false;
     bool _hasOutput0 = false;

@@ -13,6 +13,7 @@ public:
     size_t read(float* buffer, size_t n, float volume = 1.0, bool overwrite = true);
 
     bool readCaughtUp();
+    bool writingAhead();
 
     void clear();
 
@@ -25,7 +26,7 @@ private:
     const size_t FRAMES = 256 * 2; // AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
 
     float* _buffer = nullptr;
-    size_t* _readCount = nullptr;
+    size_t* _byteCount = nullptr;
     size_t _writeIndex = 0;
     size_t _readIndex = 0;
     size_t _writingLoopsAhead = 0;
