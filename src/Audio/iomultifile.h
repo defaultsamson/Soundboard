@@ -21,6 +21,7 @@ public:
 private:
     SRC_STATE* state;
     SRC_DATA data;
+    double _inverseRatio;
     QList<SndfileHandle*> _openFiles;
     std::mutex modifyLock;
     std::string _filename;
