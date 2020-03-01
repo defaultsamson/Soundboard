@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QList>
 
-#include "audioobject.h"
 #include "audioobjectinput.h"
 #include "audioobjectfile.h"
 #include "../Widget/listitemsound.h"

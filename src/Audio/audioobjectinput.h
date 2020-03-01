@@ -29,6 +29,8 @@ public:
     bool isMuted() { return _isMuted; }
 
 private:
+    const size_t SIDE_BUFFER_MULTIPLIER = 64;
+
     float *inBuffer = nullptr;
     size_t* bytesWritten = nullptr;
     size_t inBufferWrite = 0;

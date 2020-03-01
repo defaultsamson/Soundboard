@@ -38,6 +38,7 @@ SOURCES += \
     src/Audio/audioobjectinput.cpp \
     src/Audio/device.cpp \
     src/Audio/iomultifile.cpp \
+    src/Audio/tempbuffer.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
     src/Audio/audioobjectinput.h \
     src/Audio/device.h \
     src/Audio/iomultifile.h \
+    src/Audio/tempbuffer.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \

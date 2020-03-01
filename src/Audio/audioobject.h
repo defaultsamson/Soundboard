@@ -2,6 +2,7 @@
 #define AUDIOOBJECT_H
 
 #include <QObject>
+#include "tempbuffer.h"
 
 class AudioObject : public QObject {
 
@@ -26,21 +27,13 @@ public slots:
 protected:
     bool stopped = true;
 
-    // Sometimes there are 4 or possibly more reads and writes done consecutively.
-    // When that happens, we need to make sure that there's enough of a buffer for
-    // all of those consecutive reads, and fresh space for all the new writes.
-    // When writing to the audio buffer
-    const size_t SIDE_BUFFER_MULTIPLIER = 64;
-    float* sideBuffer = nullptr;
-
 private:
     int _volumeInt = 100; // 0 - 100
     float _volume = 1; // 0.0 - 1.0
-    size_t* bytesRead = nullptr;
-    size_t sideBufferWrite = 0;
-    size_t sideBufferRead = 0;
+
+    TempBuffer tempBuffer;
+
     bool device0Finished = false;
-    size_t device0LoopsAhead = 0;
     bool _updateVisualiser = false;
 
 signals:
