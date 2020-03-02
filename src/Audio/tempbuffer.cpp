@@ -4,80 +4,143 @@
 
 TempBuffer::TempBuffer() {
     // Set up _buffer to hold as much data as a device's total requested frames (frames per buffer * channels), times the BUFFER_MULTIPLIER
-    _buffer = new float[BUFFER_MULTIPLIER * FRAMES];
-
-    // Set up size_t's that represent how much data is in each section of _buffer
-    _byteCount = new size_t[BUFFER_MULTIPLIER];
+    _buffer = new float[BUFFER_BYTES];
 }
 
 TempBuffer::~TempBuffer() {
     delete [] _buffer;
-    delete [] _byteCount;
 }
 
 void TempBuffer::write(const float* buffer, size_t n, float volume, bool overwrite) {
-    float* start = _buffer + (FRAMES * _writeIndex);
+    float* start = _buffer + _writeIndex;
+
+    _writeIndex += n;
+    bool writingLooped = false;
+
+    // If the _writeIndex has reached the BUFFER_MULTIPLIER, the next write will
+    // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
+    // WARNING: This assumes that _writeIndex can only loop ahead at max 1 time
+    if (_writeIndex >= BUFFER_BYTES) {
+        _writingLoopsAhead++;
+        _writeIndex -= BUFFER_BYTES;
+        writingLooped = true;
+    }
 
     if (overwrite) {
         if (volume == 1.0F) {
             // No volume changes to make, write using memcpy
-            memcpy(start, buffer, n * sizeof(float));
+
+            if (writingLooped) {
+                size_t preLoop = n - _writeIndex; // The number of bytes at the end of _buffer to write before it loops
+                memcpy(start  , buffer          , preLoop     * sizeof(float));
+                memcpy(_buffer, buffer + preLoop, _writeIndex * sizeof(float));
+            } else {
+                memcpy(start  , buffer          , n           * sizeof(float));
+            }
+
         } else {
-            for (size_t i = 0; i < n; ++i) start[i] = buffer[i] * volume;
+
+            if (writingLooped) {
+                size_t preLoop = n - _writeIndex; // The number of bytes at the end of _buffer to write before it loops
+                for (size_t i = 0; i < preLoop    ; ++i) start[i]   = buffer[i]             * volume;
+                for (size_t i = 0; i < _writeIndex; ++i) _buffer[i] = (buffer + preLoop)[i] * volume;
+            } else {
+                for (size_t i = 0; i < n          ; ++i) start[i]   = buffer[i]             * volume;
+            }
+
         }
     } else {
         if (volume == 1.0F) {
-            for (size_t i = 0; i < n; ++i) start[i] += buffer[i];
+
+            if (writingLooped) {
+                size_t preLoop = n - _writeIndex; // The number of bytes at the end of _buffer to write before it loops
+                for (size_t i = 0; i < preLoop    ; ++i) start[i]   += buffer[i]            ;
+                for (size_t i = 0; i < _writeIndex; ++i) _buffer[i] += (buffer + preLoop)[i];
+            } else {
+                for (size_t i = 0; i < n          ; ++i) start[i]   += buffer[i]            ;
+            }
+
         } else {
-            for (size_t i = 0; i < n; ++i) start[i] += buffer[i] * volume;
+
+            if (writingLooped) {
+                size_t preLoop = n - _writeIndex; // The number of bytes at the end of _buffer to write before it loops
+                for (size_t i = 0; i < preLoop    ; ++i) start[i]   += buffer[i]             * volume;
+                for (size_t i = 0; i < _writeIndex; ++i) _buffer[i] += (buffer + preLoop)[i] * volume;
+            } else {
+                for (size_t i = 0; i < n          ; ++i) start[i]   += buffer[i]             * volume;
+            }
+
         }
-    }
-
-    _byteCount[_writeIndex] = n;
-    _writeIndex++;
-
-    // If the _writeIndex has reached the BUFFER_MULTIPLIER, the next write will
-    // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
-    if (_writeIndex >= BUFFER_MULTIPLIER) {
-        _writingLoopsAhead++;
-        _writeIndex = 0;
     }
 }
 
-size_t TempBuffer::read(float* buffer, size_t /*n*/, float volume, bool overwrite) {
-    // TODO continue filling the buffer if the availableRead < n
+size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite) {
+    // TODO return when there's < n bytes to read
 
     // Ensures that the writing is always ahead of the reading
     if (!writingAhead()) return 0;
 
-    float* start = _buffer + (FRAMES * _readIndex);
+    float* start = _buffer + _readIndex;
 
-    size_t availableRead = _byteCount[_readIndex];
-    _readIndex++;
+    _readIndex += n;
+    bool readingLooped = false;
 
     // If the _readIndex has reached the BUFFER_MULTIPLIER, the next read will
     // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
-    if (_readIndex >= BUFFER_MULTIPLIER) {
+    if (_readIndex >= BUFFER_BYTES) {
         _readIndex = 0;
         _writingLoopsAhead--;
+        readingLooped = true;
     }
 
     if (overwrite) {
         if (volume == 1.0F) {
             // No volume changes to make, write using memcpy
-            memcpy(buffer, start, availableRead * sizeof(float));
+
+            if (readingLooped) {
+                size_t preLoop = n - _readIndex; // The number of bytes at the end of _buffer to write before it loops
+                memcpy(buffer          , start  , preLoop    * sizeof(float));
+                memcpy(buffer + preLoop, _buffer, _readIndex * sizeof(float));
+            } else {
+                memcpy(buffer          , start  , n          * sizeof(float));
+            }
+
         } else {
-            for (size_t i = 0; i < availableRead; ++i) buffer[i] = start[i] * volume;
+
+            if (readingLooped) {
+                size_t preLoop = n - _readIndex; // The number of bytes at the end of _buffer to write before it loops
+                for (size_t i = 0; i < preLoop   ; ++i) buffer[i]             = start[i]   * volume;
+                for (size_t i = 0; i < _readIndex; ++i) (buffer + preLoop)[i] = _buffer[i] * volume;
+            } else {
+                for (size_t i = 0; i < n         ; ++i) buffer[i]             = start[i]   * volume;
+            }
+
         }
     } else {
         if (volume == 1.0F) {
-            for (size_t i = 0; i < availableRead; ++i) buffer[i] += start[i];
+
+            if (readingLooped) {
+                size_t preLoop = n - _readIndex; // The number of bytes at the end of _buffer to write before it loops
+                for (size_t i = 0; i < preLoop   ; ++i) buffer[i]             += start[i]  ;
+                for (size_t i = 0; i < _readIndex; ++i) (buffer + preLoop)[i] += _buffer[i];
+            } else {
+                for (size_t i = 0; i < n         ; ++i) buffer[i]             += start[i]  ;
+            }
+
         } else {
-            for (size_t i = 0; i < availableRead; ++i) buffer[i] += start[i] * volume;
+
+            if (readingLooped) {
+                size_t preLoop = n - _readIndex; // The number of bytes at the end of _buffer to write before it loops
+                for (size_t i = 0; i < preLoop   ; ++i) buffer[i]             += start[i]   * volume;
+                for (size_t i = 0; i < _readIndex; ++i) (buffer + preLoop)[i] += _buffer[i] * volume;
+            } else {
+                for (size_t i = 0; i < n         ; ++i) buffer[i]             += start[i]   * volume;
+            }
+
         }
     }
 
-    return availableRead;
+    return n;
 }
 
 bool TempBuffer::readCaughtUp() {
@@ -88,12 +151,11 @@ bool TempBuffer::readCaughtUp() {
 }
 
 bool TempBuffer::writingAhead() {
-    return _writeIndex + (BUFFER_MULTIPLIER * _writingLoopsAhead) > _readIndex;
+    return _writingLoopsAhead > 0 || _writeIndex > _readIndex;
 }
 
 void TempBuffer::clear() {
     _writeIndex = 0;
     _readIndex = 0;
     _writingLoopsAhead = 0;
-    memset(_byteCount, 0, BUFFER_MULTIPLIER);
 }

@@ -25,13 +25,12 @@ void AudioObjectInput::write(const float* buffer, size_t n) {
             if (final > maxLevel) maxLevel = final;
         }
         emit update(maxLevel);
+    }
+    if ((!(_output0 && _hasOutput0) && !(_output1 && _hasOutput1)) || !_hasInputDevice) {
+        if (!stopped) stop();
     } else {
-        if ((!(_output0 && _hasOutput0) && !(_output1 && _hasOutput1)) || !_hasInputDevice) {
-            if (!stopped) stop();
-        } else {
-            stopped = false;
-            inBuffer.write(buffer, n);
-        }
+        stopped = false;
+        inBuffer.write(buffer, n);
     }
 }
 
