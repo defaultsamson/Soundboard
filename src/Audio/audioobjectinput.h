@@ -6,8 +6,7 @@
 class AudioObjectInput  : public AudioObject
 {
 public:
-    AudioObjectInput();
-    ~AudioObjectInput();
+    AudioObjectInput() {}
 
     void write(const float* buffer, size_t n);
     size_t read(float* buffer, size_t n);

@@ -82,6 +82,15 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite) {
 
     float* start = _buffer + _readIndex;
 
+    // Compute the max n that can be read
+    if (_writingLoopsAhead > 0) {
+        n = _writeIndex + BUFFER_BYTES - _readIndex;
+    } else {
+        n = _writeIndex - _readIndex;
+    }
+
+    if (n == 0) return 0;
+
     _readIndex += n;
     bool readingLooped = false;
 

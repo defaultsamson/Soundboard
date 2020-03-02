@@ -2,11 +2,6 @@
 
 #include "audioengine.h"
 
-AudioObjectInput::AudioObjectInput() {
-}
-AudioObjectInput::~AudioObjectInput() {
-}
-
 void AudioObjectInput::stop() {
     if (stopped) return;
     AudioObject::stop();
