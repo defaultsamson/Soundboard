@@ -78,20 +78,22 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite) {
     // TODO return when there's < n bytes to read
 
     // Ensures that the writing is always ahead of the reading
-    if (!writingAhead()) return 0;
+    if (!writingAhead() || n == 0) return 0;
 
     float* start = _buffer + _readIndex;
 
+    size_t maxN = 0;
     // Compute the max n that can be read
     if (_writingLoopsAhead > 0) {
         // If the writing is a loop ahead, the available bytes in _buffer to be read is
-        // _buffer = [... <-_writeIndex ... _readIndex-> ...]
-        n = _writeIndex + (BUFFER_BYTES - _readIndex);
+        // _buffer = [0 ... <-_writeIndex ... _readIndex-> ... (BUFFER_BYTES - 1)]
+        maxN = _writeIndex + (BUFFER_BYTES - 1 - _readIndex);
     } else {
-        // _buffer = [... _readIndex-> ... <-_writeIndex ...]
-        n = _writeIndex - _readIndex;
+        // _buffer = [0 ... _readIndex-> ... <-_writeIndex ... (BUFFER_BYTES - 1)]
+        maxN = _writeIndex - _readIndex;
     }
-    if (n == 0) return 0;
+    if (maxN == 0) return 0;
+    n = maxN > n ? n : maxN;
 
     // Then process the read
     _readIndex += n;
