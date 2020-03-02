@@ -88,18 +88,10 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite, b
 
     float* start = _buffer + _readIndex;
 
-    size_t maxN = 0;
     // Compute the max n that can be read
-    if (_writingLoopsAhead > 0) {
-        // If the writing is a loop ahead, the available bytes in _buffer to be read is
-        // _buffer = [0 ... <-_writeIndex ... _readIndex-> ... (BUFFER_BYTES - 1)]
-        maxN = _writeIndex + (BUFFER_BYTES - 1 - _readIndex);
-    } else {
-        // _buffer = [0 ... _readIndex-> ... <-_writeIndex ... (BUFFER_BYTES - 1)]
-        maxN = _writeIndex - _readIndex;
-    }
-    if (maxN == 0) return 0;
+    size_t maxN = availableRead();
     n = maxN > n ? n : maxN;
+    if (n == 0) return 0;
 
     // Then process the read
     size_t currentReadIndex = _readIndex + n;
@@ -165,6 +157,20 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite, b
     }
 
     return n;
+}
+
+size_t TempBuffer::availableRead() {
+    size_t maxN = 0;
+    // Compute the max n that can be read
+    if (_writingLoopsAhead > 0) {
+        // If the writing is a loop ahead, the available bytes in _buffer to be read is
+        // _buffer = [0 ... <-_writeIndex ... _readIndex-> ... (BUFFER_BYTES - 1)]
+        maxN = _writeIndex + (BUFFER_BYTES - 1 - _readIndex);
+    } else {
+        // _buffer = [0 ... _readIndex-> ... <-_writeIndex ... (BUFFER_BYTES - 1)]
+        maxN = _writeIndex - _readIndex;
+    }
+    return maxN;
 }
 
 bool TempBuffer::readCaughtUp() {

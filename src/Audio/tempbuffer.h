@@ -12,6 +12,8 @@ public:
     void write(const float* buffer, size_t n, float volume = 1.0, bool overwrite = true, bool forwardWriteIndex = true);
     size_t read(float* buffer, size_t n, float volume = 1.0, bool overwrite = true, bool forwardReadIndex = true);
 
+    size_t availableRead();
+
     bool readCaughtUp();
     bool writingAhead();
 
