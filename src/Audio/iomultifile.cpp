@@ -93,5 +93,6 @@ void IOMultiFile::clear() {
         delete _openFiles.takeAt(i);
     }
     modifyLock.unlock();
+    _buffer.clear();
 }
 

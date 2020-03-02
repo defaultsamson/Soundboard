@@ -6,6 +6,7 @@
 #include <sndfile.hh>
 #include <samplerate.h>
 #include <mutex>
+#include "tempbuffer.h"
 
 class IOMultiFile
 {
@@ -21,6 +22,7 @@ public:
 private:
     SRC_STATE* state;
     SRC_DATA data;
+    TempBuffer _buffer;
     double _inverseRatio;
     QList<SndfileHandle*> _openFiles;
     std::mutex modifyLock;
