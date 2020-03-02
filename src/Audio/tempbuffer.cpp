@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include <iostream>
+
 TempBuffer::TempBuffer() {
     // Set up _buffer to hold as much data as a device's total requested frames (frames per buffer * channels), times the BUFFER_MULTIPLIER
     _buffer = new float[BUFFER_BYTES];
@@ -23,16 +25,68 @@ void TempBuffer::forwardWriteIndex(size_t n) {
     }
 }
 
-void TempBuffer::write(const float* buffer, size_t n, float volume, bool overwrite, bool forwardWriteIndex, bool monoToStereo) {
+// Applies the volume to the next n bytes
+void TempBuffer::applyVolume(size_t n, float volume) {
+    for (size_t i = 0; i < n; ++i) _buffer[i] = _buffer[i] * volume;
+}
+
+// Doubles the next n bytes
+// This requires write() to be called with forwardWriteIndex = false
+size_t TempBuffer::monoToStereo(size_t n) {
+    std::cout << "n: " << n << std::endl;
+    // The number of bytes at the end of _buffer to write before it loops
+    size_t bytesBeforeLoop = BUFFER_BYTES - _writeIndex;
+    std::cout << "bytesBeforeLoop: " << bytesBeforeLoop << std::endl;
+    float* start = _buffer + _writeIndex;
+    if (n > bytesBeforeLoop) {
+
+        size_t bytesAfterNReadBeforeLoops = bytesBeforeLoop - n;
+        std::cout << "bytesAfterNReadBeforeLoops: " << bytesAfterNReadBeforeLoops << std::endl;
+        // If the number of bytes to write will require a loop around,
+        // fill a temp buffer and overwrite the existing bytes.
+        size_t TEMP_SIZE = n * 2;
+        float temp[n * 2];
+        std::cout << "TEMP_SIZE: " << TEMP_SIZE << std::endl;
+
+        // bytesAfterNReadBeforeLoops < 0 means that there's -bytesAfterNReadBeforeLoops
+        // at the beginning of _buffer that still needs to be read
+        if (bytesAfterNReadBeforeLoops < 0) {
+            std::cout << "TEMP_SIZE: " << TEMP_SIZE << std::endl;
+            for (size_t i = 0; i < bytesBeforeLoop; ++i) {
+                temp[(i * 2)]     = start[i];
+                temp[(i * 2) + 1] = start[i];
+            }
+            for (size_t i = 0; i < TEMP_SIZE - bytesBeforeLoop; ++i) {
+                temp[(i * 2) + bytesBeforeLoop]     = _buffer[i];
+                temp[(i * 2) + bytesBeforeLoop + 1] = _buffer[i];
+            }
+        } else {
+            std::cout << "Looping1" << std::endl;
+            for (size_t i = 0; i < TEMP_SIZE; ++i) {
+                temp[(i * 2)]     = start[i];
+                temp[(i * 2) + 1] = start[i];
+            }
+            std::cout << "Looping2" << std::endl;
+        }
+        std::cout << "Looping3" << std::endl;
+        write(temp, n * 2, true, false);
+        std::cout << "Looping4" << std::endl;
+    } else {
+        for (int i = n - 1; i >= 0; --i) {
+            start[(i * 2)]     = start[i];
+            start[(i * 2) + 1] = start[i];
+        }
+    }
+
+    return n * 2;
+}
+
+void TempBuffer::write(const float* buffer, size_t n, bool overwrite, bool forwardWriteIndex) {
     float* start = _buffer + _writeIndex;
 
     size_t currentWriteIndex = _writeIndex + n;
-    if (forwardWriteIndex) {
-        // We are essentially doubling the n for the write index when
-        // buffer is mono, that way we can write to _buffer as stereo
-        if (monoToStereo) _writeIndex = currentWriteIndex + n;
-        else _writeIndex = currentWriteIndex;
-    }
+    if (forwardWriteIndex)
+        _writeIndex = currentWriteIndex;
 
     bool writingLooped = false;
 
@@ -49,131 +103,23 @@ void TempBuffer::write(const float* buffer, size_t n, float volume, bool overwri
     }
 
     if (overwrite) {
-        if (volume == 1.0F) {
-            // No volume changes to make, write using memcpy
-
-            if (writingLooped) {
-                size_t preLoop = n - currentWriteIndex; // The number of bytes at the end of _buffer to write before it loops
-                const float* nextBuffer = buffer + preLoop;
-                if (monoToStereo) {
-                    for (size_t i = 0; i < preLoop; ++i) {
-                        start[(i * 2)]     = buffer[i];
-                        start[(i * 2) + 1] = buffer[i];
-                    }
-                    for (size_t i = 0; i < currentWriteIndex; ++i) {
-                        _buffer[(i * 2)]     = nextBuffer[i];
-                        _buffer[(i * 2) + 1] = nextBuffer[i];
-                    }
-                } else {
-                    memcpy(start  , buffer          , preLoop           * sizeof(float));
-                    memcpy(_buffer, nextBuffer, currentWriteIndex * sizeof(float));
-                }
-            } else {
-                if (monoToStereo) {
-                    for (size_t i = 0; i < n; ++i) {
-                        start[(i * 2)]     = buffer[i];
-                        start[(i * 2) + 1] = buffer[i];
-                    }
-                } else {
-                    memcpy(start, buffer, n * sizeof(float));
-                }
-            }
-
+        if (writingLooped) {
+            size_t preLoop = n - currentWriteIndex; // The number of bytes at the end of _buffer to write before it loops
+            const float* nextBuffer = buffer + preLoop;
+            memcpy(start  , buffer          , preLoop           * sizeof(float));
+            memcpy(_buffer, nextBuffer      , currentWriteIndex * sizeof(float));
         } else {
-
-            if (writingLooped) {
-                size_t preLoop = n - currentWriteIndex; // The number of bytes at the end of _buffer to write before it loops
-                const float* nextBuffer = buffer + preLoop;
-                if (monoToStereo) {
-                    for (size_t i = 0; i < preLoop; ++i) {
-                        float final = buffer[i] * volume;
-                        start[(i * 2)]     = final;
-                        start[(i * 2) + 1] = final;
-                    }
-                    for (size_t i = 0; i < currentWriteIndex; ++i) {
-                        float final = nextBuffer[i] * volume;
-                        _buffer[(i * 2)]     = final;
-                        _buffer[(i * 2) + 1] = final;
-                    }
-                } else {
-                    for (size_t i = 0; i < preLoop          ; ++i) start[i]   = buffer[i]             * volume;
-                    for (size_t i = 0; i < currentWriteIndex; ++i) _buffer[i] = (buffer + preLoop)[i] * volume;
-                }
-            } else {
-                if (monoToStereo) {
-                    for (size_t i = 0; i < n; ++i) {
-                        float final = buffer[i] * volume;
-                        start[(i * 2)]     = final;
-                        start[(i * 2) + 1] = final;
-                    }
-                } else {
-                    for (size_t i = 0; i < n; ++i) start[i] = buffer[i] * volume;
-                }
-            }
-
+            memcpy(start  , buffer          , n                 * sizeof(float));
         }
     } else {
-        if (volume == 1.0F) {
-
-            if (writingLooped) {
-                size_t preLoop = n - currentWriteIndex; // The number of bytes at the end of _buffer to write before it loops
-                const float* nextBuffer = buffer + preLoop;
-                if (monoToStereo) {
-                    for (size_t i = 0; i < preLoop; ++i) {
-                        start[(i * 2)]     += buffer[i];
-                        start[(i * 2) + 1] += buffer[i];
-                    }
-                    for (size_t i = 0; i < currentWriteIndex; ++i) {
-                        _buffer[(i * 2)]     += nextBuffer[i];
-                        _buffer[(i * 2) + 1] += nextBuffer[i];
-                    }
-                } else {
-                    for (size_t i = 0; i < preLoop          ; ++i) start[i]   += buffer[i]    ;
-                    for (size_t i = 0; i < currentWriteIndex; ++i) _buffer[i] += nextBuffer[i];
-                }
-            } else {
-
-                if (monoToStereo) {
-                    for (size_t i = 0; i < n; ++i) {
-                        start[(i * 2)]     += buffer[i];
-                        start[(i * 2) + 1] += buffer[i];
-                    }
-                } else {
-                    for (size_t i = 0; i < n; ++i) start[i] += buffer[i];
-                }
-            }
-
+        if (writingLooped) {
+            size_t preLoop = n - currentWriteIndex; // The number of bytes at the end of _buffer to write before it loops
+            const float* nextBuffer = buffer + preLoop;
+            for (size_t i = 0; i < preLoop          ; ++i) start[i]   += buffer[i]    ;
+            for (size_t i = 0; i < currentWriteIndex; ++i) _buffer[i] += nextBuffer[i];
         } else {
 
-            if (writingLooped) {
-                size_t preLoop = n - currentWriteIndex; // The number of bytes at the end of _buffer to write before it loops
-                const float* nextBuffer = buffer + preLoop;
-                if (monoToStereo) {
-                    for (size_t i = 0; i < preLoop; ++i) {
-                        float final = buffer[i] * volume;
-                        start[(i * 2)]     += final;
-                        start[(i * 2) + 1] += final;
-                    }
-                    for (size_t i = 0; i < currentWriteIndex; ++i) {
-                        float final = nextBuffer[i] * volume;
-                        _buffer[(i * 2)]     += final;
-                        _buffer[(i * 2) + 1] += final;
-                    }
-                } else {
-                    for (size_t i = 0; i < preLoop          ; ++i) start[i]   += buffer[i]     * volume;
-                    for (size_t i = 0; i < currentWriteIndex; ++i) _buffer[i] += nextBuffer[i] * volume;
-                }
-            } else {
-                if (monoToStereo) {
-                    for (size_t i = 0; i < n; ++i) {
-                        float final = buffer[i] * volume;
-                        start[(i * 2)]     += final;
-                        start[(i * 2) + 1] += final;
-                    }
-                } else {
-                    for (size_t i = 0; i < n; ++i) start[i] += buffer[i] * volume;
-                }
-            }
+            for (size_t i = 0; i < n                ; ++i) start[i]   += buffer[i]    ;
         }
     }
 }

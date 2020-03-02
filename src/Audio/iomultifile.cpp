@@ -50,19 +50,25 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
             if (err != 0) continue; // TODO ERROR
             */
 
-            // Overwrite for the first item iterated,
-            _buffer.write(inBuffer, n, 1.0F, first, false, mono);
+            // Overwrite for the first item iterated
+            _buffer.write(inBuffer, n, first, false);
             first = false;
 
             if (read > tempTotalRead) tempTotalRead = read; // Update the max bytes read
             if (read < n) delete _openFiles.takeAt(i); // Remove file from the list if it's run out of bytes to read
         }
-        _buffer.forwardWriteIndex(mono ? tempTotalRead * 2 : tempTotalRead);
+        if (mono) {
+            std::cout << "1" << std::endl;
+            tempTotalRead = _buffer.monoToStereo(tempTotalRead);
+            std::cout << "2" << std::endl;
+        }
+        _buffer.forwardWriteIndex(tempTotalRead);
         totalRead += tempTotalRead;
     }
     modifyLock.unlock();
 
-    totalRead = mono ? totalRead * 2 : totalRead;
+    // if (mono) totalRead = _buffer.monoToStereo(tempTotalRead);
+    // totalRead = mono ? totalRead * 2 : totalRead;
 
     delete [] inBuffer;
     delete [] outBuffer;

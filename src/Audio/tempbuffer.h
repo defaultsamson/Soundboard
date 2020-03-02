@@ -9,8 +9,11 @@ public:
     TempBuffer();
     ~TempBuffer();
 
-    void write(const float* buffer, size_t n, float volume = 1.0, bool overwrite = true, bool forwardWriteIndex = true, bool monoToStereo = false);
+    void write(const float* buffer, size_t n, bool overwrite = true, bool forwardWriteIndex = true);
     size_t read(float* buffer, size_t n, float volume = 1.0, bool overwrite = true, bool forwardReadIndex = true);
+
+    void applyVolume(size_t n, float volume);
+    size_t monoToStereo(size_t n);
 
     void forwardWriteIndex(size_t n);
 
