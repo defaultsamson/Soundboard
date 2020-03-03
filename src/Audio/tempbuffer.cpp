@@ -25,6 +25,17 @@ void TempBuffer::forwardWriteIndex(size_t n) {
     }
 }
 
+void TempBuffer::forwardReadIndex(size_t n) {
+    _readIndex += n;
+    // If the _writeIndex has reached the BUFFER_MULTIPLIER, the next write will
+    // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
+    // WARNING: This assumes that _writeIndex can only loop ahead at max 1 time
+    if (_readIndex >= BUFFER_BYTES) {
+        _writingLoopsAhead--;
+        _readIndex -= BUFFER_BYTES;
+    }
+}
+
 // Applies the volume to the next n bytes
 void TempBuffer::applyVolume(size_t n, float volume) {
     for (size_t i = 0; i < n; ++i) _buffer[i] = _buffer[i] * volume;
@@ -33,46 +44,46 @@ void TempBuffer::applyVolume(size_t n, float volume) {
 // Doubles the next n bytes
 // This requires write() to be called with forwardWriteIndex = false
 size_t TempBuffer::monoToStereo(size_t n) {
-    std::cout << "n: " << n << std::endl;
     // The number of bytes at the end of _buffer to write before it loops
     size_t bytesBeforeLoop = BUFFER_BYTES - _writeIndex;
-    std::cout << "bytesBeforeLoop: " << bytesBeforeLoop << std::endl;
     float* start = _buffer + _writeIndex;
-    if (n > bytesBeforeLoop) {
+    size_t OUTPUT_LENGTH = n * 2;
 
-        size_t bytesAfterNReadBeforeLoops = bytesBeforeLoop - n;
-        std::cout << "bytesAfterNReadBeforeLoops: " << bytesAfterNReadBeforeLoops << std::endl;
+    // If the conversion output would go beyond the length of _buffer
+    if (OUTPUT_LENGTH > bytesBeforeLoop) {
         // If the number of bytes to write will require a loop around,
         // fill a temp buffer and overwrite the existing bytes.
-        size_t TEMP_SIZE = n * 2;
-        float temp[n * 2];
-        std::cout << "TEMP_SIZE: " << TEMP_SIZE << std::endl;
+        float* temp = new float[OUTPUT_LENGTH];
 
-        // bytesAfterNReadBeforeLoops < 0 means that there's -bytesAfterNReadBeforeLoops
-        // at the beginning of _buffer that still needs to be read
-        if (bytesAfterNReadBeforeLoops < 0) {
-            std::cout << "TEMP_SIZE: " << TEMP_SIZE << std::endl;
+        // If the conversion input goes beyond the length of _buffer
+        if (n > bytesBeforeLoop) {
+            size_t newI;
             for (size_t i = 0; i < bytesBeforeLoop; ++i) {
-                temp[(i * 2)]     = start[i];
-                temp[(i * 2) + 1] = start[i];
+                newI = i * 2;
+                temp[newI]     = start[i];
+                temp[newI + 1] = start[i];
             }
-            for (size_t i = 0; i < TEMP_SIZE - bytesBeforeLoop; ++i) {
-                temp[(i * 2) + bytesBeforeLoop]     = _buffer[i];
-                temp[(i * 2) + bytesBeforeLoop + 1] = _buffer[i];
+            for (size_t i = 0; i < n - bytesBeforeLoop; ++i) {
+                newI = (i + bytesBeforeLoop) * 2;
+                temp[newI]     = _buffer[i];
+                temp[newI + 1] = _buffer[i];
             }
         } else {
-            std::cout << "Looping1" << std::endl;
-            for (size_t i = 0; i < TEMP_SIZE; ++i) {
-                temp[(i * 2)]     = start[i];
-                temp[(i * 2) + 1] = start[i];
+            size_t newI;
+            for (size_t i = 0; i < n; ++i) {
+                newI = i * 2;
+                temp[newI]     = start[i];
+                temp[newI + 1] = start[i];
             }
-            std::cout << "Looping2" << std::endl;
         }
-        std::cout << "Looping3" << std::endl;
+
         write(temp, n * 2, true, false);
-        std::cout << "Looping4" << std::endl;
+
+        delete [] temp;
+
     } else {
-        for (int i = n - 1; i >= 0; --i) {
+        // if n doesn't loop
+        for (int i = static_cast<int>(n - 1); i >= 0; --i) {
             start[(i * 2)]     = start[i];
             start[(i * 2) + 1] = start[i];
         }

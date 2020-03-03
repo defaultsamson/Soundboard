@@ -16,6 +16,7 @@ public:
     size_t monoToStereo(size_t n);
 
     void forwardWriteIndex(size_t n);
+    void forwardReadIndex(size_t n);
 
     size_t availableRead();
 
