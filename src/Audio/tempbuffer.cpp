@@ -223,6 +223,7 @@ size_t TempBuffer::applySampleRateChange(size_t n, size_t channels, SRC_STATE* s
     if (n + _writeIndex > BUFFER_BYTES) {
         // Fill a temporary inBuffer
         inBuffer = new float[n];
+        data.data_in = inBuffer;
 
         size_t preLoop = BUFFER_BYTES - _writeIndex;
         memcpy(inBuffer, _buffer + _writeIndex, preLoop    );
