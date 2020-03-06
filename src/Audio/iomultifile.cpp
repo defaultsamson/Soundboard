@@ -4,7 +4,10 @@
 #include <QList>
 #include <sndfile.hh>
 #include <samplerate.h>
+
 #include <iostream>
+
+#define SAMPLE_RATE (44100)
 
 IOMultiFile::~IOMultiFile() {
     clear();
@@ -17,30 +20,29 @@ size_t IOMultiFile::read(float *buffer, size_t n) {
     memset(buffer, 0, n * sizeof(float));
     return mix(buffer, n);
 }
-size_t IOMultiFile::mix(float* buffer, size_t n) {
+
+size_t IOMultiFile::mix(float* buffer, size_t externalN) {
     //n = _inverseRatio * n;
     //n += (n % 2); // if the number isn't even, make it even
     // std::cout << "n: " << n << std::endl;
 
 
     // Makes it only read what it needs to
-    if (mono) n /= 2;
-    float* inBuffer = new float[n];
-    float* outBuffer = new float[n];
-    size_t totalRead = 0;
+    size_t internalN = mono ? externalN / 2 : externalN;
+    float* inBuffer = new float[internalN];
 
-    data.data_in = inBuffer;
-    data.data_out = outBuffer;
+    // Begin with the amount that's available to read
+    size_t totalRead = _buffer.availableRead();
 
     // Iterates the open files and adds their read bytes into buffer
     modifyLock.lock();
-    while (totalRead < n && _openFiles.size() > 0) {
+    while (totalRead < externalN && _openFiles.size() > 0) {
         size_t tempTotalRead = 0;
         bool first = true;
         // Iterate the list backwards in case a file needs to be deleted
         for (int i = _openFiles.size() - 1; i >= 0; i--) {
 
-            size_t read = static_cast<size_t>(_openFiles.at(i)->read(inBuffer, static_cast<sf_count_t>(n)));
+            size_t read = static_cast<size_t>(_openFiles.at(i)->read(inBuffer, static_cast<sf_count_t>(internalN)));
 
             /*
             data.input_frames = read / _channels;
@@ -51,12 +53,16 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
             */
 
             // Overwrite for the first item iterated
-            _buffer.write(inBuffer, n, first, false);
+            _buffer.write(inBuffer, internalN, first, false);
             first = false;
 
             if (read > tempTotalRead) tempTotalRead = read; // Update the max bytes read
-            if (read < n) delete _openFiles.takeAt(i); // Remove file from the list if it's run out of bytes to read
+            if (read < internalN) delete _openFiles.takeAt(i); // Remove file from the list if it's run out of bytes to read
         }
+
+        // TODO samplerate changing here
+        tempTotalRead = _buffer.applySampleRateChange(tempTotalRead, _channels, state, data);
+        // data.input_frames = tempTotalRead;
 
         // This will essentially reverse the n /= 2 that we did earlier
         if (mono) tempTotalRead = _buffer.monoToStereo(tempTotalRead);
@@ -70,9 +76,8 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
     // totalRead = mono ? totalRead * 2 : totalRead;
 
     delete [] inBuffer;
-    delete [] outBuffer;
 
-    return _buffer.read(buffer, totalRead, 1.0F, false);
+    return _buffer.read(buffer, externalN, 1.0F, false);
 }
 
 void IOMultiFile::startRead() {

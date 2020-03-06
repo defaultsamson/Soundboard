@@ -2,6 +2,7 @@
 #define TEMPBUFFER_H
 
 #include <stddef.h>
+#include <samplerate.h>
 
 class TempBuffer
 {
@@ -17,6 +18,8 @@ public:
 
     void forwardWriteIndex(size_t n);
     void forwardReadIndex(size_t n);
+
+    size_t applySampleRateChange(size_t n, size_t channels, SRC_STATE* state, SRC_DATA& data);
 
     size_t availableRead();
 

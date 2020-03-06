@@ -214,6 +214,48 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite, b
     return n;
 }
 
+size_t TempBuffer::applySampleRateChange(size_t n, size_t channels, SRC_STATE* state, SRC_DATA& data) {
+    if (data.src_ratio == 1.0) return n;
+
+    float* inBuffer = nullptr;
+
+    // If reading n bytes from _buffer would go past BUFFER_BYTES
+    if (n + _writeIndex > BUFFER_BYTES) {
+        // Fill a temporary inBuffer
+        inBuffer = new float[n];
+
+        size_t preLoop = BUFFER_BYTES - _writeIndex;
+        memcpy(inBuffer, _buffer + _writeIndex, preLoop    );
+        memcpy(inBuffer, _buffer              , n - preLoop);
+    } else {
+        data.data_in = _buffer + _writeIndex;
+    }
+
+    // TODO what if the outBuffer is overfilled? e.g. if input_frames_used != n
+    // Should we consider a scenario where outBuffer is also _buffer + writeIndex, as we did with inBuffer??
+    float* outBuffer = new float[n * channels];
+    data.data_out = outBuffer;
+
+    data.input_frames = n;
+    data.output_frames = n;
+
+    // TODO ERROR int err =
+    src_process(state, &data);
+    size_t converted = static_cast<size_t>(data.output_frames_gen);
+    // TODO ERROR if (err != 0) ;
+
+    write(outBuffer, converted, true, false);
+
+    if (inBuffer) delete [] inBuffer;
+    delete [] outBuffer;
+
+    std::cout << "n        : " << n << std::endl;
+    std::cout << "used N   : " << data.input_frames_used << std::endl;
+    std::cout << "converted: " << converted << std::endl;
+
+    return converted;
+}
+
 size_t TempBuffer::availableRead() {
     size_t maxN = 0;
     // Compute the max n that can be read
