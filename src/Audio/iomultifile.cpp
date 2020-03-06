@@ -57,13 +57,12 @@ size_t IOMultiFile::mix(float* buffer, size_t n) {
             if (read > tempTotalRead) tempTotalRead = read; // Update the max bytes read
             if (read < n) delete _openFiles.takeAt(i); // Remove file from the list if it's run out of bytes to read
         }
-        if (mono) {
-            // std::cout << "1" << std::endl;
-            tempTotalRead = _buffer.monoToStereo(tempTotalRead);
-            // std::cout << "2" << std::endl;
-        }
-        _buffer.forwardWriteIndex(tempTotalRead);
+
+        // This will essentially reverse the n /= 2 that we did earlier
+        if (mono) tempTotalRead = _buffer.monoToStereo(tempTotalRead);
         totalRead += tempTotalRead;
+
+        _buffer.forwardWriteIndex(tempTotalRead);
     }
     modifyLock.unlock();
 
@@ -89,9 +88,9 @@ void IOMultiFile::setFile(std::string filename) {
     _channels = tempFile.channels();
     mono = _channels == 1;
     int error = 0;
-    //state = src_new(SRC_SINC_MEDIUM_QUALITY, _channels, &error);
+    state = src_new(SRC_SINC_MEDIUM_QUALITY, _channels, &error);
     if (error != 0) return; // TODO ERROR
-    //data.src_ratio = static_cast<double>(SAMPLE_RATE) / static_cast<double>(tempFile.samplerate());
+    data.src_ratio = static_cast<double>(SAMPLE_RATE) / static_cast<double>(tempFile.samplerate());
     //_inverseRatio = static_cast<double>(tempFile.samplerate()) / static_cast<double>(SAMPLE_RATE);
 }
 
@@ -102,7 +101,9 @@ void IOMultiFile::clear() {
     }
     modifyLock.unlock();
     _buffer.clear();
-    _buffer.forwardWriteIndex(280);
-    _buffer.forwardReadIndex(280);
+
+    // For testing stereo to mono loops, num just has to be > 255
+    // _buffer.forwardWriteIndex(280);
+    // _buffer.forwardReadIndex(280);
 }
 
