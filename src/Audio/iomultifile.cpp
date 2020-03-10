@@ -28,11 +28,12 @@ size_t IOMultiFile::mix(float* buffer, size_t externalN) {
 
 
     // Makes it only read what it needs to
-    size_t internalN = mono ? externalN / 2 : externalN;
+    size_t internalN = (mono ? externalN / 2 : externalN) * READ_MULTIPLIER;
     float* inBuffer = new float[internalN];
 
     // Begin with the amount that's available to read
     size_t totalRead = _buffer.availableRead();
+    std::cout << "Total Read: " << totalRead << std::endl;
 
     // Iterates the open files and adds their read bytes into buffer
     modifyLock.lock();
@@ -53,7 +54,7 @@ size_t IOMultiFile::mix(float* buffer, size_t externalN) {
             */
 
             // Overwrite for the first item iterated
-            _buffer.write(inBuffer, internalN, first, false);
+            _buffer.write(inBuffer, read, first, false);
             first = false;
 
             if (read > tempTotalRead) tempTotalRead = read; // Update the max bytes read
@@ -77,7 +78,7 @@ size_t IOMultiFile::mix(float* buffer, size_t externalN) {
 
     delete [] inBuffer;
 
-    return _buffer.read(buffer, externalN, 1.0F, false);
+    return _buffer.read(buffer, totalRead < externalN ? totalRead : externalN, 1.0F, false);
 }
 
 void IOMultiFile::startRead() {

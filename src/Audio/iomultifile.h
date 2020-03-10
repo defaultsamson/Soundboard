@@ -29,6 +29,8 @@ private:
     std::string _filename;
     int _channels = 0;
     bool mono = false;
+
+    size_t READ_MULTIPLIER = 8;
 };
 
 #endif // IOMULTIFILE_H
