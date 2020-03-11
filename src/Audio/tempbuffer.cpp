@@ -107,7 +107,9 @@ void TempBuffer::write(const float* buffer, size_t n, bool overwrite, bool forwa
     if (endWriteIndex >= BUFFER_BYTES) {
         if (forwardWriteIndex) {
             _writingLoopsAhead++;
+            std::cout << "Forwarding Write Index1: " << _writeIndex << std::endl;
             _writeIndex -= BUFFER_BYTES;
+            std::cout << "Forwarding Write Index2: " << _writeIndex << std::endl;
         }
         endWriteIndex -= BUFFER_BYTES;
         writingLooped = true;
@@ -158,7 +160,9 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite, b
     if (endReadIndex >= BUFFER_BYTES) {
         if (forwardReadIndex) {
             _writingLoopsAhead--;
+            std::cout << "Forwarding Read Index1: " << _readIndex << std::endl;
             _readIndex -= BUFFER_BYTES;
+            std::cout << "Forwarding Read Index2: " << _readIndex << std::endl;
         }
         endReadIndex -= BUFFER_BYTES;
         readingLooped = true;
@@ -234,15 +238,15 @@ size_t TempBuffer::applySampleRateChange(size_t n, size_t channels, SRC_STATE* s
 
     // TODO what if the outBuffer is overfilled? e.g. if input_frames_used != n
     // Should we consider a scenario where outBuffer is also _buffer + writeIndex, as we did with inBuffer??
-    float* outBuffer = new float[n * channels];
+    float* outBuffer = new float[n];
     data.data_out = outBuffer;
 
-    data.input_frames = n;
-    data.output_frames = n;
+    data.input_frames = n / channels;
+    data.output_frames = n / channels;
 
     // TODO ERROR int err =
     src_process(state, &data);
-    size_t converted = static_cast<size_t>(data.output_frames_gen);
+    size_t converted = static_cast<size_t>(data.output_frames_gen) * channels;
     // TODO ERROR if (err != 0) ;
 
     write(outBuffer, converted, true, false);
