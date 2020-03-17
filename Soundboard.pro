@@ -123,9 +123,9 @@ win32: DEPENDPATH += $$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/in
 
 #libsamplerate
 unix:!macx: LIBS += -lsamplerate
-#win32: LIBS += -L$$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/lib/' -llibsndfile-1
-#win32: INCLUDEPATH += $$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/include'
-#win32: DEPENDPATH += $$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/include'
+win32: LIBS += -L$$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/lib/ -lsamplerate
+win32: INCLUDEPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
+win32: DEPENDPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
 
 RESOURCES += \
     res.qrc
