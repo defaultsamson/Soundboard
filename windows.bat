@@ -67,7 +67,7 @@ echo Finished! Output files to Soundboard\%DATA%
 goto :end
 
 :help
-echo "windows.bat <soundboard executable> <windowsdeployqt.exe> [binarycreator.exe] [installerbase.exe]"
+echo "windows.bat <soundboard executable> <windeployqt.exe> [binarycreator.exe] [installerbase.exe]"
 goto :end
 
 :clean
