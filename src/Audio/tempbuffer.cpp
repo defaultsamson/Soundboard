@@ -2,8 +2,6 @@
 
 #include <string.h>
 
-#include <iostream>
-
 TempBuffer::TempBuffer() {
     // Set up _buffer to hold as much data as a device's total requested frames (frames per buffer * channels), times the BUFFER_MULTIPLIER
     _buffer = new float[BUFFER_BYTES];
@@ -107,9 +105,7 @@ void TempBuffer::write(const float* buffer, size_t n, bool overwrite, bool forwa
     if (endWriteIndex >= BUFFER_BYTES) {
         if (forwardWriteIndex) {
             _writingLoopsAhead++;
-            std::cout << "Forwarding Write Index1: " << _writeIndex << std::endl;
             _writeIndex -= BUFFER_BYTES;
-            std::cout << "Forwarding Write Index2: " << _writeIndex << std::endl;
         }
         endWriteIndex -= BUFFER_BYTES;
         writingLooped = true;
@@ -160,9 +156,7 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite, b
     if (endReadIndex >= BUFFER_BYTES) {
         if (forwardReadIndex) {
             _writingLoopsAhead--;
-            std::cout << "Forwarding Read Index1: " << _readIndex << std::endl;
             _readIndex -= BUFFER_BYTES;
-            std::cout << "Forwarding Read Index2: " << _readIndex << std::endl;
         }
         endReadIndex -= BUFFER_BYTES;
         readingLooped = true;
@@ -230,8 +224,9 @@ size_t TempBuffer::applySampleRateChange(size_t n, size_t channels, SRC_STATE* s
         data.data_in = inBuffer;
 
         size_t preLoop = BUFFER_BYTES - _writeIndex;
-        memcpy(inBuffer, _buffer + _writeIndex, preLoop    );
-        memcpy(inBuffer, _buffer              , n - preLoop);
+        memcpy(inBuffer          , _buffer + _writeIndex, preLoop       * sizeof(float));
+        memcpy(inBuffer + preLoop, _buffer              , (n - preLoop) * sizeof(float));
+
     } else {
         data.data_in = _buffer + _writeIndex;
     }
@@ -253,12 +248,6 @@ size_t TempBuffer::applySampleRateChange(size_t n, size_t channels, SRC_STATE* s
 
     if (inBuffer) delete [] inBuffer;
     delete [] outBuffer;
-
-    /*
-    std::cout << "n        : " << n << std::endl;
-    std::cout << "used N   : " << data.input_frames_used << std::endl;
-    std::cout << "converted: " << converted << std::endl;
-    */
 
     return converted;
 }
