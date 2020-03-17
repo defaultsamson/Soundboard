@@ -25,6 +25,7 @@ WidgetKeybind::WidgetKeybind(QWidget* parent) :
     QObject::connect(buttonKey, &QPushButton::clicked, this, &WidgetKeybind::onButtonKeyClicked);
 
     buttonDelete = new QPushButton(QIcon(":/icons/res/delete.png"), "");
+    buttonDelete->setEnabled(false); // Start off disabled
     buttonDelete->setIconSize(QSize(fixedHeight, fixedHeight));
     buttonDelete->setFixedSize(QSize(fixedHeight, fixedHeight));
     layout->addWidget(buttonDelete);
