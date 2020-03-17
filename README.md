@@ -6,13 +6,14 @@ A Soundboard written in C++
 - [PortAudio](http://www.portaudio.com/) (audio device back-end)
 - [libsndfile](http://www.mega-nerd.com/libsndfile/) (audio decoding)
 - [libsamplerate](http://www.mega-nerd.com/SRC/) (samplerate conversion)
+- [QHotkey](https://github.com/Skycoder42/QHotkey) (hotkey back-end)
+- [SingleApplication](https://github.com/itay-grudev/SingleApplication) (application manager)
 
 ## Building
 1. Install [Qt 5.12.6+](https://www.qt.io/download) (the free open source version is fine)
 2. Clone this repository `git clone https://github.com/qwertysam/Soundboard`
-3. Read notes below: Install [QHotkey](https://github.com/Skycoder42/QHotkey) using [qdep](https://github.com/Skycoder42/qdep)
-    - **DO NOT INSTALL VIA QPMX AS THEY SAY**
-    - Note: Really, all you have to do is install qdep and prepare your Qt's qmake version for it (as described in their README). The Soundboard.pro file is already set up properly here, so all you'll have to do is compile the program, and it'll isntall the QHotkey library for you.
+3. Install [qdep](https://github.com/Skycoder42/qdep)
+    - Refreshing the Soundboard.pro project in Qt Creator should automatically install the [QHotkey](https://github.com/Skycoder42/QHotkey) and [SingleApplication](https://github.com/itay-grudev/SingleApplication) dependencies
 4. Install [libsndfile](https://github.com/erikd/libsndfile)
     - Without MP3 support:
         - On Linux `sudo apt install libsndfile-dev`
@@ -43,7 +44,6 @@ A Soundboard written in C++
                 - Then copy `./libsndfile/src/.libs/libsndfile.dll.a` to the Qt installation `lib` folder `C:\Qt\VERSION\mingw73_64\lib\`
         - On Windows
             - Good luck?
-    
     
         </details>
 
@@ -103,7 +103,7 @@ A Soundboard written in C++
 
 Windows deployment is done through the `windows.bat` script. Usage for `windows.bat` is as follows:
 
-`windows.bat <soundboard executable> <windowsdeployqt.exe> [binarycreator.exe] [installerbase.exe]`
+`windows.bat <soundboard executable> <windeployqt.exe> [binarycreator.exe] [installerbase.exe]`
 
 Note: the two arguments at the end are only required if you wish to deploy a Windows installer. You can find more about that process [here](https://doc.qt.io/qtinstallerframework/ifw-creating-installers.html) if you'd like to contribute to it. The `windows.bat` script takes care of all that, and the only step you need to do is install a [QT installer framework](https://wiki.qt.io/Qt-Installer-Framework) (look under "Using a prebuilt version") to get the necessary binaries `binarycreator.exe` and `installerbase.exe`.
 
