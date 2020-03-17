@@ -70,7 +70,6 @@ A Soundboard written in C++
         - [Compile and install](http://portaudio.com/docs/v19-doxydocs/tutorial_start.html) on the system
 6. Install [PortAudio](http://www.portaudio.com/usinggit.html)
     - On Linux `sudo apt install libportaudio2`
-        
     - On Windows: might need to [set up MSYS2 with mingw64](https://github.com/orlp/dev-on-windows/wiki/Installing-GCC--&-MSYS2) to compile PortAudio
         - I couldn't get it to compile or install properly no matter what, so what I did is...
         - Installed MSYS2
