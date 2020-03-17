@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/icons">
         <file>res/add.png</file>
-        <file>res/delete2.png</file>
+        <file>res/delete.png</file>
         <file>res/edit.png</file>
         <file>res/pause.png</file>
         <file>res/play.png</file>
@@ -9,6 +9,7 @@
         <file>res/mic_off.png</file>
         <file>res/mic_on.png</file>
         <file>res/icon.png</file>
+        <file>res/refresh.png</file>
     </qresource>
     <qresource prefix="/audio">
         <file>res/test.ogg</file>

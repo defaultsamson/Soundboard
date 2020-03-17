@@ -24,8 +24,6 @@ public:
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
-    void on_sliderVolume_valueChanged(int value);
-    void on_spinBoxVolume_valueChanged(int arg1);
     void on_pushButtonFile_clicked();
     void onClose();
     void on_pushButtonPlay_clicked();

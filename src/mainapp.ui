@@ -357,7 +357,7 @@
             </property>
             <property name="icon">
              <iconset resource="../res.qrc">
-              <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+              <normaloff>:/icons/res/delete.png</normaloff>:/icons/res/delete.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -573,7 +573,7 @@
             </property>
             <property name="icon">
              <iconset resource="../res.qrc">
-              <normaloff>:/icons/res/delete2.png</normaloff>:/icons/res/delete2.png</iconset>
+              <normaloff>:/icons/res/delete.png</normaloff>:/icons/res/delete.png</iconset>
             </property>
             <property name="iconSize">
              <size>

@@ -4,7 +4,7 @@
 #include <QHotkey>
 #include <qt_windows.h>
 
-QString HotkeyUtil::keycodeToString(quint32 keycode) {
+QString HotkeyUtil::keycodeToString(quint32 keycode, bool nonNative) {
     // https://stackoverflow.com/questions/38100667/windows-virtual-key-codes
     int size = 1024;
     char* name = static_cast<char*>(malloc(size * sizeof(char)));

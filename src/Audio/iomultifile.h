@@ -4,7 +4,9 @@
 #include <string>
 #include <QList>
 #include <sndfile.hh>
+#include <samplerate.h>
 #include <mutex>
+#include "tempbuffer.h"
 
 class IOMultiFile
 {
@@ -18,11 +20,17 @@ public:
     void clear();
     void startRead();
 private:
+    SRC_STATE* state;
+    SRC_DATA data;
+    TempBuffer _buffer;
+    double _inverseRatio;
     QList<SndfileHandle*> _openFiles;
     std::mutex modifyLock;
     std::string _filename;
     int _channels = 0;
     bool mono = false;
+
+    size_t READ_MULTIPLIER = 8;
 };
 
 #endif // IOMULTIFILE_H

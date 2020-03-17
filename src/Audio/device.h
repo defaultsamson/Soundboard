@@ -30,7 +30,7 @@ public:
 
     int volumeInt() { return _volumeInt; }
     float volume() { return _volume; }
-    void setVolume(int volumeInt);
+    void setVolumeInt(int volumeInt);
 
     HostInfoContainer* host() { return _host; }
     void setHost(HostInfoContainer* host) { _host = host; }

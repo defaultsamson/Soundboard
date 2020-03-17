@@ -38,6 +38,7 @@ SOURCES += \
     src/Audio/audioobjectinput.cpp \
     src/Audio/device.cpp \
     src/Audio/iomultifile.cpp \
+    src/Audio/tempbuffer.cpp \
     src/Dialog/dialogboard.cpp \
     src/Dialog/dialogkeybind.cpp \
     src/Dialog/dialogsettings.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
     src/Widget/listitem.cpp \
     src/Dialog/dialogsound.cpp \
     src/Widget/widgetaudio.cpp \
+    src/Widget/widgetvolume.cpp \
     src/mainapp.cpp
 
 HEADERS += \
@@ -58,6 +60,7 @@ HEADERS += \
     src/Audio/audioobjectinput.h \
     src/Audio/device.h \
     src/Audio/iomultifile.h \
+    src/Audio/tempbuffer.h \
     src/Dialog/dialogboard.h \
     src/Dialog/dialogkeybind.h \
     src/Dialog/dialogsettings.h \
@@ -70,6 +73,7 @@ HEADERS += \
     src/Widget/listitem.h \
     src/Dialog/dialogsound.h \
     src/Widget/widgetaudio.h \
+    src/Widget/widgetvolume.h \
     src/mainapp.h
 
 FORMS += \
@@ -116,6 +120,12 @@ unix:!macx: LIBS += -lsndfile #-lmpg123 -lmp3lame
 win32: LIBS += -L$$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/lib/' -llibsndfile-1
 win32: INCLUDEPATH += $$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/include'
 win32: DEPENDPATH += $$PWD/'../../../../../Program Files/Mega-Nerd/libsndfile/include'
+
+#libsamplerate
+unix:!macx: LIBS += -lsamplerate
+win32: LIBS += -L$$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/lib/ -lsamplerate
+win32: INCLUDEPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
+win32: DEPENDPATH += $$PWD/../../../../../Qt/$${QT_VERSION}/mingw73_64/include
 
 RESOURCES += \
     res.qrc

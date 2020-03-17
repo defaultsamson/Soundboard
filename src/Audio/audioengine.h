@@ -4,13 +4,15 @@
 #include <QObject>
 #include <QList>
 
-#include "audioobject.h"
 #include "audioobjectinput.h"
 #include "audioobjectfile.h"
 #include "../Widget/listitemsound.h"
 
 #include "device.h"
 #include <memory>
+
+// TODO allow the user to change these
+#define SAMPLE_RATE (44100)
 
 struct CallbackInfo {
     AudioEngine* audio;
@@ -87,6 +89,8 @@ private:
     QList<std::shared_ptr<DeviceIndexInfo>> _selectedInputIndexes;
     QList<AudioObjectFile*> _audioObjectRegistry;
     AudioObjectInput* _inputObject = nullptr;
+
+    void updateListIndexes(bool inputs, bool outputs);
 
     Device* getDevice(int deviceIndex);
 };

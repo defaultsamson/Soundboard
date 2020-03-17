@@ -59,7 +59,7 @@ if "%~3"=="" goto :firstend
 set OUTPUT=SoundboardInstaller.exe
 %3 -t %4 -p installer\packaged -c installer\config.xml %OUTPUT%
 
-echo Finished! Created installer Soundboard/%OUTPUT% and output files to Soundboard\%DATA%
+echo Finished! Created installer Soundboard\%OUTPUT% and output files to Soundboard\%DATA%
 goto :end
 
 :firstend
@@ -67,11 +67,12 @@ echo Finished! Output files to Soundboard\%DATA%
 goto :end
 
 :help
-echo "windows.bat <soundboard executable> <windowsdeployqt.exe> [binarycreator.exe] [installerbase.exe]"
+echo "windows.bat <soundboard executable> <windeployqt.exe> [binarycreator.exe] [installerbase.exe]"
 goto :end
 
 :clean
 rmdir /s /q %DATA%
+del %OUTPUT%
 echo Cleaned!
 goto :end
 

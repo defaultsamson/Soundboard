@@ -14,6 +14,7 @@ class AudioObjectFile : public AudioObject
 {
 public:
     void setFile(const QString &filePath);
+    QString filename() { return QString::fromStdString(_filename); }
 
     void write(const float* buffer, size_t n);
     size_t read(float* buffer, size_t n);

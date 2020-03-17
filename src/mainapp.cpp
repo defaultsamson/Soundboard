@@ -123,6 +123,7 @@ QString Main::HK_UNMUTE_INPUT_HAS = "hk_unmute_input_has";
 QString Main::HK_UNMUTE_INPUT_KEY = "hk_unmute_input_key";
 QString Main::HK_TOGGLE_MUTE_INPUT_HAS = "hk_toggle_mute_input_has";
 QString Main::HK_TOGGLE_MUTE_INPUT_KEY = "hk_toggle_mute_input_key";
+QString Main::NON_NATIVE_KEYNAMING = "non_native_keynaming";
 
 QString Main::REMEMBER_WINDOW_SIZES = "remember_window_sizes";
 QString Main::WINDOW_MAIN_GEOMETRY = "window__main_geometry";
@@ -137,6 +138,7 @@ QString Main::WINDOW_SOUND_HEIGHT = "window_sound_height";
 QString Main::SHOW_SETTINGS_OUTPUT0 = "show_settings_output0";
 QString Main::SHOW_SETTINGS_OUTPUT1 = "show_settings_output1";
 QString Main::SHOW_SETTINGS_INPUT0 = "show_settings_input0";
+QString Main::SHOW_SETTINGS_AUDIO_FILE = "show_settings_audio_file";
 
 QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
 QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
