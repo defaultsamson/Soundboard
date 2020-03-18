@@ -9,6 +9,8 @@
 #include "Dialog/dialogsettings.h"
 #include "Dialog/dialogtestaudio.h"
 #include "Hotkey/hotkeytrigger.h"
+#include "fileutil.h"
+#include "settings.h"
 
 #include <QApplication>
 #include <singleapplication.h>
@@ -19,7 +21,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFileDialog>
-#include <QSettings>
 #include <QModelIndex>
 #include <QObject>
 #include <QAbstractItemModel>
@@ -45,9 +46,9 @@ MyThread::MyThread(Main* _main) : _main(_main) {
 void MyThread::run()
 {
     // Set up testing audio
-    QFile testFile(Main::DEFAULT_TEST_FILE);
+    QFile testFile(FileUtil::DEFAULT_TEST_FILE);
     if (!testFile.exists()) {
-        QFile::copy(":/audio/res/test.ogg", Main::DEFAULT_TEST_FILE);
+        QFile::copy(":/audio/res/test.ogg", FileUtil::DEFAULT_TEST_FILE);
     }
 
     _main->audio()->init();
@@ -94,73 +95,10 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
-QString Main::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/Soundboard/";
-QString Main::SETTINGS_FILE = "settings.ini";
-QString Main::DEFAULT_SOUNDBOARD = "default.json";
-QString Main::DEFAULT_TEST_FILE = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/test.ogg";
-
-QString Main::DARK_THEME = "dark_theme";
-bool Main::DARK_THEME_DEFAULT = false;
-QString Main::ACTIVE_BOARD = "active_board";
-QString Main::ACTIVE_BOARD_DEFAULT = "";
-QString Main::HAS_ACTIVE_BOARD = "has_active_board";
-bool Main::HAS_ACTIVE_BOARD_DEFAULT = false;
-QString Main::SETTINGS_TAB = "settings_tab";
-
-QString Main::HK_ENABLE_KEYBINDS_HAS = "hk_enable_keybinds_has";
-QString Main::HK_ENABLE_KEYBINDS_KEY = "hk_enable_keybinds_key";
-QString Main::HK_DISABLE_KEYBINDS_HAS = "hk_disable_keybinds_has";
-QString Main::HK_DISABLE_KEYBINDS_KEY = "hk_disable_keybinds_key";
-QString Main::HK_STOP_SOUNDS_HAS = "hk_stop_sounds_has";
-QString Main::HK_STOP_SOUNDS_KEY = "hk_stop_sounds_key";
-QString Main::HK_PAUSE_SOUNDS_HAS = "hk_pause_sounds_has";
-QString Main::HK_PAUSE_SOUNDS_KEY = "hk_pause_sounds_key";
-QString Main::HK_RESUME_SOUNDS_HAS = "hk_resume_sounds_has";
-QString Main::HK_RESUME_SOUNDS_KEY = "hk_resume_sounds_key";
-QString Main::HK_MUTE_INPUT_HAS = "hk_mute_input_has";
-QString Main::HK_MUTE_INPUT_KEY = "hk_mute_input_key";
-QString Main::HK_UNMUTE_INPUT_HAS = "hk_unmute_input_has";
-QString Main::HK_UNMUTE_INPUT_KEY = "hk_unmute_input_key";
-QString Main::HK_TOGGLE_MUTE_INPUT_HAS = "hk_toggle_mute_input_has";
-QString Main::HK_TOGGLE_MUTE_INPUT_KEY = "hk_toggle_mute_input_key";
-QString Main::NON_NATIVE_KEYNAMING = "non_native_keynaming";
-
-QString Main::REMEMBER_WINDOW_SIZES = "remember_window_sizes";
-QString Main::WINDOW_MAIN_GEOMETRY = "window__main_geometry";
-QString Main::WINDOW_MAIN_SPLITTER0 = "window__main_slider0";
-QString Main::WINDOW_MAIN_SPLITTER1 = "window__main_slider1";
-QString Main::WINDOW_SETTINGS_WIDTH = "window_settings_width";
-QString Main::WINDOW_SETTINGS_HEIGHT = "window_settings_height";
-QString Main::WINDOW_BOARD_WIDTH = "window_board_width";
-QString Main::WINDOW_BOARD_HEIGHT = "window_board_height";
-QString Main::WINDOW_SOUND_WIDTH = "window_sound_width";
-QString Main::WINDOW_SOUND_HEIGHT = "window_sound_height";
-QString Main::SHOW_SETTINGS_OUTPUT0 = "show_settings_output0";
-QString Main::SHOW_SETTINGS_OUTPUT1 = "show_settings_output1";
-QString Main::SHOW_SETTINGS_INPUT0 = "show_settings_input0";
-QString Main::SHOW_SETTINGS_AUDIO_FILE = "show_settings_audio_file";
-
-QString Main::EXPLICIT_NO_OUTPUT_DEVICES = "explicit_no_outputs";
-QString Main::EXPLICIT_NO_INPUT_DEVICES = "explicit_no_inputs";
-QString Main::OUTPUT_INDEX0 = "output_index0";
-QString Main::OUTPUT_INDEX1 = "output_index1";
-QString Main::INPUT_INDEX0 = "input_index0";
-QString Main::OUTPUT_VOLUME0 = "output_volume0";
-QString Main::OUTPUT_VOLUME1 = "output_volume1";
-QString Main::INPUT_VOLUME0 = "input_volume0";
-QString Main::TEST_VOLUME = "test_volume";
-QString Main::INPUT_OUT0 = "input_out0";
-QString Main::INPUT_OUT1 = "input_out1";
-QString Main::INPUT_MUTED = "input_muted";
-QString Main::SHOW_MUTE_BUTTON = "show_mute_button";
-QString Main::SHOW_DRIVERS = "show_drivers";
-QString Main::TEST_FILE = "test_file";
-
 Main::Main(QWidget* parent) :
     QMainWindow(parent),
     ui(new Ui::MainApp),
     _audio(new AudioEngine(this)),
-    _settings(new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat)),
     defaultPalette(qApp->palette())
 {
     ui->setupUi(this);
@@ -199,54 +137,53 @@ Main::Main(QWidget* parent) :
 
     // Light, Midlight, Mid, NoRole, PlaceholderText
 
-    setDarkTheme(settings()->value(DARK_THEME, DARK_THEME_DEFAULT).toBool());
+    setDarkTheme(Settings::DARK_THEME.value().toBool());
 
     // Load the previously active board
-    if (settings()->value(HAS_ACTIVE_BOARD, HAS_ACTIVE_BOARD_DEFAULT).toBool()) {
-        load(settings()->value(ACTIVE_BOARD, ACTIVE_BOARD_DEFAULT).toString());
-    }
+    if (Settings::ACTIVE_BOARD.hasValue())
+        load(Settings::ACTIVE_BOARD.value().toString());
 
     connect(ui->listSounds, &QListWidget::currentRowChanged, this, &Main::rowChanged);
 
     // Loads global keybinds & their behaviour
     hkEnableKeybinds = new HotkeyTrigger(this, [this]{ enableKeybinds(); });
-    if (settings()->value(HK_ENABLE_KEYBINDS_HAS, false).toBool()) {
-        hkEnableKeybinds->setKey(static_cast<quint32>(settings()->value(HK_ENABLE_KEYBINDS_KEY, 0).toInt()));
+    if (Settings::HK_ENABLE_KEYBINDS_KEY.hasValue()) {
+        hkEnableKeybinds->setKey(Settings::HK_ENABLE_KEYBINDS_KEY.value().toUInt());
         hkEnableKeybinds->reg();
     }
     hkDisableKeybinds = new HotkeyTrigger(this, [this]{ disableKeybinds(); });
-    if (settings()->value(HK_DISABLE_KEYBINDS_HAS, false).toBool()) {
-        hkDisableKeybinds->setKey(static_cast<quint32>(settings()->value(HK_DISABLE_KEYBINDS_KEY, 0).toInt()));
+    if (Settings::HK_DISABLE_KEYBINDS_KEY.hasValue()) {
+        hkDisableKeybinds->setKey(Settings::HK_DISABLE_KEYBINDS_KEY.value().toUInt());
         hkDisableKeybinds->reg();
     }
     hkStopSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->stop(); });
-    if (settings()->value(HK_STOP_SOUNDS_HAS, false).toBool()) {
-        hkStopSounds->setKey(static_cast<quint32>(settings()->value(HK_STOP_SOUNDS_KEY, 0).toInt()));
+    if (Settings::HK_STOP_SOUNDS_KEY.hasValue()) {
+        hkStopSounds->setKey(Settings::HK_STOP_SOUNDS_KEY.value().toUInt());
         hkStopSounds->reg();
     }
     hkPauseSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->pause(); });
-    if (settings()->value(HK_PAUSE_SOUNDS_HAS, false).toBool()) {
-        hkPauseSounds->setKey(static_cast<quint32>(settings()->value(HK_PAUSE_SOUNDS_KEY, 0).toInt()));
+    if (Settings::HK_PAUSE_SOUNDS_KEY.hasValue()) {
+        hkPauseSounds->setKey(Settings::HK_PAUSE_SOUNDS_KEY.value().toUInt());
         hkPauseSounds->reg();
     }
     hkResumeSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) if (sound->isPaused()) sound->play(); });
-    if (settings()->value(HK_RESUME_SOUNDS_HAS, false).toBool()) {
-        hkResumeSounds->setKey(static_cast<quint32>(settings()->value(HK_RESUME_SOUNDS_KEY, 0).toInt()));
+    if (Settings::HK_RESUME_SOUNDS_KEY.hasValue()) {
+        hkResumeSounds->setKey(Settings::HK_RESUME_SOUNDS_KEY.value().toUInt());
         hkResumeSounds->reg();
     }
     hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(true); updateMuteButton(); });
-    if (settings()->value(HK_MUTE_INPUT_HAS, false).toBool()) {
-        hkMuteInput->setKey(static_cast<quint32>(settings()->value(HK_MUTE_INPUT_KEY, 0).toInt()));
+    if (Settings::HK_MUTE_INPUT_KEY.hasValue()) {
+        hkMuteInput->setKey(Settings::HK_MUTE_INPUT_KEY.value().toUInt());
         hkMuteInput->reg();
     }
     hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(false); updateMuteButton(); });
-    if (settings()->value(HK_UNMUTE_INPUT_HAS, false).toBool()) {
-        hkUnmuteInput->setKey(static_cast<quint32>(settings()->value(HK_UNMUTE_INPUT_KEY, 0).toInt()));
+    if (Settings::HK_UNMUTE_INPUT_KEY.hasValue()) {
+        hkUnmuteInput->setKey(Settings::HK_UNMUTE_INPUT_KEY.value().toUInt());
         hkUnmuteInput->reg();
     }
     hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(!_audio->inputObject()->isMuted()); updateMuteButton(); });
-    if (settings()->value(HK_TOGGLE_MUTE_INPUT_HAS, false).toBool()) {
-        hkToggleMuteInput->setKey(static_cast<quint32>(settings()->value(HK_TOGGLE_MUTE_INPUT_KEY, 0).toInt()));
+    if (Settings::HK_TOGGLE_MUTE_INPUT_KEY.hasValue()) {
+        hkToggleMuteInput->setKey(Settings::HK_TOGGLE_MUTE_INPUT_KEY.value().toUInt());
         hkToggleMuteInput->reg();
     }
 
@@ -258,7 +195,6 @@ Main::~Main()
     clear();
     delete ui;
     delete _audio;
-    delete _settings;
 
     delete hkEnableKeybinds;
     delete hkDisableKeybinds;
@@ -642,7 +578,7 @@ void Main::load(const QString fn) {
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open save file.");
         // TODO inform user the file failed to load
-        settings()->setValue(HAS_ACTIVE_BOARD, false);
+        Settings::ACTIVE_BOARD.clearValue();
         return;
     }
 
@@ -669,8 +605,7 @@ void Main::load(const QString fn) {
 
     hasFile = true;
     fileName = fn;
-    settings()->setValue(HAS_ACTIVE_BOARD, true);
-    settings()->setValue(ACTIVE_BOARD, fileName);
+    Settings::ACTIVE_BOARD.setValue(fileName);
     updateTitle();
 }
 
@@ -679,7 +614,7 @@ void Main::save(bool saveAs) {
     if (saveAs) { // Let the user choose a save file
         tempFileName = QFileDialog::getSaveFileName(this, tr("Open Soundboard File"), QString(), tr("JSON Files (*.json)"));
     } else if (!hasFile) { // Use default
-        tempFileName = DEFAULT_DIR + DEFAULT_SOUNDBOARD;
+        tempFileName = FileUtil::DEFAULT_DIR + FileUtil::DEFAULT_SOUNDBOARD_FILE;
     } else {
         tempFileName = fileName;
     }
@@ -705,7 +640,7 @@ void Main::save(bool saveAs) {
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning("Couldn't write to save file.");
         // TODO inform user the file failed to save
-        settings()->setValue(HAS_ACTIVE_BOARD, false);
+        Settings::ACTIVE_BOARD.clearValue();
         return;
     }
 
@@ -731,8 +666,7 @@ void Main::save(bool saveAs) {
     fileName = tempFileName;
     setChanged(false);
     updateTitle();
-    settings()->setValue(HAS_ACTIVE_BOARD, true);
-    settings()->setValue(ACTIVE_BOARD, fileName);
+    Settings::ACTIVE_BOARD.setValue(fileName);
 }
 
 // ******************* END FILE FUNCTIONS *******************
@@ -752,15 +686,11 @@ void Main::disableKeybinds() {
 
 void Main::setDarkTheme(bool set) {
     qApp->setPalette(set ? darkPalette : defaultPalette);
-    settings()->setValue(DARK_THEME, set);
+    Settings::DARK_THEME.setValue(set);
 }
 
 AudioEngine *Main::audio() {
     return _audio;
-}
-
-QSettings *Main::settings() {
-    return _settings;
 }
 
 QMessageBox::StandardButton Main::unsavedChangedDialogue() {
@@ -789,11 +719,11 @@ void Main::closeEvent (QCloseEvent* event)
     }
 
     // Save the _main window sizes
-    settings()->setValue(WINDOW_MAIN_GEOMETRY, saveGeometry());
+    Settings::WINDOW_MAIN_GEOMETRY.setValue(saveGeometry());
     QList<int> sizes = ui->splitter->sizes();
-    settings()->setValue(WINDOW_MAIN_SPLITTER0, sizes.at(0));
-    settings()->setValue(WINDOW_MAIN_SPLITTER1, sizes.at(1));
-    settings()->setValue(INPUT_MUTED, _audio->inputObject()->isMuted());
+    Settings::WINDOW_MAIN_SPLITTER0.setValue(sizes.at(0));
+    Settings::WINDOW_MAIN_SPLITTER1.setValue(sizes.at(1));
+    Settings::INPUT_MUTED.setValue(_audio->inputObject()->isMuted());
 }
 
 void Main::setChanged(bool changed) {
@@ -905,13 +835,13 @@ void Main::resizeEvent(QResizeEvent* event) {
 
 void Main::restoreSizes() {
     // Restores the window geometry
-    if (settings()->value(REMEMBER_WINDOW_SIZES, true).toBool()) {
-        if (settings()->contains(WINDOW_MAIN_GEOMETRY)) restoreGeometry(settings()->value(WINDOW_MAIN_GEOMETRY).toByteArray());
+    if (Settings::REMEMBER_WINDOW_SIZES.value().toBool()) {
+        if (Settings::WINDOW_MAIN_GEOMETRY.hasValue()) restoreGeometry(Settings::WINDOW_MAIN_GEOMETRY.value().toByteArray());
 
-        if (settings()->contains(WINDOW_MAIN_SPLITTER0) && settings()->contains(WINDOW_MAIN_SPLITTER1)) {
+        if (Settings::WINDOW_MAIN_SPLITTER0.hasValue() && Settings::WINDOW_MAIN_SPLITTER1.hasValue()) {
             QList<int> sizes;
-            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER0).toInt());
-            sizes.append(settings()->value(WINDOW_MAIN_SPLITTER1).toInt());
+            sizes.append(Settings::WINDOW_MAIN_SPLITTER0.value().toInt());
+            sizes.append(Settings::WINDOW_MAIN_SPLITTER1.value().toInt());
             ui->splitter->setSizes(sizes);
         }
     } else {
@@ -935,7 +865,7 @@ void Main::updateMuteButton() {
             && _audio->inputObject()
             && ((_audio->inputObject()->isActiveOutput0() && _audio->getActiveDisplayOutput(0))
                 || (_audio->inputObject()->isActiveOutput1() && _audio->getActiveDisplayOutput(1)))
-            && settings()->value(SHOW_MUTE_BUTTON, true).toBool())
+            && Settings::SHOW_MUTE_BUTTON.value().toBool())
     {
         ui->muteButton->show();
         ui->muteButton->setIcon(QIcon(_audio->inputObject()->isMuted() ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));

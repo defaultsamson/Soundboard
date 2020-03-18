@@ -2,6 +2,7 @@
 #include "ui_dialogboard.h"
 
 #include "../mainapp.h"
+#include "../settings.h"
 #include "../Widget/listitemboard.h"
 
 #include <QObject>
@@ -18,9 +19,9 @@ DialogBoard::DialogBoard(Main* _main, ListItemBoard* board, bool creatingNew) :
     if (board->hasKey()) ui->keybindBoard->setKey(board->key());
 
     // Restore the geometry, if it was saved
-    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool()) {
-        if (_main->settings()->contains(Main::WINDOW_BOARD_WIDTH)) {
-            resize(_main->settings()->value(Main::WINDOW_BOARD_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_BOARD_HEIGHT, 500).toInt());
+    if (Settings::REMEMBER_WINDOW_SIZES.value().toBool()) {
+        if (Settings::WINDOW_BOARD_WIDTH.hasValue() && Settings::WINDOW_BOARD_HEIGHT.hasValue()) {
+            resize(Settings::WINDOW_BOARD_WIDTH.value().toInt(), Settings::WINDOW_BOARD_HEIGHT.value().toInt());
         }
     }
 
@@ -70,6 +71,6 @@ void DialogBoard::onClose() {
     _main->enableKeybinds();
 
     // Save the geometry
-    _main->settings()->setValue(Main::WINDOW_BOARD_WIDTH, width());
-    _main->settings()->setValue(Main::WINDOW_BOARD_HEIGHT, height());
+    Settings::WINDOW_BOARD_WIDTH.setValue(width());
+    Settings::WINDOW_BOARD_HEIGHT.setValue(height());
 }

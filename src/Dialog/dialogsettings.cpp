@@ -1,6 +1,7 @@
 #include "dialogsettings.h"
 #include "ui_dialogsettings.h"
 #include "../mainapp.h"
+#include "../settings.h"
 #include "../Audio/audioengine.h"
 #include "../Audio/audioobjectfile.h"
 #include "dialogtestaudio.h"
@@ -25,19 +26,19 @@ DialogSettings::DialogSettings(Main* _main) :
 
     QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onClose()));
 
-    ui->tabWidget->setCurrentIndex(_main->settings()->value(Main::SETTINGS_TAB, 0).toInt());
+    ui->tabWidget->setCurrentIndex(Settings::SETTINGS_TAB.value().toInt());
 
 #ifdef Q_OS_WIN
     ui->checkBoxDarkTheme->hide();
 #endif
-    ui->checkBoxDarkTheme->setChecked(_main->settings()->value(Main::DARK_THEME, false).toBool());
-    ui->checkBoxShowMuteButton->setChecked(_main->settings()->value(Main::SHOW_MUTE_BUTTON, true).toBool());
-    ui->checkBoxListDrivers->setChecked(_main->settings()->value(Main::SHOW_DRIVERS, false).toBool());
-    ui->checkBoxWindowSize->setChecked(_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool());
+    ui->checkBoxDarkTheme->setChecked(Settings::DARK_THEME.value().toBool());
+    ui->checkBoxShowMuteButton->setChecked(Settings::SHOW_MUTE_BUTTON.value().toBool());
+    ui->checkBoxListDrivers->setChecked(Settings::SHOW_DRIVERS.value().toBool());
+    ui->checkBoxWindowSize->setChecked(Settings::REMEMBER_WINDOW_SIZES.value().toBool());
     // Restore the geometry, if it was saved
-    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool()) {
-        if (_main->settings()->contains(Main::WINDOW_SETTINGS_WIDTH)) {
-            resize(_main->settings()->value(Main::WINDOW_SETTINGS_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_SETTINGS_HEIGHT, 500).toInt());
+    if (Settings::REMEMBER_WINDOW_SIZES.value().toBool()) {
+        if (Settings::WINDOW_SETTINGS_WIDTH.hasValue() && Settings::WINDOW_SETTINGS_HEIGHT.hasValue()) {
+            resize(Settings::WINDOW_SETTINGS_WIDTH.value().toInt(), Settings::WINDOW_SETTINGS_HEIGHT.value().toInt());
         }
     }
 
@@ -50,17 +51,17 @@ DialogSettings::DialogSettings(Main* _main) :
     connect(ui->comboBoxDriverInput0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::hostChangedInput0);
     connect(ui->comboBoxDeviceInput0, QOverload<int>::of(&QComboBox::activated), this, &DialogSettings::deviceChangedInput0);
 
-    ui->volumeOutput0->setValue(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
-    ui->volumeOutput1->setValue(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
-    ui->volumeInput0->setValue(_main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+    ui->volumeOutput0->setValue(Settings::OUTPUT_VOLUME0.value().toInt());
+    ui->volumeOutput1->setValue(Settings::OUTPUT_VOLUME1.value().toInt());
+    ui->volumeInput0->setValue(Settings::INPUT_VOLUME0.value().toInt());
     connect(ui->volumeOutput0, &WidgetVolume::valueChanged, this, [this](int value){ setOutputDeviceVolume(value, 0); });
     connect(ui->volumeOutput1, &WidgetVolume::valueChanged, this, [this](int value){ setOutputDeviceVolume(value, 1); });
     connect(ui->volumeInput0, &WidgetVolume::valueChanged, this, [this](int value){ setInputDeviceVolume(value); });
 
-    ui->checkBoxInput0Output0->setChecked(_main->settings()->value(Main::INPUT_OUT0, false).toBool());
-    ui->checkBoxInput0Output1->setChecked(_main->settings()->value(Main::INPUT_OUT1, false).toBool());
+    ui->checkBoxInput0Output0->setChecked(Settings::INPUT_OUT0.value().toBool());
+    ui->checkBoxInput0Output1->setChecked(Settings::INPUT_OUT1.value().toBool());
 
-    QString testFile = _main->settings()->value(Main::TEST_FILE, Main::DEFAULT_TEST_FILE).toString();
+    QString testFile = Settings::TEST_FILE.value().toString();
     audio.setFile(testFile);
     audio.setUpdateVisualizer(true);
     connect(&audio, &AudioObject::update, this, [this](float level) {
@@ -69,8 +70,8 @@ DialogSettings::DialogSettings(Main* _main) :
     _main->audio()->registerAudio(&audio);
     if (audio.hasFile()) ui->lineEditAudioFile->setText(testFile);
 
-    audio.setVolume(_main->settings()->value(Main::TEST_VOLUME, 100).toInt() / static_cast<float>(100));
-    ui->volumeAudioFile->setValue(_main->settings()->value(Main::TEST_VOLUME, 100).toInt());
+    audio.setVolumeInt(Settings::TEST_VOLUME.value().toInt());
+    ui->volumeAudioFile->setValue(Settings::TEST_VOLUME.value().toInt());
     // Connects the volume slider&box with the AudioObject
     connect(ui->volumeAudioFile, &WidgetVolume::valueChanged, &audio, &AudioObject::setVolumeInt);
 
@@ -107,11 +108,11 @@ DialogSettings::DialogSettings(Main* _main) :
     _main->hkToggleMuteInput->unreg();
     if (_main->hkToggleMuteInput->hasKey()) ui->keybindInput0ToggleMute->setKey(_main->hkToggleMuteInput->key());
 
-    ui->checkBoxNonNativeKeys->setChecked(_main->settings()->value(Main::NON_NATIVE_KEYNAMING, true).toBool());
+    ui->checkBoxNonNativeKeys->setChecked(Settings::NON_NATIVE_KEYNAMING.value().toBool());
 }
 
 void DialogSettings::updateKeybindNaming() {
-    bool nonNative = _main->settings()->value(Main::NON_NATIVE_KEYNAMING, true).toBool();
+    bool nonNative = Settings::NON_NATIVE_KEYNAMING.value().toBool();
     ui->keybindKeybindsEnable->updateKeyname(nonNative);
     ui->keybindKeybindsDisable->updateKeyname(nonNative);
     ui->keybindSoundsStop->updateKeyname(nonNative);
@@ -133,7 +134,7 @@ void DialogSettings::updateScrollAreaPalette() {
     // have a QPalette::XXXXX value that correlates to its background. It seems to be QPalette:Button,
     // except that colour isn't accurate in light mode. QPalette::AlternateBase seems to be accurate
     // in dark mode.
-    pal.setColor(QPalette::Window, _main->settings()->value(Main::DARK_THEME, false).toBool() ? QColor(66, 66, 66) : QColor(255, 255, 255));
+    pal.setColor(QPalette::Window, Settings::DARK_THEME.value().toBool() ? QColor(66, 66, 66) : QColor(255, 255, 255));
     ui->scrollAreaAudio->setPalette(pal);
     ui->scrollAreaKeybinds->setPalette(pal);
     ui->scrollAreaOther->setPalette(pal);
@@ -145,109 +146,109 @@ void DialogSettings::onClose() {
     _main->enableKeybinds();
     if (_inputObjectInited) _main->audio()->inputObject()->setUpdateVisualizer(false);
 
-    _main->settings()->setValue(Main::TEST_VOLUME, ui->volumeAudioFile->value());
+    Settings::TEST_VOLUME.setValue(ui->volumeAudioFile->value());
 
     // Save the geometry
-    _main->settings()->setValue(Main::REMEMBER_WINDOW_SIZES, ui->checkBoxWindowSize->isChecked());
-    _main->settings()->setValue(Main::WINDOW_SETTINGS_WIDTH, width());
-    _main->settings()->setValue(Main::WINDOW_SETTINGS_HEIGHT, height());
+    Settings::REMEMBER_WINDOW_SIZES.setValue(ui->checkBoxWindowSize->isChecked());
+    Settings::WINDOW_SETTINGS_WIDTH.setValue(width());
+    Settings::WINDOW_SETTINGS_HEIGHT.setValue(height());
 
     _main->updateMuteButton();
 
     // Save all global keybinds
     bool hasKey = ui->keybindKeybindsEnable->hasKey();
     quint32 key = ui->keybindKeybindsEnable->key();
-    _main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_HAS, hasKey);
     if (hasKey) {
         _main->hkEnableKeybinds->setKey(ui->keybindKeybindsEnable->key());
         _main->hkEnableKeybinds->reg();
-        _main->settings()->setValue(Main::HK_ENABLE_KEYBINDS_KEY, key);
+        Settings::HK_ENABLE_KEYBINDS_KEY.setValue(key);
     } else {
         _main->hkEnableKeybinds->unSetKey();
+        Settings::HK_ENABLE_KEYBINDS_KEY.clearValue();
     }
 
 
     hasKey = ui->keybindKeybindsDisable->hasKey();
     key = ui->keybindKeybindsDisable->key();
-    _main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_HAS, hasKey);
     if (hasKey) {
         _main->hkDisableKeybinds->setKey(ui->keybindKeybindsDisable->key());
         _main->hkDisableKeybinds->reg();
-        _main->settings()->setValue(Main::HK_DISABLE_KEYBINDS_KEY, key);
+        Settings::HK_DISABLE_KEYBINDS_KEY.setValue(key);
     } else {
         _main->hkDisableKeybinds->unSetKey();
+        Settings::HK_DISABLE_KEYBINDS_KEY.clearValue();
     }
 
 
     hasKey = ui->keybindSoundsStop->hasKey();
     key = ui->keybindSoundsStop->key();
-    _main->settings()->setValue(Main::HK_STOP_SOUNDS_HAS, hasKey);
     if (hasKey) {
         _main->hkStopSounds->setKey(ui->keybindSoundsStop->key());
         _main->hkStopSounds->reg();
-        _main->settings()->setValue(Main::HK_STOP_SOUNDS_KEY, key);
+        Settings::HK_STOP_SOUNDS_KEY.setValue(key);
     } else {
         _main->hkStopSounds->unSetKey();
+        Settings::HK_STOP_SOUNDS_KEY.clearValue();
     }
 
 
     hasKey = ui->keybindSoundsPause->hasKey();
     key = ui->keybindSoundsPause->key();
-    _main->settings()->setValue(Main::HK_PAUSE_SOUNDS_HAS, hasKey);
     if (hasKey) {
         _main->hkPauseSounds->setKey(ui->keybindSoundsPause->key());
         _main->hkPauseSounds->reg();
-        _main->settings()->setValue(Main::HK_PAUSE_SOUNDS_KEY, key);
+        Settings::HK_PAUSE_SOUNDS_KEY.setValue(key);
     } else {
         _main->hkPauseSounds->unSetKey();
+        Settings::HK_PAUSE_SOUNDS_KEY.clearValue();
     }
 
 
     hasKey = ui->keybindSoundsResume->hasKey();
     key = ui->keybindSoundsResume->key();
-    _main->settings()->setValue(Main::HK_RESUME_SOUNDS_HAS, hasKey);
     if (hasKey) {
         _main->hkResumeSounds->setKey(ui->keybindSoundsResume->key());
         _main->hkResumeSounds->reg();
-        _main->settings()->setValue(Main::HK_RESUME_SOUNDS_KEY, key);
+        Settings::HK_RESUME_SOUNDS_KEY.setValue(key);
     } else {
         _main->hkResumeSounds->unSetKey();
+        Settings::HK_RESUME_SOUNDS_KEY.clearValue();
     }
 
 
     hasKey = ui->keybindInput0Mute->hasKey();
     key = ui->keybindInput0Mute->key();
-    _main->settings()->setValue(Main::HK_MUTE_INPUT_HAS, hasKey);
     if (hasKey) {
         _main->hkMuteInput->setKey(ui->keybindInput0Mute->key());
         _main->hkMuteInput->reg();
-        _main->settings()->setValue(Main::HK_MUTE_INPUT_KEY, key);
+        Settings::HK_MUTE_INPUT_KEY.setValue(key);
     } else {
         _main->hkMuteInput->unSetKey();
+        Settings::HK_MUTE_INPUT_KEY.clearValue();
     }
 
 
     hasKey = ui->keybindInput0Unmute->hasKey();
     key = ui->keybindInput0Unmute->key();
-    _main->settings()->setValue(Main::HK_UNMUTE_INPUT_HAS, hasKey);
     if (hasKey) {
         _main->hkUnmuteInput->setKey(ui->keybindInput0Unmute->key());
         _main->hkUnmuteInput->reg();
-        _main->settings()->setValue(Main::HK_UNMUTE_INPUT_KEY, key);
+        Settings::HK_UNMUTE_INPUT_KEY.setValue(key);
     } else {
         _main->hkUnmuteInput->unSetKey();
+        Settings::HK_UNMUTE_INPUT_KEY.clearValue();
     }
 
 
     hasKey = ui->keybindInput0ToggleMute->hasKey();
     key = ui->keybindInput0ToggleMute->key();
-    _main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_HAS, hasKey);
     if (hasKey) {
         _main->hkToggleMuteInput->setKey(ui->keybindInput0ToggleMute->key());
         _main->hkToggleMuteInput->reg();
-        _main->settings()->setValue(Main::HK_TOGGLE_MUTE_INPUT_KEY, key);
+        Settings::HK_TOGGLE_MUTE_INPUT_KEY.setValue(key);
     } else {
         _main->hkToggleMuteInput->unSetKey();
+        Settings::HK_TOGGLE_MUTE_INPUT_KEY.clearValue();
     }
 }
 
@@ -391,27 +392,27 @@ QPixmap DialogSettings::modifyPixmap(QPixmap pixmap, bool dark, bool rotate) {
     */
 }
 void DialogSettings::toggleOutput0() {
-    _main->settings()->setValue(Main::SHOW_SETTINGS_OUTPUT0, !_main->settings()->value(Main::SHOW_SETTINGS_OUTPUT0, true).toBool());
+    Settings::SHOW_SETTINGS_OUTPUT0.setValue(!Settings::SHOW_SETTINGS_OUTPUT0.value().toBool());
     updateGroupBoxes();
 }
 void DialogSettings::toggleOutput1() {
-    _main->settings()->setValue(Main::SHOW_SETTINGS_OUTPUT1, !_main->settings()->value(Main::SHOW_SETTINGS_OUTPUT1, true).toBool());
+    Settings::SHOW_SETTINGS_OUTPUT1.setValue(!Settings::SHOW_SETTINGS_OUTPUT1.value().toBool());
     updateGroupBoxes();
 }
 void DialogSettings::toggleInput0() {
-    _main->settings()->setValue(Main::SHOW_SETTINGS_INPUT0, !_main->settings()->value(Main::SHOW_SETTINGS_INPUT0, true).toBool());
+    Settings::SHOW_SETTINGS_INPUT0.setValue(!Settings::SHOW_SETTINGS_INPUT0.value().toBool());
     updateGroupBoxes();
 }
 void DialogSettings::toggleAudioFile() {
-    _main->settings()->setValue(Main::SHOW_SETTINGS_AUDIO_FILE, !_main->settings()->value(Main::SHOW_SETTINGS_AUDIO_FILE, true).toBool());
+    Settings::SHOW_SETTINGS_AUDIO_FILE.setValue(!Settings::SHOW_SETTINGS_AUDIO_FILE.value().toBool());
     updateGroupBoxes();
 }
 
 void DialogSettings::updateGroupBoxes() {
     bool inited = _main->audio()->isInitialized();
-    bool dark = _main->settings()->value(Main::DARK_THEME, false).toBool();
+    bool dark = Settings::DARK_THEME.value().toBool();
 
-    bool show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT0, true).toBool();
+    bool show = Settings::SHOW_SETTINGS_OUTPUT0.value().toBool();
     QPixmap map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
     Device* device = _main->audio()->getActiveDisplayOutput(0);
     ui->arrowOutput0->setPixmap(modifyPixmap(map, dark, !show));
@@ -420,7 +421,7 @@ void DialogSettings::updateGroupBoxes() {
                               : "Output Device 1 (INITIALIZING...)");
     show ? ui->frameOutput0->show() : ui->frameOutput0->hide();
 
-    show = _main->settings()->value(Main::SHOW_SETTINGS_OUTPUT1, true).toBool();
+    show = Settings::SHOW_SETTINGS_OUTPUT1.value().toBool();
     map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
     device = _main->audio()->getActiveDisplayOutput(1);
     ui->arrowOutput1->setPixmap(modifyPixmap(map, dark, !show));
@@ -429,7 +430,7 @@ void DialogSettings::updateGroupBoxes() {
                               : "Output Device 2 (INITIALIZING...)");
     show ? ui->frameOutput1->show() : ui->frameOutput1->hide();
 
-    show = _main->settings()->value(Main::SHOW_SETTINGS_INPUT0, true).toBool();
+    show = Settings::SHOW_SETTINGS_INPUT0.value().toBool();
     map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
     device = _main->audio()->getActiveDisplayInput(0);
     ui->arrowInput0->setPixmap(modifyPixmap(map, dark, !show));
@@ -438,7 +439,7 @@ void DialogSettings::updateGroupBoxes() {
                               : "Input Device (INITIALIZING...)");
     show ? ui->frameInput0->show() : ui->frameInput0->hide();
 
-    show = _main->settings()->value(Main::SHOW_SETTINGS_AUDIO_FILE, true).toBool();
+    show = Settings::SHOW_SETTINGS_AUDIO_FILE.value().toBool();
     map = style()->standardPixmap(QStyle::SP_TitleBarUnshadeButton);
     ui->arrowAudioFile->setPixmap(modifyPixmap(map, dark, !show));
     show ? ui->frameAudioFile->show() : ui->frameAudioFile->hide();
@@ -447,7 +448,7 @@ void DialogSettings::updateGroupBoxes() {
 void DialogSettings::refreshDeviceSelection() {
     AudioEngine* a = _main->audio();
 
-    bool showDrivers = _main->settings()->value(Main::SHOW_DRIVERS, false).toBool();
+    bool showDrivers = Settings::SHOW_DRIVERS.value().toBool();
 
     ui->labelDriverOutput0->setVisible(showDrivers);
     ui->comboBoxDriverOutput0->setVisible(showDrivers);
@@ -634,10 +635,10 @@ void DialogSettings::setOutputDeviceVolume(int value, int devDisplayIndex) {
 
     switch (devDisplayIndex) {
     case 0:
-        _main->settings()->setValue(Main::OUTPUT_VOLUME0, value);
+        Settings::OUTPUT_VOLUME0.setValue(value);
         break;
     case 1:
-        _main->settings()->setValue(Main::OUTPUT_VOLUME1, value);
+        Settings::OUTPUT_VOLUME1.setValue(value);
         break;
     }
 }
@@ -645,7 +646,7 @@ void DialogSettings::setOutputDeviceVolume(int value, int devDisplayIndex) {
 void DialogSettings::setInputDeviceVolume(int value) {
     AudioObjectInput* dev = _main->audio()->inputObject();
     if (dev) dev->setVolumeInt(value);
-    _main->settings()->setValue(Main::INPUT_VOLUME0, value);
+    Settings::INPUT_VOLUME0.setValue(value);
 }
 
 void DialogSettings::updateFileName(QString fn) {
@@ -653,14 +654,14 @@ void DialogSettings::updateFileName(QString fn) {
     audio.setFile(fn);
     ui->lineEditAudioFile->setText(fn);
     refreshDeviceSelection();
-    _main->settings()->setValue(Main::TEST_FILE, fn);
+    Settings::TEST_FILE.setValue(fn);
 }
 
 void DialogSettings::updateMuteButton() {
     if (!_inputObjectInited) return;
     bool muted = _main->audio()->inputObject()->isMuted();
     ui->buttonMuteInput0->setIcon(QIcon(muted ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
-    _main->settings()->setValue(Main::INPUT_MUTED, muted);
+    Settings::INPUT_MUTED.setValue(muted);
 }
 
 void DialogSettings::on_checkBoxListDrivers_clicked(){
@@ -700,7 +701,7 @@ void DialogSettings::on_checkBoxListDrivers_clicked(){
 
     switch (resBtn) {
     case QMessageBox::Yes:
-        _main->settings()->setValue(Main::SHOW_DRIVERS, enable);
+        Settings::SHOW_DRIVERS.setValue(enable);
 
         if (enable) {
             // Show all drivers, and remove all displayHosts that don't have an
@@ -792,14 +793,14 @@ void DialogSettings::on_buttonDeleteInput0_clicked()
 void DialogSettings::on_checkBoxInput0Output0_clicked()
 {
     bool enabled = ui->checkBoxInput0Output0->isChecked();
-    _main->settings()->setValue(Main::INPUT_OUT0, enabled);
+    Settings::INPUT_OUT0.setValue(enabled);
     if (_inputObjectInited) _main->audio()->inputObject()->setOutput0(enabled);
 }
 
 void DialogSettings::on_checkBoxInput0Output1_clicked()
 {
     bool enabled = ui->checkBoxInput0Output1->isChecked();
-    _main->settings()->setValue(Main::INPUT_OUT1, enabled);
+    Settings::INPUT_OUT1.setValue(enabled);
     if (_inputObjectInited) _main->audio()->inputObject()->setOutput1(enabled);
 }
 
@@ -818,7 +819,7 @@ void DialogSettings::on_buttonMuteInput0_clicked()
 
 void DialogSettings::on_checkBoxShowMuteButton_clicked()
 {
-    _main->settings()->setValue(Main::SHOW_MUTE_BUTTON, ui->checkBoxShowMuteButton->isChecked());
+    Settings::SHOW_MUTE_BUTTON.setValue(ui->checkBoxShowMuteButton->isChecked());
 }
 
 void DialogSettings::on_buttonAudioFile_clicked()
@@ -830,7 +831,7 @@ void DialogSettings::on_buttonAudioFile_clicked()
 
 void DialogSettings::on_tabWidget_currentChanged(int index)
 {
-    _main->settings()->setValue(Main::SETTINGS_TAB, index);
+    Settings::SETTINGS_TAB.setValue(index);
 }
 
 void DialogSettings::on_checkBoxDarkTheme_clicked()
@@ -842,6 +843,6 @@ void DialogSettings::on_checkBoxDarkTheme_clicked()
 
 void DialogSettings::on_checkBoxNonNativeKeys_clicked()
 {
-    _main->settings()->setValue(Main::NON_NATIVE_KEYNAMING, ui->checkBoxNonNativeKeys->isChecked());
+    Settings::NON_NATIVE_KEYNAMING.setValue(ui->checkBoxNonNativeKeys->isChecked());
     updateKeybindNaming();
 }

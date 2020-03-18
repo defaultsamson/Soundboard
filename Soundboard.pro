@@ -51,9 +51,12 @@ SOURCES += \
     src/Dialog/dialogsound.cpp \
     src/Widget/widgetaudio.cpp \
     src/Widget/widgetvolume.cpp \
-    src/mainapp.cpp
+    src/fileutil.cpp \
+    src/mainapp.cpp \
+    src/settings.cpp
 
 HEADERS += \
+    src/fileutil.h \
     src/Audio/audioengine.h \
     src/Audio/audioobject.h \
     src/Audio/audioobjectfile.h \
@@ -74,7 +77,8 @@ HEADERS += \
     src/Dialog/dialogsound.h \
     src/Widget/widgetaudio.h \
     src/Widget/widgetvolume.h \
-    src/mainapp.h
+    src/mainapp.h \
+    src/settings.h
 
 FORMS += \
     src/Dialog/dialogboard.ui \

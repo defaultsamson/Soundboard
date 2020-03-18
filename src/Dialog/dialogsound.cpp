@@ -2,6 +2,7 @@
 #include "ui_dialogsound.h"
 
 #include "../mainapp.h"
+#include "../settings.h"
 #include "../Widget/listitemsound.h"
 #include "dialogtestaudio.h"
 #include "../Audio/audioobjectfile.h"
@@ -19,7 +20,7 @@ DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
 {
     ui->setupUi(this);
     ui->lineEditName->setText(creatingNew ? "" : sound->text());
-    ui->keybindSound->updateKeyname(_main->settings()->value(Main::NON_NATIVE_KEYNAMING, true).toBool());
+    ui->keybindSound->updateKeyname(Settings::NON_NATIVE_KEYNAMING.value().toBool());
     if (sound->hasKey()) ui->keybindSound->setKey(sound->key());
     ui->lineEditFile->setText(sound->audio()->filename());
     ui->widgetVolume->setValue(sound->audio()->volumeInt());
@@ -32,9 +33,9 @@ DialogSound::DialogSound(Main* _main, ListItemSound* sound, bool creatingNew) :
     sound->audio()->stop();
 
     // Restore the geometry, if it was saved
-    if (_main->settings()->value(Main::REMEMBER_WINDOW_SIZES, true).toBool()) {
-        if (_main->settings()->contains(Main::WINDOW_SOUND_WIDTH)) {
-            resize(_main->settings()->value(Main::WINDOW_SOUND_WIDTH, 500).toInt(), _main->settings()->value(Main::WINDOW_SOUND_HEIGHT, 500).toInt());
+    if (Settings::REMEMBER_WINDOW_SIZES.value().toBool()) {
+        if (Settings::WINDOW_SOUND_WIDTH.hasValue() && Settings::WINDOW_SOUND_HEIGHT.hasValue()) {
+            resize(Settings::WINDOW_SOUND_WIDTH.value().toInt(), Settings::WINDOW_SOUND_HEIGHT.value().toInt());
         }
     }
 
@@ -131,8 +132,8 @@ void DialogSound::onClose() {
     _main->setAudioTestDialog(nullptr);
 
     // Save the geometry
-    _main->settings()->setValue(Main::WINDOW_SOUND_WIDTH, width());
-    _main->settings()->setValue(Main::WINDOW_SOUND_HEIGHT, height());
+    Settings::WINDOW_SOUND_WIDTH.setValue(width());
+    Settings::WINDOW_SOUND_HEIGHT.setValue(height());
 }
 
 void DialogSound::on_pushButtonPlay_clicked()

@@ -1,11 +1,13 @@
 #include "audioengine.h"
 
 #include "audioobject.h"
+#include "../settings.h"
+#include "../mainapp.h"
+
 #include <portaudio.h>
 #ifdef Q_OS_LINUX
 #include <pa_jack.h>
 #endif
-#include "../mainapp.h"
 #include <memory>
 #include <iostream>
 
@@ -207,8 +209,8 @@ const QList<Device*> AudioEngine::inputs() {
 void AudioEngine::init() {
     _main->showAudioEngineText(true);
     _inputObject = new AudioObjectInput();
-    _inputObject->setOutput0(_main->settings()->value(Main::INPUT_OUT0, false).toBool());
-    _inputObject->setOutput1(_main->settings()->value(Main::INPUT_OUT1, false).toBool());
+    _inputObject->setOutput0(Settings::INPUT_OUT0.value().toBool());
+    _inputObject->setOutput1(Settings::INPUT_OUT1.value().toBool());
 #ifdef Q_OS_LINUX
     PaJack_SetClientName("Soundboard");
 #endif
@@ -292,36 +294,36 @@ void AudioEngine::refreshDevices() {
     }
 
     // Devices are loaded, now determine which are supposed to be active
-    Device* out0 = getDevice(_main->settings()->value(Main::OUTPUT_INDEX0, -1).toInt());
-    Device* out1 = getDevice(_main->settings()->value(Main::OUTPUT_INDEX1, -1).toInt());
-    Device* in0 = getDevice(_main->settings()->value(Main::INPUT_INDEX0, -1).toInt());
-    _inputObject->setMute(_main->settings()->value(Main::INPUT_MUTED, false).toBool());
+    Device* out0 = Settings::OUTPUT_INDEX0.hasValue() ? getDevice(Settings::OUTPUT_INDEX0.value().toInt()) : nullptr;
+    Device* out1 = Settings::OUTPUT_INDEX0.hasValue() ? getDevice(Settings::OUTPUT_INDEX1.value().toInt()) : nullptr;
+    Device* in0 = Settings::OUTPUT_INDEX0.hasValue() ? getDevice(Settings::INPUT_INDEX0.value().toInt()) : nullptr;
+    _inputObject->setMute(Settings::INPUT_MUTED.value().toBool());
 
     // There's a saved device, load it
     if (out0) {
         out0->indexes()->outputDisplayIndex = 0;
-        out0->setVolumeInt(_main->settings()->value(Main::OUTPUT_VOLUME0, 100).toInt());
+        out0->setVolumeInt(Settings::OUTPUT_VOLUME0.value().toInt());
         addActiveOutput(out0);
     }
     if (out1) {
         out1->indexes()->outputDisplayIndex = 1;
-        out1->setVolumeInt(_main->settings()->value(Main::OUTPUT_VOLUME1, 100).toInt());
+        out1->setVolumeInt(Settings::OUTPUT_VOLUME1.value().toInt());
         addActiveOutput(out1);
     }
     if (in0) {
         in0->indexes()->inputDisplayIndex = 0;
-        _inputObject->setVolumeInt(_main->settings()->value(Main::INPUT_VOLUME0, 100).toInt());
+        _inputObject->setVolumeInt(Settings::INPUT_VOLUME0.value().toInt());
         addActiveInput(in0);
     }
 
     // If no device was found, and the devices weren't explicitly all removed, load the defaults
-    if (_activeOutputs.size() == 0 && _defaultOutput && !_main->settings()->value(Main::EXPLICIT_NO_OUTPUT_DEVICES, false).toBool()) {
-        _main->settings()->setValue(Main::OUTPUT_INDEX0, _defaultOutput ? _defaultOutput->indexes()->deviceIndex : -1);
+    if (_activeOutputs.size() == 0 && _defaultOutput && !Settings::EXPLICIT_NO_OUTPUT_DEVICES.value().toBool()) {
+        Settings::OUTPUT_INDEX0.setValue(_defaultOutput ? _defaultOutput->indexes()->deviceIndex : -1);
         _defaultOutput->indexes()->outputDisplayIndex = 0;
         addActiveOutput(_defaultOutput);
     }
-    if (_activeInputs.size() == 0 && _defaultInput && !_main->settings()->value(Main::EXPLICIT_NO_INPUT_DEVICES, false).toBool()) {
-        _main->settings()->setValue(Main::INPUT_INDEX0, _defaultInput ? _defaultInput->indexes()->deviceIndex : -1);
+    if (_activeInputs.size() == 0 && _defaultInput && !Settings::EXPLICIT_NO_INPUT_DEVICES.value().toBool()) {
+        Settings::INPUT_INDEX0.setValue(_defaultInput ? _defaultInput->indexes()->deviceIndex : -1);
         _defaultInput->indexes()->inputDisplayIndex = 0;
         addActiveInput(_defaultInput);
     }
@@ -399,12 +401,12 @@ int AudioEngine::audioCallback(const void* inputBuffer, void *outputBuffer,
 void AudioEngine::updateSavedDevices() {
     Device* dev;
     dev = getActiveDisplayOutput(0);
-    _main->settings()->setValue(Main::OUTPUT_INDEX0, dev ? dev->indexes()->deviceIndex : -1);
+    dev ? Settings::OUTPUT_INDEX0.setValue(dev->indexes()->deviceIndex) : Settings::OUTPUT_INDEX0.clearValue();
     dev = getActiveDisplayOutput(1);
-    _main->settings()->setValue(Main::OUTPUT_INDEX1, dev ? dev->indexes()->deviceIndex : -1);
+    dev ? Settings::OUTPUT_INDEX1.setValue(dev->indexes()->deviceIndex) : Settings::OUTPUT_INDEX1.clearValue();
     dev = getActiveDisplayInput(0);
-    _main->settings()->setValue(Main::INPUT_INDEX0, dev ? dev->indexes()->deviceIndex : -1);
+    dev ? Settings::INPUT_INDEX0.setValue(dev->indexes()->deviceIndex) : Settings::INPUT_INDEX0.clearValue();
 
-    _main->settings()->setValue(Main::EXPLICIT_NO_OUTPUT_DEVICES, _activeOutputs.count() == 0);
-    _main->settings()->setValue(Main::EXPLICIT_NO_INPUT_DEVICES, _activeInputs.count() == 0);
+    Settings::EXPLICIT_NO_OUTPUT_DEVICES.setValue(_activeOutputs.count() == 0);
+    Settings::EXPLICIT_NO_INPUT_DEVICES.setValue(_activeInputs.count() == 0);
 }
