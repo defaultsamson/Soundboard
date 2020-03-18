@@ -21,24 +21,15 @@ QSettings* Settings::SETTINGS = new QSettings(FileUtil::DEFAULT_DIR + FileUtil::
 
 Settings Settings::DARK_THEME = Settings("dark_theme", false);
 Settings Settings::ACTIVE_BOARD = Settings("active_board");
-//Setting Setting::HAS_ACTIVE_BOARD = Setting("has_active_board", false);
 Settings Settings::SETTINGS_TAB = Settings("settings_tab", 0);
 
-//Setting Setting::HK_ENABLE_KEYBINDS_HAS = Setting("hk_enable_keybinds_has", false);
 Settings Settings::HK_ENABLE_KEYBINDS_KEY = Settings("hk_enable_keybinds_key");
-//Setting Setting::HK_DISABLE_KEYBINDS_HAS = Setting("hk_disable_keybinds_has", false);
 Settings Settings::HK_DISABLE_KEYBINDS_KEY = Settings("hk_disable_keybinds_key");
-//Setting Setting::HK_STOP_SOUNDS_HAS = Setting("hk_stop_sounds_has", false);
 Settings Settings::HK_STOP_SOUNDS_KEY = Settings("hk_stop_sounds_key");
-//Setting Setting::HK_PAUSE_SOUNDS_HAS = Setting("hk_pause_sounds_has", false);
 Settings Settings::HK_PAUSE_SOUNDS_KEY = Settings("hk_pause_sounds_key");
-//Setting Setting::HK_RESUME_SOUNDS_HAS = Setting("hk_resume_sounds_has", false);
 Settings Settings::HK_RESUME_SOUNDS_KEY = Settings("hk_resume_sounds_key");
-//Setting Setting::HK_MUTE_INPUT_HAS = Setting("hk_mute_input_has", false);
 Settings Settings::HK_MUTE_INPUT_KEY = Settings("hk_mute_input_key");
-//Setting Setting::HK_UNMUTE_INPUT_HAS = Setting("hk_unmute_input_has", false);
 Settings Settings::HK_UNMUTE_INPUT_KEY = Settings("hk_unmute_input_key");
-//Setting Setting::HK_TOGGLE_MUTE_INPUT_HAS = Setting("hk_toggle_mute_input_has", false);
 Settings Settings::HK_TOGGLE_MUTE_INPUT_KEY = Settings("hk_toggle_mute_input_key");
 Settings Settings::NON_NATIVE_KEYNAMING = Settings("non_native_keynaming", true);
 

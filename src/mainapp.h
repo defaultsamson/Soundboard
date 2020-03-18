@@ -61,7 +61,6 @@ public:
 
     void restoreSizes();
     void updateButtonBar();
-    void showAudioEngineText(bool show);
 
 private slots:
     void on_actionNew_triggered();

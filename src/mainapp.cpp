@@ -98,10 +98,13 @@ int main(int argc, char *argv[])
 Main::Main(QWidget* parent) :
     QMainWindow(parent),
     ui(new Ui::MainApp),
-    _audio(new AudioEngine(this)),
+    _audio(new AudioEngine()),
     defaultPalette(qApp->palette())
 {
     ui->setupUi(this);
+
+    QObject::connect(_audio, &AudioEngine::refreshing, this, [&]{ ui->labelAudioEngine->show(); });
+    QObject::connect(_audio, &AudioEngine::finishedRefreshing, this, [&]{ ui->labelAudioEngine->hide(); });
 
     // Sets up the onSoundMoved event
     QObject::connect(ui->listSounds->model(), &QAbstractItemModel::rowsMoved, this, &Main::onSoundMoved);
@@ -852,11 +855,6 @@ void Main::restoreSizes() {
         ui->splitter->setSizes(sizes);
     }
     updateButtonBar();
-}
-
-void Main::showAudioEngineText(bool show) {
-    if (show) ui->labelAudioEngine->show();
-    else ui->labelAudioEngine->hide();
 }
 
 void Main::updateMuteButton() {

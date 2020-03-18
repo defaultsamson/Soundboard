@@ -11,24 +11,15 @@ class Settings
 public:
     static Settings DARK_THEME;
     static Settings ACTIVE_BOARD;
-    //static Setting HAS_ACTIVE_BOARD;
     static Settings SETTINGS_TAB;
 
-    //static Setting HK_ENABLE_KEYBINDS_HAS;
     static Settings HK_ENABLE_KEYBINDS_KEY;
-    //static Setting HK_DISABLE_KEYBINDS_HAS;
     static Settings HK_DISABLE_KEYBINDS_KEY;
-    //static Setting HK_STOP_SOUNDS_HAS;
     static Settings HK_STOP_SOUNDS_KEY;
-    //static Setting HK_PAUSE_SOUNDS_HAS;
     static Settings HK_PAUSE_SOUNDS_KEY;
-    //static Setting HK_RESUME_SOUNDS_HAS;
     static Settings HK_RESUME_SOUNDS_KEY;
-    //static Setting HK_MUTE_INPUT_HAS;
     static Settings HK_MUTE_INPUT_KEY;
-    //static Setting HK_UNMUTE_INPUT_HAS;
     static Settings HK_UNMUTE_INPUT_KEY;
-    //static Setting HK_TOGGLE_MUTE_INPUT_HAS;
     static Settings HK_TOGGLE_MUTE_INPUT_KEY;
     static Settings NON_NATIVE_KEYNAMING;
 

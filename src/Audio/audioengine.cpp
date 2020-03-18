@@ -15,7 +15,7 @@
 size_t AudioEngine::FRAMES_PER_BUFFER = 256;
 size_t AudioEngine::CHANNELS = 2;
 
-AudioEngine::AudioEngine(Main* _main) : _main(_main) {
+AudioEngine::AudioEngine() : QObject() {
 }
 AudioEngine::~AudioEngine() {
     Pa_Terminate();
@@ -207,7 +207,7 @@ const QList<Device*> AudioEngine::inputs() {
 }
 
 void AudioEngine::init() {
-    _main->showAudioEngineText(true);
+    emit refreshing();
     _inputObject = new AudioObjectInput();
     _inputObject->setOutput0(Settings::INPUT_OUT0.value().toBool());
     _inputObject->setOutput1(Settings::INPUT_OUT1.value().toBool());
@@ -224,7 +224,7 @@ bool AudioEngine::isInitialized() {
 }
 
 void AudioEngine::refreshDevices() {
-    _main->showAudioEngineText(true);
+    emit refreshing();
 
     int devices = Pa_GetDeviceCount();
     std::cout << "Refreshing devices... [" << devices << "]" << std::endl;
@@ -328,7 +328,7 @@ void AudioEngine::refreshDevices() {
         addActiveInput(_defaultInput);
     }
 
-    _main->showAudioEngineText(false);
+    emit finishedRefreshing();
 }
 
 Device* AudioEngine::getDevice(int deviceIndex) {

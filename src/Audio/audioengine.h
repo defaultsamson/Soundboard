@@ -1,14 +1,12 @@
 #ifndef AUDIOENGINE_H
 #define AUDIOENGINE_H
 
-#include <QObject>
-#include <QList>
-
 #include "audioobjectinput.h"
 #include "audioobjectfile.h"
-#include "../Widget/listitemsound.h"
-
 #include "device.h"
+
+#include <QObject>
+#include <QList>
 #include <memory>
 
 // TODO allow the user to change these
@@ -19,10 +17,13 @@ struct CallbackInfo {
     Device* device;
 };
 
-class AudioEngine
+class AudioEngine : public QObject
 {
+
+    Q_OBJECT
+
 public:
-    AudioEngine(Main* _main);
+    AudioEngine();
 
     static size_t FRAMES_PER_BUFFER;
     static size_t CHANNELS;
@@ -74,7 +75,6 @@ public:
     ~AudioEngine();
 
 private:
-    Main* _main;
     bool _isInitialized = false;
 
     Device* _defaultOutput = nullptr;
@@ -93,6 +93,10 @@ private:
     void updateListIndexes(bool inputs, bool outputs);
 
     Device* getDevice(int deviceIndex);
+
+signals:
+    void refreshing();
+    void finishedRefreshing();
 };
 
 #endif // AUDIOENGINE_H
