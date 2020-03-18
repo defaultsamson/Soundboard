@@ -1,7 +1,6 @@
 #include "widgetvolume.h"
 
 #include <QHBoxLayout>
-#include <iostream>
 
 WidgetVolume::WidgetVolume(QWidget *parent) : QWidget(parent)
 {

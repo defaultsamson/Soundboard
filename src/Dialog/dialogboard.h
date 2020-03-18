@@ -1,9 +1,9 @@
 #ifndef DIALOGBOARD_H
 #define DIALOGBOARD_H
 
-#include <QDialog>
-
 #include "../Widget/listitemboard.h"
+
+#include <QDialog>
 
 class Main;
 
@@ -16,7 +16,7 @@ class DialogBoard : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogBoard(Main* _main, ListItemBoard* board, bool creatingNew = false);
+    explicit DialogBoard(Main* _main, ListItemBoard* _board, bool creatingNew = false);
     ~DialogBoard();
 
 private slots:
@@ -27,7 +27,7 @@ private slots:
 private:
     Ui::DialogBoard* ui;
     Main* _main;
-    ListItemBoard* board;
+    ListItemBoard* _board;
     bool creatingNew;
     bool boardUpdated = false;
 };

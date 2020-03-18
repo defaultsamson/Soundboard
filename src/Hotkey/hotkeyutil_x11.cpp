@@ -1,8 +1,6 @@
 #include "hotkeyutil.h"
 
 #include <X11/XKBlib.h>
-#include <QString>
-#include <QHotkey>
 
 bool HotkeyUtil::keymapInited = false;
 QHash<quint32, QString> HotkeyUtil::keymap = QHash<quint32, QString>();

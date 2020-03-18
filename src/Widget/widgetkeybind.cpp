@@ -1,12 +1,9 @@
 #include "widgetkeybind.h"
-#include "../Dialog/dialogkeybind.h"
 
-#include <QWidget>
-#include <QSizePolicy>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QString>
+#include "../Dialog/dialogkeybind.h"
 #include "../Hotkey/hotkeyutil.h"
+
+#include <QHBoxLayout>
 
 WidgetKeybind::WidgetKeybind(QWidget* parent) :
     QWidget(parent),

@@ -1,8 +1,5 @@
 #include "hotkeyutil.h"
 
-#include <QString>
-#include <QHotkey>
-
 QString HotkeyUtil::keycodeToString(quint32 keycode, bool nonNative) {
     return "(keycode: " + QString::number(keycode) + ")";
 }

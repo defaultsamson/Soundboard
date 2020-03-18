@@ -28,7 +28,7 @@ public:
     bool isMuted() { return _isMuted; }
 
 private:
-    TempBuffer inBuffer;
+    TempBuffer _inBuffer;
 
     bool _output0 = false;
     bool _hasOutput0 = false;

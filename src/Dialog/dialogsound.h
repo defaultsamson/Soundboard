@@ -1,10 +1,10 @@
 #ifndef DIALOGSOUND_H
 #define DIALOGSOUND_H
 
-#include <QDialog>
-
 #include "../Widget/listitemsound.h"
 #include "dialogtestaudio.h"
+
+#include <QDialog>
 
 class Main;
 

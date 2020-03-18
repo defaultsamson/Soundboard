@@ -2,6 +2,7 @@
 #define DIALOGKEYBIND_H
 
 #include "../Widget/widgetkeybind.h"
+
 #include <QDialog>
 #include <QWidget>
 #include <QKeyEvent>

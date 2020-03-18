@@ -1,7 +1,5 @@
 #include "device.h"
 
-#include <memory>
-
 Device::Device(HostInfoContainer* host,
                const PaDeviceInfo* info,
                size_t channels,

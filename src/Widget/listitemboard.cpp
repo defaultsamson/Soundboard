@@ -4,11 +4,7 @@
 #include "listitemsound.h"
 #include "listitem.h"
 
-#include <QJsonObject>
 #include <QJsonArray>
-#include <QString>
-#include <QHotkey>
-#include <QObject>
 
 QString ListItemBoard::NEW_BOARD = "New Board";
 

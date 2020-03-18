@@ -1,11 +1,9 @@
 #include "audioobjectinput.h"
 
-#include "audioengine.h"
-
 void AudioObjectInput::stop() {
     if (stopped) return;
     AudioObject::stop();
-    inBuffer.clear();
+    _inBuffer.clear();
 }
 
 void AudioObjectInput::write(const float* buffer, size_t n) {
@@ -25,7 +23,7 @@ void AudioObjectInput::write(const float* buffer, size_t n) {
         if (!stopped) stop();
     } else {
         stopped = false;
-        inBuffer.write(buffer, n);
+        _inBuffer.write(buffer, n);
     }
 }
 
@@ -36,8 +34,8 @@ size_t AudioObjectInput::read(float* buffer, size_t n) {
         return 0;
     }
     // Makes sure that the inBuffer writing is always ahead of the reading
-    if (inBuffer.writingAhead()) {
-        size_t read = inBuffer.read(buffer, n);
+    if (_inBuffer.writingAhead()) {
+        size_t read = _inBuffer.read(buffer, n);
 
         if (read < n) stop();
 

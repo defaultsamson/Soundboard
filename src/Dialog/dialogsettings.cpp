@@ -1,15 +1,9 @@
 #include "dialogsettings.h"
 #include "ui_dialogsettings.h"
-#include "../mainapp.h"
-#include "../settings.h"
-#include "../Audio/audioengine.h"
-#include "../Audio/audioobjectfile.h"
-#include "dialogtestaudio.h"
 
-#include <QBuffer>
+#include "../settings.h"
+
 #include <QObject>
-#include <QProgressBar>
-#include <QStandardPaths>
 #include <QFileDialog>
 #include <QStyle>
 

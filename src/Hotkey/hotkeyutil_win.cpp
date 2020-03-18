@@ -1,7 +1,5 @@
 #include "hotkeyutil.h"
 
-#include <QString>
-#include <QHotkey>
 #include <qt_windows.h>
 
 QString HotkeyUtil::keycodeToString(quint32 keycode, bool nonNative) {

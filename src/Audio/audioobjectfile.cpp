@@ -1,33 +1,29 @@
 #include "audioobjectfile.h"
 
-#include <QString>
 #include <QFile>
-#include <portaudio.h>
-#include "audioengine.h"
-#include "iomultifile.h"
 
 bool AudioObjectFile::isPlaying() { return !isPaused() && !isStopped(); }
-bool AudioObjectFile::isPaused() { return paused; }
+bool AudioObjectFile::isPaused() { return _paused; }
 
 void AudioObjectFile::stop() {
     AudioObject::stop();
-    paused = false;
+    _paused = false;
     _file.clear();
 }
 
 void AudioObjectFile::pause() {
     if (!stopped) {
         emit update(0);
-        paused = true;
+        _paused = true;
         stopped = false;
     }
 }
 
 void AudioObjectFile::play() {
     if (!_hasFile) return;
-    if (paused) {
+    if (_paused) {
         // Resume
-        paused = false;
+        _paused = false;
     } else {
         stopped = false;
         _file.startRead();
@@ -42,7 +38,7 @@ size_t AudioObjectFile::read(float* buffer, size_t n) {
 }
 
 bool AudioObjectFile::doMix() {
-    return !stopped && !paused && _hasFile;
+    return !stopped && !_paused && _hasFile;
 }
 
 void AudioObjectFile::setFile(const QString &filename) {

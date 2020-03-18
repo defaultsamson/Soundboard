@@ -1,10 +1,10 @@
 #ifndef AUDIOOBJECTFILE_H
 #define AUDIOOBJECTFILE_H
 
-#include <QString>
-
 #include "audioobject.h"
 #include "iomultifile.h"
+
+#include <QString>
 #include <portaudio.h>
 #include <sndfile.hh>
 #include <string>
@@ -33,7 +33,7 @@ private:
     IOMultiFile _file;
     std::string _filename;
     bool _hasFile = false;
-    bool paused = false;
+    bool _paused = false;
 };
 
 #endif // AUDIOOBJECTFILE_H

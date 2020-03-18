@@ -1,8 +1,6 @@
 #include "audioengine.h"
 
-#include "audioobject.h"
 #include "../settings.h"
-#include "../mainapp.h"
 
 #include <portaudio.h>
 #ifdef Q_OS_LINUX
@@ -358,7 +356,7 @@ void AudioEngine::mix(float* buffer, size_t framesPerBuffer, size_t channels, in
     // Fills the buffer with zeros
     memset(buffer, 0, frames * sizeof(float));
 
-    for (AudioObject* audio : _audioObjectRegistry) {
+    for (AudioObjectFile* audio : _audioObjectRegistry) {
         audio->mix(buffer, framesPerBuffer, channels, deviceListIndex, deviceVolume, singleDevice);
     }
 }

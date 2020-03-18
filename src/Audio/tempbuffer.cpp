@@ -4,7 +4,7 @@
 
 TempBuffer::TempBuffer() {
     // Set up _buffer to hold as much data as a device's total requested frames (frames per buffer * channels), times the BUFFER_MULTIPLIER
-    _buffer = new float[BUFFER_BYTES];
+    _buffer = new float[_BUFFER_BYTES];
     clear();
 }
 
@@ -17,9 +17,9 @@ void TempBuffer::forwardWriteIndex(size_t n) {
     // If the _writeIndex has reached the BUFFER_MULTIPLIER, the next write will
     // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
     // WARNING: This assumes that _writeIndex can only loop ahead at max 1 time
-    if (_writeIndex >= BUFFER_BYTES) {
+    if (_writeIndex >= _BUFFER_BYTES) {
         _writingLoopsAhead++;
-        _writeIndex -= BUFFER_BYTES;
+        _writeIndex -= _BUFFER_BYTES;
     }
 }
 
@@ -28,9 +28,9 @@ void TempBuffer::forwardReadIndex(size_t n) {
     // If the _writeIndex has reached the BUFFER_MULTIPLIER, the next write will
     // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
     // WARNING: This assumes that _writeIndex can only loop ahead at max 1 time
-    if (_readIndex >= BUFFER_BYTES) {
+    if (_readIndex >= _BUFFER_BYTES) {
         _writingLoopsAhead--;
-        _readIndex -= BUFFER_BYTES;
+        _readIndex -= _BUFFER_BYTES;
     }
 }
 
@@ -43,7 +43,7 @@ void TempBuffer::applyVolume(size_t n, float volume) {
 // This requires write() to be called with forwardWriteIndex = false
 size_t TempBuffer::monoToStereo(size_t n) {
     // The number of bytes at the end of _buffer to write before it loops
-    size_t bytesBeforeLoop = BUFFER_BYTES - _writeIndex;
+    size_t bytesBeforeLoop = _BUFFER_BYTES - _writeIndex;
     float* start = _buffer + _writeIndex;
     size_t OUTPUT_LENGTH = n * 2;
 
@@ -102,12 +102,12 @@ void TempBuffer::write(const float* buffer, size_t n, bool overwrite, bool forwa
     // If the _writeIndex has reached the BUFFER_MULTIPLIER, the next write will
     // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
     // WARNING: This assumes that _writeIndex can only loop ahead at max 1 time
-    if (endWriteIndex >= BUFFER_BYTES) {
+    if (endWriteIndex >= _BUFFER_BYTES) {
         if (forwardWriteIndex) {
             _writingLoopsAhead++;
-            _writeIndex -= BUFFER_BYTES;
+            _writeIndex -= _BUFFER_BYTES;
         }
-        endWriteIndex -= BUFFER_BYTES;
+        endWriteIndex -= _BUFFER_BYTES;
         writingLooped = true;
     }
 
@@ -153,12 +153,12 @@ size_t TempBuffer::read(float* buffer, size_t n, float volume, bool overwrite, b
 
     // If the _readIndex has reached the BUFFER_MULTIPLIER, the next read will
     // surpass the limit of _buffer. To avoid this, we loop it back around to the beginning
-    if (endReadIndex >= BUFFER_BYTES) {
+    if (endReadIndex >= _BUFFER_BYTES) {
         if (forwardReadIndex) {
             _writingLoopsAhead--;
-            _readIndex -= BUFFER_BYTES;
+            _readIndex -= _BUFFER_BYTES;
         }
-        endReadIndex -= BUFFER_BYTES;
+        endReadIndex -= _BUFFER_BYTES;
         readingLooped = true;
     }
 
@@ -218,12 +218,12 @@ size_t TempBuffer::applySampleRateChange(size_t n, size_t channels, SRC_STATE* s
     float* inBuffer = nullptr;
 
     // If reading n bytes from _buffer would go past BUFFER_BYTES
-    if (n + _writeIndex > BUFFER_BYTES) {
+    if (n + _writeIndex > _BUFFER_BYTES) {
         // Fill a temporary inBuffer
         inBuffer = new float[n];
         data.data_in = inBuffer;
 
-        size_t preLoop = BUFFER_BYTES - _writeIndex;
+        size_t preLoop = _BUFFER_BYTES - _writeIndex;
         memcpy(inBuffer          , _buffer + _writeIndex, preLoop       * sizeof(float));
         memcpy(inBuffer + preLoop, _buffer              , (n - preLoop) * sizeof(float));
 
@@ -258,7 +258,7 @@ size_t TempBuffer::availableRead() {
     if (_writingLoopsAhead > 0) {
         // If the writing is a loop ahead, the available bytes in _buffer to be read is
         // _buffer = [0 ... <-_writeIndex ... _readIndex-> ... (BUFFER_BYTES - 1)]
-        maxN = _writeIndex + (BUFFER_BYTES - _readIndex);
+        maxN = _writeIndex + (_BUFFER_BYTES - _readIndex);
     } else {
         // _buffer = [0 ... _readIndex-> ... <-_writeIndex ... (BUFFER_BYTES - 1)]
         maxN = _writeIndex - _readIndex;
@@ -281,5 +281,5 @@ void TempBuffer::clear() {
     _writeIndex = 0;
     _readIndex = 0;
     _writingLoopsAhead = 0;
-    memset(_buffer, 0, BUFFER_BYTES * sizeof(float));
+    memset(_buffer, 0, _BUFFER_BYTES * sizeof(float));
 }

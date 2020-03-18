@@ -1,11 +1,6 @@
 #include "listitemsound.h"
-#include "../mainapp.h"
 
-#include <QListWidgetItem>
-#include <QJsonObject>
-#include <QString>
-#include <QHotkey>
-#include <QUrl>
+#include "../mainapp.h"
 
 QString ListItemSound::NEW_SOUND = "New Sound";
 

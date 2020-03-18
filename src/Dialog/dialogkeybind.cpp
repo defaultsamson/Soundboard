@@ -1,11 +1,7 @@
 #include "dialogkeybind.h"
 #include "ui_dialogkeybind.h"
 
-#include "../Widget/widgetkeybind.h"
-#include <QKeyEvent>
 #include <QThread>
-#include <QMutex>
-#include <memory>
 
 #include "../Hotkey/hotkeyutil.h"
 

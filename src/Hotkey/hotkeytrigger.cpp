@@ -1,10 +1,9 @@
 #include "hotkeytrigger.h"
 
-#include <QObject>
-#include <QHotkey>
 #include "../mainapp.h"
-#include "../Hotkey/hotkeypass.h"
 #include "../Hotkey/hotkeyutil.h"
+
+#include <QHotkey>
 
 HotkeyTrigger::HotkeyTrigger(Main* _main, std::function<void()> trigger)
     : QObject(),

@@ -1,10 +1,10 @@
 #ifndef HOTKEYTRIGGER_H
 #define HOTKEYTRIGGER_H
 
+#include "../Hotkey/hotkeypass.h"
+
 #include <functional>
 #include <QObject>
-#include <QHotkey>
-#include "../Hotkey/hotkeypass.h"
 
 class Main;
 

@@ -1,7 +1,6 @@
 #include "hotkeypass.h"
 
 #include <QObject>
-#include <QHotkey>
 
 HotkeyPass::HotkeyPass(QObject* parent) :
     QHotkey(parent)

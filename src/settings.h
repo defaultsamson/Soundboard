@@ -9,6 +9,8 @@
 class Settings
 {
 public:
+    static QSettings* QSETTINGS;
+
     static Settings DARK_THEME;
     static Settings ACTIVE_BOARD;
     static Settings SETTINGS_TAB;
@@ -55,8 +57,6 @@ public:
     static Settings TEST_FILE;
 
 private:
-    static QSettings* SETTINGS;
-
     Settings(const QString key, const QVariant defaultValue = QVariant())
         : _key(key), _defaultValue(defaultValue) {}
 

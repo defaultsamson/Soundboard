@@ -33,8 +33,8 @@ private:
     // When that happens, we need to make sure that there's enough of a buffer for
     // all of those consecutive reads, and fresh space for all the new writes.
     // When writing to the audio buffer
-    const size_t FRAMES = 256 * 2; // AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
-    const size_t BUFFER_BYTES = FRAMES * 64;
+    const size_t _FRAMES = 256 * 2; // AudioEngine::FRAMES_PER_BUFFER * AudioEngine::CHANNELS;
+    const size_t _BUFFER_BYTES = _FRAMES * 64;
 
     float* _buffer = nullptr;
     size_t _writeIndex = 0;

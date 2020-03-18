@@ -1,9 +1,9 @@
 #ifndef LISTITEM_H
 #define LISTITEM_H
 
-#include <QListWidgetItem>
-#include <QHotkey>
 #include "../Hotkey/hotkeytrigger.h"
+
+#include <QListWidgetItem>
 
 class Main;
 

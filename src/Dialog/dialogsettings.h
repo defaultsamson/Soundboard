@@ -1,14 +1,13 @@
 #ifndef DIALOGSETTINGS_H
 #define DIALOGSETTINGS_H
 
-#include <QDialog>
-#include <QComboBox>
-#include <QPushButton>
 #include "../Audio/audioobjectfile.h"
 #include "../Audio/audioengine.h"
 #include "dialogtestaudio.h"
+#include "../mainapp.h"
 
-#include <portaudio.h>
+#include <QComboBox>
+#include <QPushButton>
 
 class Main;
 

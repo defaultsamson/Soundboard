@@ -1,15 +1,15 @@
 #include "settings.h"
 
 const QVariant Settings::value() {
-    return SETTINGS->value(_key, _defaultValue);
+    return QSETTINGS->value(_key, _defaultValue);
 }
 
 void Settings::setValue(const QVariant value) {
-    SETTINGS->setValue(_key, value);
+    QSETTINGS->setValue(_key, value);
 }
 
 bool Settings::hasValue() {
-    QVariant val = SETTINGS->value(_key);
+    QVariant val = QSETTINGS->value(_key);
     return !val.isNull() && val.isValid();
 }
 
@@ -17,7 +17,7 @@ void Settings::clearValue() {
     setValue(QVariant());
 }
 
-QSettings* Settings::SETTINGS = new QSettings(FileUtil::DEFAULT_DIR + FileUtil::SETTINGS_FILE, QSettings::IniFormat);
+QSettings* Settings::QSETTINGS = new QSettings(FileUtil::DEFAULT_DIR + FileUtil::SETTINGS_FILE, QSettings::IniFormat);
 
 Settings Settings::DARK_THEME = Settings("dark_theme", false);
 Settings Settings::ACTIVE_BOARD = Settings("active_board");

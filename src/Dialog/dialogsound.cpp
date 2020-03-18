@@ -3,9 +3,6 @@
 
 #include "../mainapp.h"
 #include "../settings.h"
-#include "../Widget/listitemsound.h"
-#include "dialogtestaudio.h"
-#include "../Audio/audioobjectfile.h"
 
 #include <QObject>
 #include <QFileDialog>

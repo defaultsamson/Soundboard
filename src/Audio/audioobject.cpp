@@ -1,9 +1,5 @@
 #include "audioobject.h"
 
-#include <QString>
-#include <QFile>
-#include <portaudio.h>
-
 AudioObject::AudioObject() {
 }
 

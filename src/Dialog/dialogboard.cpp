@@ -3,7 +3,6 @@
 
 #include "../mainapp.h"
 #include "../settings.h"
-#include "../Widget/listitemboard.h"
 
 #include <QObject>
 
@@ -11,7 +10,7 @@ DialogBoard::DialogBoard(Main* _main, ListItemBoard* board, bool creatingNew) :
     QDialog(_main),
     ui(new Ui::DialogBoard),
     _main(_main),
-    board(board),
+    _board(board),
     creatingNew(creatingNew)
 {
     ui->setupUi(this);
@@ -37,19 +36,19 @@ DialogBoard::~DialogBoard()
 
 void DialogBoard::on_buttonBox_accepted()
 {
-    QString originalName = board->text();
-    quint32 originalHasKey = board->hasKey();
-    quint32 originalKey = board->key();
+    QString originalName = _board->text();
+    quint32 originalHasKey = _board->hasKey();
+    quint32 originalKey = _board->key();
 
-    board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
-    if (ui->keybindBoard->hasKey()) board->setKey(ui->keybindBoard->key());
-    else board->unSetKey();
+    _board->setText(ui->lineEditName->text().length() > 0 ? ui->lineEditName->text() : ListItemBoard::NEW_BOARD);
+    if (ui->keybindBoard->hasKey()) _board->setKey(ui->keybindBoard->key());
+    else _board->unSetKey();
 
     // If anything's ACTUALLY changed, then tell the program
     if (creatingNew
-            || board->text() != originalName
-            || board->hasKey() != originalHasKey
-            || board->key() != originalKey) {
+            || _board->text() != originalName
+            || _board->hasKey() != originalHasKey
+            || _board->key() != originalKey) {
         _main->setChanged();
     }
 
@@ -65,7 +64,7 @@ void DialogBoard::on_buttonBox_rejected()
 void DialogBoard::onClose() {
     // Remove the board if it's being created new and wasn't saved (e.g. hit "OK: on)
     if (creatingNew && !boardUpdated) {
-       _main->removeBoard(board, true);
+       _main->removeBoard(_board, true);
     }
     // Re-enable the keybinds
     _main->enableKeybinds();

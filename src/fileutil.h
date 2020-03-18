@@ -2,7 +2,6 @@
 #define FILEUTIL_H
 
 #include <QString>
-#include <QStandardPaths>
 
 class FileUtil {
 public:

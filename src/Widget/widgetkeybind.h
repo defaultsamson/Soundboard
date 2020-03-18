@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QPushButton>
-#include <QFocusEvent>
 
 class WidgetKeybind : public QWidget
 {

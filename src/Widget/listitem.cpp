@@ -1,17 +1,11 @@
 #include "listitem.h"
 
 #include "../mainapp.h"
-#include "../Hotkey/hotkeypass.h"
-#include "../Hotkey/hotkeyutil.h"
-#include "../Hotkey/hotkeytrigger.h"
-#include <QHotkey>
-#include <functional>
 
 ListItem::ListItem(Main* _main) :
     HotkeyTrigger(_main, [this]{ trigger(); })
 {
 }
-
 
 void ListItem::load(const QJsonObject &json) {
     setText(json["name"].toString());

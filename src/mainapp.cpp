@@ -1,14 +1,9 @@
 #include "mainapp.h"
 #include "ui_mainapp.h"
 
-#include "Audio/audioengine.h"
-#include "Widget/listitemboard.h"
-#include "Widget/listitemsound.h"
 #include "Dialog/dialogboard.h"
 #include "Dialog/dialogsound.h"
 #include "Dialog/dialogsettings.h"
-#include "Dialog/dialogtestaudio.h"
-#include "Hotkey/hotkeytrigger.h"
 #include "fileutil.h"
 #include "settings.h"
 
@@ -21,12 +16,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFileDialog>
-#include <QModelIndex>
 #include <QObject>
 #include <QAbstractItemModel>
 #include <QThread>
 #include <QCloseEvent>
-#include <QMessageBox>
 #include <QGroupBox>
 
 class MyThread : public QThread
@@ -196,6 +189,8 @@ Main::~Main()
 {
     clear();
     delete ui;
+
+    delete Settings::QSETTINGS;
 
     delete hkEnableKeybinds;
     delete hkDisableKeybinds;

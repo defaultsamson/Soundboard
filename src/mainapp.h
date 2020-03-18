@@ -1,20 +1,18 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
 
+#include "Audio/audioengine.h"
+#include "Dialog/dialogtestaudio.h"
+#include "Widget/listitemboard.h"
+#include "Widget/listitemsound.h"
+#include "Hotkey/hotkeytrigger.h"
+
 #include <QMainWindow>
 #include <QListWidgetItem>
 #include <QString>
 #include <QWidget>
 #include <QModelIndex>
 #include <QMessageBox>
-
-#include "Audio/audioengine.h"
-#include "Dialog/dialogsettings.h"
-#include "Dialog/dialogtestaudio.h"
-#include "Widget/listitem.h"
-#include "Widget/listitemboard.h"
-#include "Widget/listitemsound.h"
-#include "Hotkey/hotkeytrigger.h"
 
 namespace Ui {
 class MainApp;

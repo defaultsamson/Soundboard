@@ -2,13 +2,11 @@
 #define LISTITEMSOUND_H
 
 #include "listitem.h"
+#include "../Audio/audioobjectfile.h"
 
 #include <QString>
 #include <QJsonObject>
-#include <QHotkey>
 #include <QFile>
-
-#include "../Audio/audioobjectfile.h"
 
 class Main;
 class ListItemBoard;

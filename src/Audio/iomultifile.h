@@ -1,12 +1,13 @@
 #ifndef IOMULTIFILE_H
 #define IOMULTIFILE_H
 
+#include "tempbuffer.h"
+
 #include <string>
 #include <QList>
 #include <sndfile.hh>
 #include <samplerate.h>
 #include <mutex>
-#include "tempbuffer.h"
 
 class IOMultiFile
 {
@@ -20,17 +21,17 @@ public:
     void clear();
     void startRead();
 private:
-    SRC_STATE* state;
-    SRC_DATA data;
+    SRC_STATE* _state = nullptr;
+    SRC_DATA _data;
     TempBuffer _buffer;
-    double _inverseRatio;
     QList<SndfileHandle*> _openFiles;
-    std::mutex modifyLock;
+    std::mutex _modifyLock;
     std::string _filename;
-    int _channels = 0;
-    bool mono = false;
+    size_t _channels = 0;
+    bool _mono = false;
 
-    size_t READ_MULTIPLIER = 8;
+    // This makes the files need to read _READ_MULTIPLIER times fewer (it may need to read more anyways if there's samplerate changes to be made)
+    size_t _READ_MULTIPLIER = 8;
 };
 
 #endif // IOMULTIFILE_H
