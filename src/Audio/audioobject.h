@@ -31,7 +31,7 @@ private:
     int _volumeInt = 100; // 0 - 100
     float _volume = 1; // 0.0 - 1.0
 
-    TempBuffer tempBuffer;
+    TempBuffer _tempBuffer;
 
     bool device0Finished = false;
     bool _updateVisualiser = false;

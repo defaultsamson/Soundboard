@@ -15,12 +15,12 @@ ListItemSound::ListItemSound(Main* _main, ListItemBoard* board) :
     _audio(new AudioObjectFile())
 {
     setText(NEW_SOUND);
-    _main->audio()->registerAudio(_audio);
+    _main->audio().registerAudio(_audio);
 }
 
 ListItemSound::~ListItemSound() {
     board->removeSound(this, false);
-    _main->audio()->unregisterAudio(_audio);
+    _main->audio().unregisterAudio(_audio);
     delete _audio;
 }
 

@@ -15,7 +15,7 @@ void AudioObject::stop() {
     emit update(0);
     stopped = true;
     device0Finished = false;
-    tempBuffer.clear();
+    _tempBuffer.clear();
 }
 
 void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channels*/, int deviceListIndex, float deviceVolume, bool singleDevice) {
@@ -42,7 +42,7 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
 
         // If it's not the only device, sill the tempBuffer
         if (!singleDevice)
-            tempBuffer.write(readBuffer, readCount);
+            _tempBuffer.write(readBuffer, readCount);
 
         float maxLevel = 0;
         // Read the amount of bytes read from mixBuffer into buffer, and apply the volume
@@ -68,12 +68,12 @@ void AudioObject::mix(float* buffer, size_t /*framesPerBuffer*/, size_t /*channe
 
     // Makes sure that the sideBuffer writing is always ahead of the reading
     } else {
-        tempBuffer.read(buffer, frames, finalVolume, false);
+        _tempBuffer.read(buffer, frames, finalVolume, false);
 
         // If the first device stopped reading the file, and the other device has caught up
         // Note: sideBufferRead should never be > sideBufferWrite, we want this to stop
         // when they are equal, but JUST in case, we use >=
-        if (device0Finished && tempBuffer.readCaughtUp()) {
+        if (device0Finished && _tempBuffer.readCaughtUp()) {
             stop();
         }
     }

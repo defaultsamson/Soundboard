@@ -156,7 +156,7 @@ void DialogSound::audioEngineInit() {
 }
 
 void DialogSound::updateTestButtons() {
-    bool enabled = _main->audio()->isInitialized() && sound->audio()->hasFile();
+    bool enabled = _main->audio().isInitialized() && sound->audio()->hasFile();
 
     ui->pushButtonPlay->setEnabled(enabled);
     ui->pushButtonPause->setEnabled(enabled);

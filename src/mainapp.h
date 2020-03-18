@@ -42,7 +42,7 @@ public:
     void removeSound(int row, bool wasNew = false);
     ListItemSound* getSound(int row);
     void setDarkTheme(bool set = true);
-    AudioEngine* audio();
+    AudioEngine& audio();
 
     // This is only used while initializing the AudioEngine, makes the audio player work better
     void setAudioTestDialog(DialogTestAudio*);
@@ -108,7 +108,7 @@ public slots:
 
 private:
     Ui::MainApp* ui;
-    AudioEngine* _audio;
+    AudioEngine _audio;
     bool hasFile = false;
     QString fileName;
     ListItemBoard* currentBoard = nullptr;

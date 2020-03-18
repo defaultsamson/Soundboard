@@ -51,7 +51,7 @@ void MyThread::run()
         QFile::copy(":/audio/res/test.ogg", FileUtil::DEFAULT_TEST_FILE);
     }
 
-    _main->audio()->init();
+    _main->audio().init();
     if (_main->getAudioTestDialog()) _main->getAudioTestDialog()->audioEngineInit();
 }
 
@@ -98,13 +98,12 @@ int main(int argc, char *argv[])
 Main::Main(QWidget* parent) :
     QMainWindow(parent),
     ui(new Ui::MainApp),
-    _audio(new AudioEngine()),
     defaultPalette(qApp->palette())
 {
     ui->setupUi(this);
 
-    QObject::connect(_audio, &AudioEngine::refreshing, this, [&]{ ui->labelAudioEngine->show(); });
-    QObject::connect(_audio, &AudioEngine::finishedRefreshing, this, [&]{ ui->labelAudioEngine->hide(); });
+    QObject::connect(&_audio, &AudioEngine::refreshing, this, [&]{ ui->labelAudioEngine->show(); });
+    QObject::connect(&_audio, &AudioEngine::finishedRefreshing, this, [&]{ ui->labelAudioEngine->hide(); });
 
     // Sets up the onSoundMoved event
     QObject::connect(ui->listSounds->model(), &QAbstractItemModel::rowsMoved, this, &Main::onSoundMoved);
@@ -159,32 +158,32 @@ Main::Main(QWidget* parent) :
         hkDisableKeybinds->setKey(Settings::HK_DISABLE_KEYBINDS_KEY.value().toUInt());
         hkDisableKeybinds->reg();
     }
-    hkStopSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->stop(); });
+    hkStopSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) sound->stop(); });
     if (Settings::HK_STOP_SOUNDS_KEY.hasValue()) {
         hkStopSounds->setKey(Settings::HK_STOP_SOUNDS_KEY.value().toUInt());
         hkStopSounds->reg();
     }
-    hkPauseSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) sound->pause(); });
+    hkPauseSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) sound->pause(); });
     if (Settings::HK_PAUSE_SOUNDS_KEY.hasValue()) {
         hkPauseSounds->setKey(Settings::HK_PAUSE_SOUNDS_KEY.value().toUInt());
         hkPauseSounds->reg();
     }
-    hkResumeSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio->audioRegistry()) if (sound->isPaused()) sound->play(); });
+    hkResumeSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) if (sound->isPaused()) sound->play(); });
     if (Settings::HK_RESUME_SOUNDS_KEY.hasValue()) {
         hkResumeSounds->setKey(Settings::HK_RESUME_SOUNDS_KEY.value().toUInt());
         hkResumeSounds->reg();
     }
-    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(true); updateMuteButton(); });
+    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(true); updateMuteButton(); });
     if (Settings::HK_MUTE_INPUT_KEY.hasValue()) {
         hkMuteInput->setKey(Settings::HK_MUTE_INPUT_KEY.value().toUInt());
         hkMuteInput->reg();
     }
-    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(false); updateMuteButton(); });
+    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(false); updateMuteButton(); });
     if (Settings::HK_UNMUTE_INPUT_KEY.hasValue()) {
         hkUnmuteInput->setKey(Settings::HK_UNMUTE_INPUT_KEY.value().toUInt());
         hkUnmuteInput->reg();
     }
-    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio->inputObject()) _audio->inputObject()->setMute(!_audio->inputObject()->isMuted()); updateMuteButton(); });
+    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(!_audio.inputObject()->isMuted()); updateMuteButton(); });
     if (Settings::HK_TOGGLE_MUTE_INPUT_KEY.hasValue()) {
         hkToggleMuteInput->setKey(Settings::HK_TOGGLE_MUTE_INPUT_KEY.value().toUInt());
         hkToggleMuteInput->reg();
@@ -197,7 +196,6 @@ Main::~Main()
 {
     clear();
     delete ui;
-    delete _audio;
 
     delete hkEnableKeybinds;
     delete hkDisableKeybinds;
@@ -692,7 +690,7 @@ void Main::setDarkTheme(bool set) {
     Settings::DARK_THEME.setValue(set);
 }
 
-AudioEngine *Main::audio() {
+AudioEngine& Main::audio() {
     return _audio;
 }
 
@@ -726,7 +724,7 @@ void Main::closeEvent (QCloseEvent* event)
     QList<int> sizes = ui->splitter->sizes();
     Settings::WINDOW_MAIN_SPLITTER0.setValue(sizes.at(0));
     Settings::WINDOW_MAIN_SPLITTER1.setValue(sizes.at(1));
-    Settings::INPUT_MUTED.setValue(_audio->inputObject()->isMuted());
+    Settings::INPUT_MUTED.setValue(_audio.inputObject()->isMuted());
 }
 
 void Main::setChanged(bool changed) {
@@ -859,22 +857,22 @@ void Main::restoreSizes() {
 
 void Main::updateMuteButton() {
     // If it wants to show, and there's an ACTIVE input device
-    if (_audio->activeInputs().size() > 0
-            && _audio->inputObject()
-            && ((_audio->inputObject()->isActiveOutput0() && _audio->getActiveDisplayOutput(0))
-                || (_audio->inputObject()->isActiveOutput1() && _audio->getActiveDisplayOutput(1)))
+    if (_audio.activeInputs().size() > 0
+            && _audio.inputObject()
+            && ((_audio.inputObject()->isActiveOutput0() && _audio.getActiveDisplayOutput(0))
+                || (_audio.inputObject()->isActiveOutput1() && _audio.getActiveDisplayOutput(1)))
             && Settings::SHOW_MUTE_BUTTON.value().toBool())
     {
         ui->muteButton->show();
-        ui->muteButton->setIcon(QIcon(_audio->inputObject()->isMuted() ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
+        ui->muteButton->setIcon(QIcon(_audio.inputObject()->isMuted() ? ":/icons/res/mic_off.png" : ":/icons/res/mic_on.png"));
     }
     else ui->muteButton->hide();
 }
 
 void Main::on_muteButton_clicked()
 {
-    if (_audio->inputObject()) {
-        _audio->inputObject()->setMute(!_audio->inputObject()->isMuted());
+    if (_audio.inputObject()) {
+        _audio.inputObject()->setMute(!_audio.inputObject()->isMuted());
         updateMuteButton();
     }
 }
