@@ -293,8 +293,8 @@ void AudioEngine::refreshDevices() {
 
     // Devices are loaded, now determine which are supposed to be active
     Device* out0 = Settings::OUTPUT_INDEX0.hasValue() ? getDevice(Settings::OUTPUT_INDEX0.value().toInt()) : nullptr;
-    Device* out1 = Settings::OUTPUT_INDEX0.hasValue() ? getDevice(Settings::OUTPUT_INDEX1.value().toInt()) : nullptr;
-    Device* in0 = Settings::OUTPUT_INDEX0.hasValue() ? getDevice(Settings::INPUT_INDEX0.value().toInt()) : nullptr;
+    Device* out1 = Settings::OUTPUT_INDEX1.hasValue() ? getDevice(Settings::OUTPUT_INDEX1.value().toInt()) : nullptr;
+    Device* in0 = Settings::INPUT_INDEX0.hasValue() ? getDevice(Settings::INPUT_INDEX0.value().toInt()) : nullptr;
     _inputObject->setMute(Settings::INPUT_MUTED.value().toBool());
 
     // There's a saved device, load it
@@ -302,16 +302,19 @@ void AudioEngine::refreshDevices() {
         out0->indexes()->outputDisplayIndex = 0;
         out0->setVolumeInt(Settings::OUTPUT_VOLUME0.value().toInt());
         addActiveOutput(out0);
+        std::cout << "Setting active output: " << 0 << std::endl;
     }
     if (out1) {
         out1->indexes()->outputDisplayIndex = 1;
         out1->setVolumeInt(Settings::OUTPUT_VOLUME1.value().toInt());
         addActiveOutput(out1);
+        std::cout << "Setting active output: " << 1 << std::endl;
     }
     if (in0) {
         in0->indexes()->inputDisplayIndex = 0;
         _inputObject->setVolumeInt(Settings::INPUT_VOLUME0.value().toInt());
         addActiveInput(in0);
+        std::cout << "Setting active input: " << 0 << std::endl;
     }
 
     // If no device was found, and the devices weren't explicitly all removed, load the defaults
