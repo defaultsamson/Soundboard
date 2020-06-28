@@ -112,3 +112,10 @@ NOTE: The 5.14.0 MingW64 `windeployqt.exe` is bugged. You just need to get an un
 
 Also NOTE: When building, may need to initially say "no" when the script asks if the program didn't run okay, then copy `libportaudio-2.dll`, `libsamplerate-0.dll`, and `libsndfile-1.dll` into `Soundboard/lib`, then continue.
 
+## Common Compile Errors (Linux)
+- `error: 'portaudio.h' file not found`
+    - Solution: `sudo apt install libasound-dev portaudio19-dev`
+- `error: X11/XKBlib.h: No such file or directory`
+    - Solution: `sudo apt install libx11-dev`
+- `error: cannot find -lGL`
+    - Solution: `sudo apt install libgl1-mesa-dev`
