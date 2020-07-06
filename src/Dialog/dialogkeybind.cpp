@@ -38,6 +38,8 @@ void NumlockThread::run()
     this->msleep(TIME_FOR_NUMPAD_HACK);
     if (_keyEventLock->tryLock()) {
         dialog->setKey(_nativeKeyCode);
+        _keyEventLock->unlock();
+        dialog->close();
     }
 }
 
@@ -63,7 +65,6 @@ DialogKeybind::~DialogKeybind()
 void DialogKeybind::setKey(quint32 nativeKeycode) {
     if (stopThreadFromSettingKey) return;
     widget->setKey(nativeKeycode);
-    close();
 }
 
 void DialogKeybind::keyPressEvent(QKeyEvent* e) {
@@ -86,5 +87,6 @@ void DialogKeybind::keyPressEvent(QKeyEvent* e) {
     } else {
         // If there's no thread, and the key isn't numlock
         setKey(e->nativeScanCode());
+        close();
     }
 }
