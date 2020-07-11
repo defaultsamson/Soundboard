@@ -34,6 +34,7 @@ private:
 
 MyThread::MyThread(Main* _main) : _main(_main) {
     QObject::connect(this, SIGNAL(finished()), _main, SLOT(updateMuteButton()));
+    QObject::connect(this, &MyThread::finished, _main, [&]{ delete this; });
 }
 
 void MyThread::run()
@@ -80,10 +81,6 @@ int main(int argc, char *argv[])
         &w,
         [&]{ w.raise(); w.activateWindow(); w.showNormal(); }
     );
-
-    // Initializes audio engine on separate thread so that the UI starts super fast
-    MyThread t(&w);
-    t.start();
 
     return a.exec();
 }
@@ -132,57 +129,13 @@ Main::Main(QWidget* parent) :
 
     // Light, Midlight, Mid, NoRole, PlaceholderText
 
-    setDarkTheme(Settings::DARK_THEME.value().toBool());
-
     // Load the previously active board
     if (Settings::ACTIVE_BOARD.hasValue())
         load(Settings::ACTIVE_BOARD.value().toString());
 
     connect(ui->listSounds, &QListWidget::currentRowChanged, this, &Main::rowChanged);
 
-    // Loads global keybinds & their behaviour
-    hkEnableKeybinds = new HotkeyTrigger(this, [this]{ enableKeybinds(); });
-    if (Settings::HK_ENABLE_KEYBINDS_KEY.hasValue()) {
-        hkEnableKeybinds->setKey(Settings::HK_ENABLE_KEYBINDS_KEY.value().toUInt());
-        hkEnableKeybinds->reg();
-    }
-    hkDisableKeybinds = new HotkeyTrigger(this, [this]{ disableKeybinds(); });
-    if (Settings::HK_DISABLE_KEYBINDS_KEY.hasValue()) {
-        hkDisableKeybinds->setKey(Settings::HK_DISABLE_KEYBINDS_KEY.value().toUInt());
-        hkDisableKeybinds->reg();
-    }
-    hkStopSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) sound->stop(); });
-    if (Settings::HK_STOP_SOUNDS_KEY.hasValue()) {
-        hkStopSounds->setKey(Settings::HK_STOP_SOUNDS_KEY.value().toUInt());
-        hkStopSounds->reg();
-    }
-    hkPauseSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) sound->pause(); });
-    if (Settings::HK_PAUSE_SOUNDS_KEY.hasValue()) {
-        hkPauseSounds->setKey(Settings::HK_PAUSE_SOUNDS_KEY.value().toUInt());
-        hkPauseSounds->reg();
-    }
-    hkResumeSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) if (sound->isPaused()) sound->play(); });
-    if (Settings::HK_RESUME_SOUNDS_KEY.hasValue()) {
-        hkResumeSounds->setKey(Settings::HK_RESUME_SOUNDS_KEY.value().toUInt());
-        hkResumeSounds->reg();
-    }
-    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(true); updateMuteButton(); });
-    if (Settings::HK_MUTE_INPUT_KEY.hasValue()) {
-        hkMuteInput->setKey(Settings::HK_MUTE_INPUT_KEY.value().toUInt());
-        hkMuteInput->reg();
-    }
-    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(false); updateMuteButton(); });
-    if (Settings::HK_UNMUTE_INPUT_KEY.hasValue()) {
-        hkUnmuteInput->setKey(Settings::HK_UNMUTE_INPUT_KEY.value().toUInt());
-        hkUnmuteInput->reg();
-    }
-    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(!_audio.inputObject()->isMuted()); updateMuteButton(); });
-    if (Settings::HK_TOGGLE_MUTE_INPUT_KEY.hasValue()) {
-        hkToggleMuteInput->setKey(Settings::HK_TOGGLE_MUTE_INPUT_KEY.value().toUInt());
-        hkToggleMuteInput->reg();
-    }
-
-    updateMuteButton();
+    loadSettings();
 }
 
 Main::~Main()
@@ -848,6 +801,58 @@ void Main::restoreSizes() {
         ui->splitter->setSizes(sizes);
     }
     updateButtonBar();
+}
+
+void Main::loadSettings() {
+    setDarkTheme(Settings::DARK_THEME.value().toBool());
+
+    // Loads global keybinds & their behaviour
+    hkEnableKeybinds = new HotkeyTrigger(this, [this]{ enableKeybinds(); });
+    if (Settings::HK_ENABLE_KEYBINDS_KEY.hasValue()) {
+        hkEnableKeybinds->setKey(Settings::HK_ENABLE_KEYBINDS_KEY.value().toUInt());
+        hkEnableKeybinds->reg();
+    }
+    hkDisableKeybinds = new HotkeyTrigger(this, [this]{ disableKeybinds(); });
+    if (Settings::HK_DISABLE_KEYBINDS_KEY.hasValue()) {
+        hkDisableKeybinds->setKey(Settings::HK_DISABLE_KEYBINDS_KEY.value().toUInt());
+        hkDisableKeybinds->reg();
+    }
+    hkStopSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) sound->stop(); });
+    if (Settings::HK_STOP_SOUNDS_KEY.hasValue()) {
+        hkStopSounds->setKey(Settings::HK_STOP_SOUNDS_KEY.value().toUInt());
+        hkStopSounds->reg();
+    }
+    hkPauseSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) sound->pause(); });
+    if (Settings::HK_PAUSE_SOUNDS_KEY.hasValue()) {
+        hkPauseSounds->setKey(Settings::HK_PAUSE_SOUNDS_KEY.value().toUInt());
+        hkPauseSounds->reg();
+    }
+    hkResumeSounds = new HotkeyTrigger(this, [this]{ for (auto sound : _audio.audioRegistry()) if (sound->isPaused()) sound->play(); });
+    if (Settings::HK_RESUME_SOUNDS_KEY.hasValue()) {
+        hkResumeSounds->setKey(Settings::HK_RESUME_SOUNDS_KEY.value().toUInt());
+        hkResumeSounds->reg();
+    }
+    hkMuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(true); updateMuteButton(); });
+    if (Settings::HK_MUTE_INPUT_KEY.hasValue()) {
+        hkMuteInput->setKey(Settings::HK_MUTE_INPUT_KEY.value().toUInt());
+        hkMuteInput->reg();
+    }
+    hkUnmuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(false); updateMuteButton(); });
+    if (Settings::HK_UNMUTE_INPUT_KEY.hasValue()) {
+        hkUnmuteInput->setKey(Settings::HK_UNMUTE_INPUT_KEY.value().toUInt());
+        hkUnmuteInput->reg();
+    }
+    hkToggleMuteInput = new HotkeyTrigger(this, [this]{ if (_audio.inputObject()) _audio.inputObject()->setMute(!_audio.inputObject()->isMuted()); updateMuteButton(); });
+    if (Settings::HK_TOGGLE_MUTE_INPUT_KEY.hasValue()) {
+        hkToggleMuteInput->setKey(Settings::HK_TOGGLE_MUTE_INPUT_KEY.value().toUInt());
+        hkToggleMuteInput->reg();
+    }
+
+    updateMuteButton();
+
+    // Initializes audio engine on separate thread so that the UI starts super fast
+    // (no need to delete the memory allocation, it will delete itself upon completion)
+    (new MyThread(this))->start();
 }
 
 void Main::updateMuteButton() {

@@ -57,6 +57,7 @@ public:
     HotkeyTrigger* hkUnmuteInput;
     HotkeyTrigger* hkToggleMuteInput;
 
+    void loadSettings();
     void restoreSizes();
     void updateButtonBar();
 

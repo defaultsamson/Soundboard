@@ -206,6 +206,7 @@ const QList<Device*> AudioEngine::inputs() {
 
 void AudioEngine::init() {
     emit refreshing();
+    Pa_Terminate();
     _inputObject = new AudioObjectInput();
     _inputObject->setOutput0(Settings::INPUT_OUT0.value().toBool());
     _inputObject->setOutput1(Settings::INPUT_OUT1.value().toBool());

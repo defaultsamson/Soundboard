@@ -855,6 +855,7 @@ void DialogSettings::on_buttonRevertSettings_clicked()
         return;
     case QMessageBox::Ok:
         Settings::QSETTINGS->clear();
+        _main->loadSettings();
         break;
     }
 }
