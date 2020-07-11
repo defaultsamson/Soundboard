@@ -840,3 +840,21 @@ void DialogSettings::on_checkBoxNonNativeKeys_clicked()
     Settings::NON_NATIVE_KEYNAMING.setValue(ui->checkBoxNonNativeKeys->isChecked());
     updateKeybindNaming();
 }
+
+void DialogSettings::on_buttonRevertSettings_clicked()
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Reset Settings",
+                                                               tr("Reset ALL settings to their defaults?\n"
+                                                                  "THIS CANNOT BE UNDONE"),
+                                                               QMessageBox::Cancel | QMessageBox::Ok,
+                                                               QMessageBox::Cancel);
+
+    switch (resBtn) {
+    default:
+    case QMessageBox::Cancel:
+        return;
+    case QMessageBox::Ok:
+        Settings::QSETTINGS->clear();
+        break;
+    }
+}

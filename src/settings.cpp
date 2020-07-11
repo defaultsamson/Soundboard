@@ -14,7 +14,8 @@ bool Settings::hasValue() {
 }
 
 void Settings::clearValue() {
-    setValue(QVariant());
+    // Old method. setValue(QVariant());
+    QSETTINGS->remove(_key);
 }
 
 QSettings* Settings::QSETTINGS = new QSettings(FileUtil::DEFAULT_DIR + FileUtil::SETTINGS_FILE, QSettings::IniFormat);

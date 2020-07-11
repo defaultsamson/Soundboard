@@ -68,6 +68,7 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_checkBoxDarkTheme_clicked();
     void on_checkBoxNonNativeKeys_clicked();
+    void on_buttonRevertSettings_clicked();
 
 private:
     Ui::DialogSettings* ui;
