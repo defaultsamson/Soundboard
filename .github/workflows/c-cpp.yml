@@ -17,7 +17,7 @@ jobs:
     - name: Install Dependencies
       run: sudo apt install -y libsndfile-dev libsamplerate-dev libportaudio2 
     
-    - name: Setup Python
+    - name: Install Python 3
       uses: actions/setup-python@v2
       with:
         # Version range or exact version of a Python version to use, using SemVer's version range syntax.
@@ -54,3 +54,9 @@ jobs:
         # py7zrversion: # optional, default is ==0.7
         # Any extra arguments to append to the back
         # extra: # optional
+    
+    - name: Install qdep # https://github.com/Skycoder42/qdep#installation
+      run: |
+        pip install qdep
+        qdep pftgen --qmake ./Qt/5.15.0/gcc_64/bin/qmake
+      
