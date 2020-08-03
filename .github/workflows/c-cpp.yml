@@ -14,18 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install Dependencies
+    - name: Install Native Dependencies
       run: sudo apt install -y libsndfile-dev libsamplerate-dev libportaudio2 libasound-dev portaudio19-dev libx11-dev libgl1-mesa-dev
-    
-    - name: Install Python 3
-      uses: actions/setup-python@v2
-      with:
-        # Version range or exact version of a Python version to use, using SemVer's version range syntax.
-        python-version: 3.x # optional, default is 3.x
-        # The target architecture (x86, x64) of the Python interpreter.
-        # architecture: # optional
-        # Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
-        # token: # optional, default is ${{ github.token }}
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.7.2
@@ -55,14 +45,33 @@ jobs:
         # Any extra arguments to append to the back
         # extra: # optional
     
+    - name: Install Python 3 # Python >= 3.7 Needed for qdep
+      uses: actions/setup-python@v2
+      with:
+        # Version range or exact version of a Python version to use, using SemVer's version range syntax.
+        python-version: 3.x # optional, default is 3.x
+        # The target architecture (x86, x64) of the Python interpreter.
+        # architecture: # optional
+        # Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
+        # token: # optional, default is ${{ github.token }}
+          
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
         pip install qdep
         qdep prfgen --qmake ./Qt/5.15.0/gcc_64/bin/qmake
         
+    - name: Install Deploy Tools
+      run: |
+        wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+        wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+        
     - name: Build Soundboard
       run: |
         ./Qt/5.15.0/gcc_64/bin/qmake Soundboard.pro
         make -j4
+        
+    - name: Package Soundboard # [optional: Qt's qmake executable]
+      run: |
+        ./appimage.sh ./linuxdeploy-x86_64.AppImage .
         ls
       
