@@ -76,6 +76,7 @@ jobs:
         
     - name: Package Soundboard # [optional: Qt's qmake executable]
       run: |
+        export QT_QPA_PLATFORM_PLUGIN_PATH=./Qt/5.15.0/gcc_64/plugins
         ./appimage.sh ./linuxdeploy-x86_64.AppImage .
         ls
       
