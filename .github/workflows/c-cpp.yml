@@ -63,6 +63,6 @@ jobs:
     - name: Build Soundboard
       run: |
         ./Qt/5.15.0/gcc_64/bin/qmake Soundboard.pro
+        make -j4
         ls
-        make -j4 in ./build
       
