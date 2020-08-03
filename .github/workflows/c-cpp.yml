@@ -9,9 +9,38 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
 
     steps:
     - uses: actions/checkout@v2
-    - name: configure
-      run: echo "nocie"
+
+    - name: Install Dependencies
+      run: sudo apt install -y libsndfile-dev libsamplerate-dev libportaudio2 
+    
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.7.2
+      with:
+        # Directory to install Qt
+        dir: . # optional
+        # Version of Qt to install
+        version: 5.15.0 # optional, default is 5.12.9
+        # Host platform
+        # host: # optional
+        # Target platform for build
+        # target: # optional, default is desktop
+        # Architecture for Windows/Android
+        # arch: # optional
+        # Whether or not to install Qt dependencies on Linux
+        # install-deps: # optional, default is true
+        # Additional Qt modules to install
+        # modules: # optional
+        # Force a Qt mirror in case the default is not working
+        # mirror: # optional
+        # Whether or not to actually download Qt
+        # cached: # optional, default is false
+        # Version of aqtinstall to use in case of issues
+        # aqtversion: # optional, default is ==0.9
+        # Version of py7zr to use in case of issues
+        # py7zrversion: # optional, default is ==0.7
+        # Any extra arguments to append to the back
+        # extra: # optional
