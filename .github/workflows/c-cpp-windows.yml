@@ -29,17 +29,13 @@ jobs:
       
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
-        cd ../Qt
+        cd ../Qt/Tools
         dir
-        echo "Next"
-        cd ./5.15.0
-        dir
-        qdep prfgen --qmake ../Qt/5.15.0/win64_mingw73/bin/qmake
         
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
         pip install qdep
-        qdep prfgen --qmake ../Qt/5.15.0/win64_mingw73/bin/qmake
+        qdep prfgen --qmake ../Qt/5.15.0/msvc2019_64/bin/qmake
         
     - name: Build
       run: | 
