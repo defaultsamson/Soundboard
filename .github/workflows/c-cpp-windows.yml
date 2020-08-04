@@ -14,6 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        # Version range or exact version of a Python version to use, using SemVer's version range syntax.
+        python-version: 3.8 # optional, default is 3.x
+        
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.7.2
       with:
@@ -21,12 +27,6 @@ jobs:
         version: 5.15.0 # optional, default is 5.12.9
         arch: win64_mingw73
       
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        # Version range or exact version of a Python version to use, using SemVer's version range syntax.
-        python-version: 3.8 # optional, default is 3.x
-
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
         pip install qdep
