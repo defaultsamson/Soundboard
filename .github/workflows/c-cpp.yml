@@ -80,17 +80,10 @@ jobs:
         ./appimage.sh ./linuxdeploy-x86_64.AppImage .
         mv Soundboard*.AppImage SoundboardLinux64.AppImage
         
-    - name: Upload a Release Asset
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload files to a GitHub release
+      uses: svenstaro/upload-release-action@v2
       with:
-        # The URL for uploading assets to the release
-        upload_url: https://github.com/qwertysam/Soundboard/releases/tag/continuous
-        # The path to the asset you want to upload
-        asset_path: ./SoundboardLinux64.AppImage
-        # The name of the asset you want to upload
-        asset_name: SoundboardLinux64.AppImage
-        # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
-        asset_content_type: application/zip
-
+        repo_token: ${{ secrets.STANDARD }} # ${{ secrets.GITHUB_TOKEN }}
+        file: ./SoundboardLinux64.AppImage
+        tag: ${{ github.ref }}
+        overwrite: true
