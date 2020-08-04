@@ -27,6 +27,10 @@ jobs:
       
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
+        dir
+        
+    - name: Install qdep # https://github.com/Skycoder42/qdep#installation
+      run: |
         pip install qdep
-        qdep prfgen --qmake ./Qt/5.15.0/mingw73_64/bin/qmake
+        qdep prfgen --qmake .\Qt\5.15.0\mingw73_64\bin\qmake
         
