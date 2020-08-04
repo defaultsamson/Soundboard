@@ -25,3 +25,8 @@ jobs:
         # Version range or exact version of a Python version to use, using SemVer's version range syntax.
         python-version: 3.x # optional, default is 3.x
       
+    - name: Install qdep # https://github.com/Skycoder42/qdep#installation
+      run: |
+        pip install qdep
+        qdep prfgen --qmake ./Qt/5.15.0/mingw73_64/bin/qmake
+        
