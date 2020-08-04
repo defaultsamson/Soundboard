@@ -27,10 +27,11 @@ jobs:
       
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
+        cd D:/a/Soundboard/Qt/5.15.0
         dir
         
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
         pip install qdep
-        qdep prfgen --qmake .\Qt\5.15.0\mingw73_64\bin\qmake
+        qdep prfgen --qmake D:/a/Soundboard/Qt/5.15.0/msvc2019_64/bin/qmake
         
