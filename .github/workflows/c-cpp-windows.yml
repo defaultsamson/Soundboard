@@ -25,8 +25,17 @@ jobs:
       with:
         # Version of Qt to install
         version: 5.15.0 # optional, default is 5.12.9
-        arch: win64_mingw73
+        # arch: win64_mingw73
       
+    - name: Install qdep # https://github.com/Skycoder42/qdep#installation
+      run: |
+        cd ../Qt
+        dir
+        echo "Next"
+        cd ./5.15.0
+        dir
+        qdep prfgen --qmake ../Qt/5.15.0/win64_mingw73/bin/qmake
+        
     - name: Install qdep # https://github.com/Skycoder42/qdep#installation
       run: |
         pip install qdep
