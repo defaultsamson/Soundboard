@@ -1,4 +1,4 @@
-# Soundboard
+# Soundboard ![Linux](https://github.com/qwertysam/Soundboard/workflows/Linux/badge.svg) ![Windows](https://github.com/qwertysam/Soundboard/workflows/Windows/badge.svg)
 A Soundboard written in C++
 
 ## Technologies
