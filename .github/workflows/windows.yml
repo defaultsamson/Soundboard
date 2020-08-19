@@ -1,4 +1,4 @@
-name: C/C++ Windows
+name: Windows Build
 
 on:
   push:
