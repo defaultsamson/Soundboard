@@ -1,0 +1,44 @@
+name: Windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        # Version range or exact version of a Python version to use, using SemVer's version range syntax.
+        python-version: 3.8 # optional, default is 3.x
+        
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.7.2
+      with:
+        # Version of Qt to install
+        version: 5.15.0 # optional, default is 5.12.9
+        # arch: win64_mingw73
+      
+    - name: Install qdep # https://github.com/Skycoder42/qdep#installation
+      run: |
+        cd ../Qt/Tools
+        dir
+        
+    - name: Install qdep # https://github.com/Skycoder42/qdep#installation
+      run: |
+        pip install qdep
+        qdep prfgen --qmake ../Qt/5.15.0/msvc2019_64/bin/qmake
+        
+    - name: Build
+      run: | 
+        ../Qt/5.15.0/win64_mingw73/bin/qmake Soundboard.pro
+        ../Qt/mingw730_64/mingw32-make.exe
+        
